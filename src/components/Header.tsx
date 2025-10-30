@@ -1,7 +1,7 @@
 "use client";
 
 import Link from 'next/link';
-import { Disc3, LogOut, User as UserIcon } from 'lucide-react';
+import { Disc3, LogOut, User as UserIcon, Map } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import {
@@ -24,6 +24,7 @@ export default function Header() {
   const navLinks = [
     { href: '/', label: 'Home' },
     { href: '/events', label: 'Events' },
+    { href: '/map', label: 'Map', icon: Map },
     { href: '/dashboard', label: 'Dashboard', requiresAuth: true },
   ];
 
@@ -46,6 +47,7 @@ export default function Header() {
                   pathname === link.href ? '' : 'text-muted-foreground'
                 }`}
               >
+                {link.icon && <link.icon className="mr-2 h-4 w-4 inline-block" />}
                 {link.label}
               </Link>
             )

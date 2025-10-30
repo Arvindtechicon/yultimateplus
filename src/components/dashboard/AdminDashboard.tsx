@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { format } from 'date-fns';
 import QRCode from 'qrcode.react';
 import { Button } from '../ui/button';
+import Link from 'next/link';
 
 export default function AdminDashboard() {
   return (
@@ -62,10 +63,12 @@ export default function AdminDashboard() {
                   </div>
                 </CardContent>
                 <div className="p-4 pt-0">
-                  <Button className="w-full" variant="outline">
-                    <MapPin className="mr-2 h-4 w-4" />
-                    View on Map
-                  </Button>
+                  <Link href={`/map?venueId=${event.venueId}`} passHref>
+                    <Button className="w-full" variant="outline">
+                      <MapPin className="mr-2 h-4 w-4" />
+                      View on Map
+                    </Button>
+                  </Link>
                 </div>
               </Card>
             );

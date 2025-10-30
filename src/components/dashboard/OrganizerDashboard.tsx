@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { Button } from '../ui/button';
 import QRCode from 'qrcode.react';
+import Link from 'next/link';
 
 interface OrganizerDashboardProps {
   user: User;
@@ -69,10 +70,12 @@ export default function OrganizerDashboard({ user }: OrganizerDashboardProps) {
                   </div>
                 </CardContent>
                 <div className="p-4 grid grid-cols-2 gap-2">
-                  <Button variant="outline">
-                      <MapPin className="mr-2 h-4 w-4" />
-                      View on Map
-                  </Button>
+                  <Link href={`/map?venueId=${event.venueId}`} passHref>
+                    <Button variant="outline" className="w-full">
+                        <MapPin className="mr-2 h-4 w-4" />
+                        View on Map
+                    </Button>
+                  </Link>
                   <Button>
                       <Edit className="mr-2 h-4 w-4" />
                       Edit Event

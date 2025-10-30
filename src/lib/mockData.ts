@@ -20,6 +20,10 @@ export interface Venue {
   id: number;
   name:string;
   location: string;
+  coordinates: {
+    lat: number;
+    lng: number;
+  };
 }
 
 export interface Organization {
@@ -43,9 +47,9 @@ export const organizations: Organization[] = [
 ];
 
 export const venues: Venue[] = [
-  { id: 1, name: 'City Park Fields', location: '123 Park Ave, Cityville' },
-  { id: 2, name: 'University Stadium', location: '456 University Dr, Townsville' },
-  { id: 3, name: 'Beachfront Arena', location: '789 Ocean Blvd, Beachtown' },
+  { id: 1, name: 'City Park Fields', location: '123 Park Ave, Cityville', coordinates: { lat: 40.7128, lng: -74.0060 } },
+  { id: 2, name: 'University Stadium', location: '456 University Dr, Townsville', coordinates: { lat: 34.0522, lng: -118.2437 } },
+  { id: 3, name: 'Beachfront Arena', location: '789 Ocean Blvd, Beachtown', coordinates: { lat: 33.7701, lng: -118.1937 } },
 ];
 
 export const events: Event[] = [

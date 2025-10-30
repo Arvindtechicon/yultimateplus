@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Calendar, MapPin, Building, Users } from 'lucide-react';
 import { format } from 'date-fns';
 import QRCode from 'qrcode.react';
+import Link from 'next/link';
 
 export default function EventListPage() {
   return (
@@ -51,10 +52,12 @@ export default function EventListPage() {
                 </div>
               </CardContent>
               <div className="p-6 pt-0">
-                <Button className="w-full" variant="outline">
-                    <MapPin className="mr-2 h-4 w-4" />
-                    View on Map
-                </Button>
+                <Link href={`/map?venueId=${event.venueId}`} passHref>
+                  <Button className="w-full" variant="outline">
+                      <MapPin className="mr-2 h-4 w-4" />
+                      View on Map
+                  </Button>
+                </Link>
               </div>
             </Card>
           );
