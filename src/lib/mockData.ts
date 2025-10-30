@@ -1,0 +1,92 @@
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+  role: 'Admin' | 'Organizer' | 'Participant';
+}
+
+export interface Event {
+  id: number;
+  name: string;
+  date: string;
+  description: string;
+  venueId: number;
+  organizationId: number;
+  type: 'Tournament' | 'Workshop' | 'Meetup';
+  participants: number[]; // array of user IDs
+}
+
+export interface Venue {
+  id: number;
+  name:string;
+  location: string;
+}
+
+export interface Organization {
+  id: number;
+  name: string;
+  organizers: number[]; // array of user IDs
+}
+
+export const users: User[] = [
+  { id: 1, name: 'Admin User', email: 'admin@yultimate.com', role: 'Admin' },
+  { id: 2, name: 'Organizer User', email: 'organizer@yultimate.com', role: 'Organizer' },
+  { id: 3, name: 'Participant User', email: 'participant@yultimate.com', role: 'Participant' },
+  { id: 4, name: 'Jane Doe', email: 'jane@example.com', role: 'Participant' },
+  { id: 5, name: 'John Smith', email: 'john@example.com', role: 'Participant' },
+  { id: 6, name: 'Alice Johnson', email: 'alice@example.com', role: 'Organizer' },
+];
+
+export const organizations: Organization[] = [
+    { id: 1, name: 'Y-Ultimate Sports', organizers: [2, 6] },
+    { id: 2, name: 'Community Frisbee League', organizers: [6] },
+];
+
+export const venues: Venue[] = [
+  { id: 1, name: 'City Park Fields', location: '123 Park Ave, Cityville' },
+  { id: 2, name: 'University Stadium', location: '456 University Dr, Townsville' },
+  { id: 3, name: 'Beachfront Arena', location: '789 Ocean Blvd, Beachtown' },
+];
+
+export const events: Event[] = [
+  {
+    id: 1,
+    name: 'Summer Breeze Tournament',
+    date: '2024-07-20T09:00:00Z',
+    description: 'Annual summer ultimate frisbee tournament. All levels welcome.',
+    venueId: 1,
+    organizationId: 1,
+    type: 'Tournament',
+    participants: [3, 4, 5],
+  },
+  {
+    id: 2,
+    name: 'Advanced Throws Workshop',
+    date: '2024-08-05T14:00:00Z',
+    description: 'Learn advanced throwing techniques from pro players.',
+    venueId: 2,
+    organizationId: 1,
+    type: 'Workshop',
+    participants: [3, 5],
+  },
+  {
+    id: 3,
+    name: 'Weekly Pickup Game',
+    date: '2024-07-25T18:00:00Z',
+    description: 'Casual pickup games for the community.',
+    venueId: 1,
+    organizationId: 2,
+    type: 'Meetup',
+    participants: [3, 4, 5],
+  },
+  {
+    id: 4,
+    name: 'Beach Ultimate Championship',
+    date: '2024-09-10T10:00:00Z',
+    description: 'The final championship on the sunny beaches.',
+    venueId: 3,
+    organizationId: 2,
+    type: 'Tournament',
+    participants: [4, 5],
+  },
+];

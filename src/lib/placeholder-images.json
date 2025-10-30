@@ -1,3 +1,28 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "event-1",
+      "description": "An ultimate frisbee game in a park on a sunny day.",
+      "imageUrl": "https://images.unsplash.com/photo-1704213176120-8d38fdbe4ffe?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxmcmlzYmVlJTIwcGFya3xlbnwwfHx8fDE3NjE4MzYxNjV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "frisbee park"
+    },
+    {
+      "id": "event-2",
+      "description": "A close-up of a player throwing a frisbee disc.",
+      "imageUrl": "https://images.unsplash.com/photo-1606855269773-6359493df697?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxmcmlzYmVlJTIwdGhyb3d8ZW58MHx8fHwxNzYxODM2MTY0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "frisbee throw"
+    },
+    {
+      "id": "event-3",
+      "description": "A group of people at a frisbee meetup.",
+      "imageUrl": "https://images.unsplash.com/photo-1723675376203-52abddd68832?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxmcmlzYmVlJTIwZ3JvdXB8ZW58MHx8fHwxNzYxODM2MTY0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "frisbee group"
+    },
+    {
+      "id": "event-4",
+      "description": "A frisbee game on a beach.",
+      "imageUrl": "https://images.unsplash.com/photo-1589679872279-be2f8d895980?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxiZWFjaCUyMGZyaXNiZWV8ZW58MHx8fHwxNzYxODM2MTY1fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "beach frisbee"
+    }
+  ]
 }
