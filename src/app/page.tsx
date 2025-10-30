@@ -8,22 +8,24 @@ import { useRouter } from 'next/navigation';
 import type { User as UserType } from '@/lib/mockData';
 import { motion } from 'framer-motion';
 import Header from '@/components/Header';
+import { useEffect } from 'react';
 
 export default function Home() {
   const { login, user, loading } = useAuth();
   const router = useRouter();
 
-  if (loading) {
+  useEffect(() => {
+    if (user) {
+      router.push('/dashboard');
+    }
+  }, [user, router]);
+
+  if (loading || user) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background">
         <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
-  }
-
-  if (user) {
-    router.push('/dashboard');
-    return null;
   }
 
   const handleLogin = (role: UserType['role']) => {
