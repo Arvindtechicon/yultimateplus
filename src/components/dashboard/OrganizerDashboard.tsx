@@ -1,10 +1,12 @@
 import type { User } from '@/lib/mockData';
 import { events, organizations, venues } from '@/lib/mockData';
 import { StatCard } from './StatCard';
-import { Calendar, Users, Building } from 'lucide-react';
+import { Calendar, Users, Building, MapPin, Edit } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
+import { Button } from '../ui/button';
+import QRCode from 'qrcode.react';
 
 interface OrganizerDashboardProps {
   user: User;
@@ -28,27 +30,53 @@ export default function OrganizerDashboard({ user }: OrganizerDashboardProps) {
 
       <Card>
         <CardHeader>
-          <CardTitle>Your Upcoming Events</CardTitle>
+          <CardTitle>Your Events</CardTitle>
           <CardDescription>A list of events you are organizing.</CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-4 md:grid-cols-2">
+        <CardContent className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
           {myEvents.length > 0 ? myEvents.map(event => {
             const venue = venues.find(v => v.id === event.venueId);
+            const organization = organizations.find(o => o.id === event.organizationId);
             return (
-              <Card key={event.id} className="flex flex-col hover:bg-muted/50 transition-colors">
+              <Card key={event.id} className="overflow-hidden flex flex-col">
                 <CardHeader>
-                  <CardTitle>{event.name}</CardTitle>
-                  <CardDescription>{format(new Date(event.date), 'MMMM d, yyyy')} at {venue?.name}</CardDescription>
+                  <CardTitle className="text-xl flex justify-between items-center">
+                    {event.name}
+                    <Badge variant="secondary">{event.type}</Badge>
+                  </CardTitle>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground pt-2">
+                    <Building className="w-4 h-4" />
+                    <span>{organization?.name}</span>
+                  </div>
                 </CardHeader>
-                <CardContent className="flex-grow">
-                  <p className="text-sm text-muted-foreground line-clamp-2">{event.description}</p>
+                <CardContent className="flex-grow space-y-4">
+                  <div className="flex items-center gap-2 text-sm">
+                    <Calendar className="w-4 h-4 text-muted-foreground" />
+                    <span>{format(new Date(event.date), 'PPPP p')}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <MapPin className="w-4 h-4 text-muted-foreground" />
+                    <span>{venue?.name}</span>
+                  </div>
+                   <div className="flex items-center gap-2 text-sm">
+                    <Users className="w-4 h-4 text-muted-foreground" />
+                    <span>{event.participants.length} participants</span>
+                  </div>
+                  <div className="flex justify-center pt-4">
+                    <div className='bg-white p-2 rounded-md'>
+                      <QRCode value={JSON.stringify({ eventId: event.id, eventName: event.name })} size={100} />
+                    </div>
+                  </div>
                 </CardContent>
-                <div className="p-6 pt-0 flex justify-between items-center">
-                   <Badge variant="secondary">{event.type}</Badge>
-                   <div className="text-sm font-medium flex items-center">
-                    <Users className='w-4 h-4 mr-2 text-muted-foreground' />
-                    {event.participants.length} Participants
-                   </div>
+                <div className="p-4 grid grid-cols-2 gap-2">
+                  <Button variant="outline">
+                      <MapPin className="mr-2 h-4 w-4" />
+                      View on Map
+                  </Button>
+                  <Button>
+                      <Edit className="mr-2 h-4 w-4" />
+                      Edit Event
+                  </Button>
                 </div>
               </Card>
             )
