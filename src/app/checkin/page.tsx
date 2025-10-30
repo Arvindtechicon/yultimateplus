@@ -7,6 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { CheckCircle, XCircle, QrCode } from 'lucide-react';
 import { events } from '@/lib/mockData';
+import { motion, AnimatePresence } from 'framer-motion';
+import DashboardLayout from '@/components/DashboardLayout';
 
 export default function CheckinPage() {
   const [qrValue, setQrValue] = useState('');
@@ -26,16 +28,15 @@ export default function CheckinPage() {
       const parsedQr = JSON.parse(qrValue);
       const eventId = parsedQr.eventId;
       
-      const eventExists = events.some(event => event.id === eventId);
+      const event = events.find(event => event.id === eventId);
 
-      if (eventExists) {
+      if (event) {
         setCheckinStatus('success');
-        setCheckedInEvent(parsedQr.eventName || `Event ID: ${eventId}`);
+        setCheckedInEvent(event.name);
       } else {
         setCheckinStatus('error');
       }
     } catch (error) {
-      // Handle cases where qrValue is not a valid JSON string
       const eventId = parseInt(qrValue, 10);
       if (!isNaN(eventId) && events.some(event => event.id === eventId)) {
         const event = events.find(e => e.id === eventId);
@@ -48,52 +49,79 @@ export default function CheckinPage() {
   };
 
   return (
-    <div className="container mx-auto py-10 flex justify-center items-center min-h-[calc(100vh-8rem)] animate-fade-in-up">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="mx-auto bg-primary/10 p-3 rounded-full w-fit mb-2">
-            <QrCode className="w-8 h-8 text-primary" />
-          </div>
-          <CardTitle>Event Check-in</CardTitle>
-          <CardDescription>
-            Simulate scanning a QR code by pasting the event details below.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <Input
-              type="text"
-              placeholder='e.g., {"eventId":1,"eventName":"Summer Breeze Tournament"}'
-              value={qrValue}
-              onChange={(e) => setQrValue(e.target.value)}
-              aria-label="QR Code Value"
-            />
-            <Button onClick={handleCheckIn} className="w-full">
-              Check In
-            </Button>
-          </div>
+    <DashboardLayout>
+    <div className="container mx-auto py-10 flex justify-center items-start pt-20">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <Card className="w-full max-w-md glass-card">
+          <CardHeader className="text-center">
+            <div className="mx-auto bg-primary/10 dark:bg-primary/20 p-4 rounded-full w-fit mb-4">
+              <QrCode className="w-10 h-10 text-primary" />
+            </div>
+            <CardTitle className="text-3xl font-bold">Event Check-in</CardTitle>
+            <CardDescription>
+              Simulate scanning a QR code by pasting the event details below.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <Input
+                type="text"
+                placeholder='e.g., {"eventId":1}'
+                value={qrValue}
+                onChange={(e) => setQrValue(e.target.value)}
+                aria-label="QR Code Value"
+                className="h-12 text-center text-lg"
+              />
+              <Button onClick={handleCheckIn} className="w-full h-12 text-lg">
+                Check In
+              </Button>
+            </div>
 
-          {checkinStatus === 'success' && (
-            <Alert variant="default" className="mt-6 bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800">
-              <CheckCircle className="h-4 w-4 text-green-600" />
-              <AlertTitle className="text-green-800 dark:text-green-300">Check-in Successful ✅</AlertTitle>
-              <AlertDescription className="text-green-700 dark:text-green-400">
-                You have successfully checked into: <strong>{checkedInEvent}</strong>
-              </AlertDescription>
-            </Alert>
-          )}
+            <AnimatePresence>
+              {checkinStatus === 'success' && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                  className="mt-6"
+                >
+                  <Alert variant="default" className="bg-green-50/50 dark:bg-green-900/30 border-green-500/30">
+                    <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+                    <AlertTitle className="text-green-800 dark:text-green-300 font-bold text-lg">Check-in Successful!</AlertTitle>
+                    <AlertDescription className="text-green-700 dark:text-green-400">
+                      Welcome to <strong>{checkedInEvent}</strong>. Enjoy the event!
+                    </AlertDescription>
+                  </Alert>
+                </motion.div>
+              )}
 
-          {checkinStatus === 'error' && (
-            <Alert variant="destructive" className="mt-6">
-              <XCircle className="h-4 w-4" />
-              <AlertTitle>Check-in Failed</AlertTitle>
-              <AlertDescription>
-                Invalid or unrecognized event QR code. Please try again.
-              </AlertDescription>
-            </Alert>
-          )}
-        </CardContent>
-      </Card>
+              {checkinStatus === 'error' && (
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                  className="mt-6"
+                >
+                  <Alert variant="destructive">
+                    <XCircle className="h-5 w-5" />
+                    <AlertTitle className='font-bold text-lg'>Check-in Failed</AlertTitle>
+                    <AlertDescription>
+                      Invalid or unrecognized event QR code. Please try again.
+                    </AlertDescription>
+                  </Alert>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </CardContent>
+        </Card>
+      </motion.div>
     </div>
+    </DashboardLayout>
   );
 }

@@ -7,6 +7,7 @@ import AdminDashboard from '@/components/dashboard/AdminDashboard';
 import OrganizerDashboard from '@/components/dashboard/OrganizerDashboard';
 import ParticipantDashboard from '@/components/dashboard/ParticipantDashboard';
 import { Skeleton } from '@/components/ui/skeleton';
+import DashboardLayout from '@/components/DashboardLayout';
 
 export default function DashboardPage() {
   const { user, loading } = useAuth();
@@ -18,24 +19,22 @@ export default function DashboardPage() {
     }
   }, [user, loading, router]);
 
-  if (loading || !user) {
-    return (
-      <div className="container mx-auto py-10">
-        <div className="space-y-6">
-          <Skeleton className="h-10 w-1/3" />
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Skeleton className="h-32 rounded-lg" />
-            <Skeleton className="h-32 rounded-lg" />
-            <Skeleton className="h-32 rounded-lg" />
-            <Skeleton className="h-32 rounded-lg" />
-          </div>
-          <Skeleton className="h-96 rounded-lg" />
-        </div>
-      </div>
-    );
-  }
-
   const renderDashboard = () => {
+    if (loading || !user) {
+        return (
+          <div className="p-8">
+            <Skeleton className="h-8 w-1/3 mb-8" />
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
+              <Skeleton className="h-32 rounded-lg" />
+              <Skeleton className="h-32 rounded-lg" />
+              <Skeleton className="h-32 rounded-lg" />
+              <Skeleton className="h-32 rounded-lg" />
+            </div>
+            <Skeleton className="h-96 rounded-lg" />
+          </div>
+        );
+      }
+
     switch (user.role) {
       case 'Admin':
         return <AdminDashboard />;
@@ -51,8 +50,8 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="container mx-auto py-10 animate-fade-in-up">
-      {renderDashboard()}
-    </div>
+    <DashboardLayout>
+        {renderDashboard()}
+    </DashboardLayout>
   );
 }
