@@ -248,7 +248,7 @@ function MapComponent() {
         if (status === google.maps.DirectionsStatus.OK) {
           setDirections(result);
         } else {
-          console.error(`error fetching directions ${result}`);
+          console.error(`error fetching directions. Status: ${status}`);
           alert('Could not get directions. Please check your start location.');
         }
       }
