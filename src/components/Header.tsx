@@ -1,7 +1,7 @@
 "use client";
 
 import Link from 'next/link';
-import { Disc3, LogOut, User as UserIcon, Map } from 'lucide-react';
+import { Disc3, LogOut, User as UserIcon, Map, QrCode } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import {
@@ -25,6 +25,7 @@ export default function Header() {
     { href: '/', label: 'Home' },
     { href: '/events', label: 'Events' },
     { href: '/map', label: 'Map', icon: Map },
+    { href: '/checkin', label: 'Check-in', icon: QrCode },
     { href: '/dashboard', label: 'Dashboard', requiresAuth: true },
   ];
 
