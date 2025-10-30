@@ -73,17 +73,17 @@ function MapPage() {
     setDirections(null);
   }
 
-  if (!isLoaded) return <div className='container mx-auto py-10'><Skeleton className='h-[80vh] w-full' /></div>;
+  if (!isLoaded) return <div className='container mx-auto py-10 animate-fade-in-up'><Skeleton className='h-[80vh] w-full' /></div>;
   if (!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY) {
     return (
-        <div className="container mx-auto py-10 flex items-center justify-center h-[80vh]">
+        <div className="container mx-auto py-10 flex items-center justify-center h-[80vh] animate-fade-in-up">
             <Card className="max-w-md text-center">
                 <CardHeader>
                     <CardTitle>Google Maps API Key Missing</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <p>Please add your Google Maps API Key to continue. Create a `.env.local` file in the root of your project and add the following:</p>
-                    <pre className="bg-muted p-2 rounded-md my-4 text-sm">NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=Your_API_Key_Here</pre>
+                    <pre className="bg-muted p-2 rounded-md my-4 text-sm dark:bg-background">NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=Your_API_Key_Here</pre>
                     <p>You will need to restart your development server after adding the key.</p>
                 </CardContent>
             </Card>
@@ -92,12 +92,12 @@ function MapPage() {
   }
 
   return (
-    <div className="container mx-auto py-10">
+    <div className="container mx-auto py-10 animate-fade-in-up">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 h-[85vh]">
         <div className="md:col-span-1 space-y-4 overflow-y-auto pr-4">
           <h2 className="text-2xl font-bold">Events Venues</h2>
           {venues.map(venue => (
-            <Card key={venue.id} className={`cursor-pointer hover:shadow-md ${selectedVenue?.id === venue.id ? 'border-primary' : ''}`} onClick={() => handleVenueSelect(venue)}>
+            <Card key={venue.id} className={`cursor-pointer hover:shadow-md transition-shadow duration-300 ${selectedVenue?.id === venue.id ? 'border-primary shadow-lg' : ''}`} onClick={() => handleVenueSelect(venue)}>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2"><Pin className='w-5 h-5 text-primary' /> {venue.name}</CardTitle>
               </CardHeader>
@@ -105,7 +105,7 @@ function MapPage() {
                 <p className="text-sm text-muted-foreground">{venue.location}</p>
                  <div className='mt-4'>
                     <h4 className='font-semibold text-sm mb-2'>Events at this venue:</h4>
-                    <ul className='list-disc list-inside text-sm text-muted-foreground'>
+                    <ul className='list-disc list-inside text-sm text-muted-foreground space-y-1'>
                         {events.filter(e => e.venueId === venue.id).map(e => <li key={e.id}>{e.name}</li>)}
                     </ul>
                  </div>

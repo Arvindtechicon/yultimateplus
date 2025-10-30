@@ -10,7 +10,7 @@ import Link from 'next/link';
 
 export default function EventListPage() {
   return (
-    <div className="container mx-auto py-10">
+    <div className="container mx-auto py-10 animate-fade-in-up">
       <div className="text-center mb-12">
         <h1 className="text-4xl md:text-5xl font-bold tracking-tighter">All Events</h1>
         <p className="max-w-[600px] mx-auto text-muted-foreground md:text-xl mt-4">
@@ -24,7 +24,7 @@ export default function EventListPage() {
           const organization = organizations.find(o => o.id === event.organizationId);
 
           return (
-            <Card key={event.id} className="overflow-hidden flex flex-col hover:shadow-xl transition-shadow duration-300 animate-fade-in-up">
+            <Card key={event.id} className="overflow-hidden flex flex-col hover:shadow-xl transition-shadow duration-300">
               <CardHeader>
                 <CardTitle className="text-2xl">{event.name}</CardTitle>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground pt-2">

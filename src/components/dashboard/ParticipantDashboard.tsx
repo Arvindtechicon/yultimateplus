@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { Separator } from '@/components/ui/separator';
+import { Button } from '../ui/button';
+import Link from 'next/link';
 
 interface ParticipantDashboardProps {
   user: User;
@@ -38,20 +40,25 @@ export default function ParticipantDashboard({ user }: ParticipantDashboardProps
                   const venue = venues.find(v => v.id === event.venueId);
                   return (
                     <div key={event.id} className="p-4 border rounded-lg hover:bg-muted/50 transition-colors">
-                      <div className="flex justify-between items-start">
+                      <div className="flex justify-between items-start gap-4">
                         <div>
                           <p className="font-semibold">{event.name}</p>
                           <p className="text-sm text-muted-foreground">{format(new Date(event.date), 'PPPP p')}</p>
                           <p className="text-sm text-muted-foreground">{venue?.name} - {venue?.location}</p>
                         </div>
-                        <Badge variant="outline">{event.type}</Badge>
+                        <Badge variant={event.type === 'Tournament' ? "default" : "secondary"}>{event.type}</Badge>
+                      </div>
+                      <div className="flex justify-end mt-4">
+                        <Link href={`/map?venueId=${event.venueId}`} passHref>
+                          <Button size="sm" variant="outline">View on Map</Button>
+                        </Link>
                       </div>
                     </div>
                   );
                 })}
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground text-center py-4">You have no upcoming events. Check out the Events page to join one!</p>
+              <p className="text-sm text-muted-foreground text-center py-4">You have no upcoming events. <Link href="/events" className="text-primary underline">Check out the Events page</Link> to join one!</p>
             )}
           </div>
           
@@ -68,7 +75,7 @@ export default function ParticipantDashboard({ user }: ParticipantDashboardProps
                           <p className="font-semibold">{event.name}</p>
                           <p className="text-sm text-muted-foreground">{format(new Date(event.date), 'MMMM d, yyyy')}</p>
                         </div>
-                        <Badge variant="ghost">{event.type}</Badge>
+                        <Badge variant="outline">{event.type}</Badge>
                       </div>
                   </div>
                 ))}

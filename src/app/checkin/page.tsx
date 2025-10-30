@@ -48,7 +48,7 @@ export default function CheckinPage() {
   };
 
   return (
-    <div className="container mx-auto py-10 flex justify-center items-center min-h-[calc(100vh-8rem)]">
+    <div className="container mx-auto py-10 flex justify-center items-center min-h-[calc(100vh-8rem)] animate-fade-in-up">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="mx-auto bg-primary/10 p-3 rounded-full w-fit mb-2">
@@ -74,10 +74,10 @@ export default function CheckinPage() {
           </div>
 
           {checkinStatus === 'success' && (
-            <Alert variant="default" className="mt-6 bg-green-50 border-green-200">
+            <Alert variant="default" className="mt-6 bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800">
               <CheckCircle className="h-4 w-4 text-green-600" />
-              <AlertTitle className="text-green-800">Check-in Successful ✅</AlertTitle>
-              <AlertDescription className="text-green-700">
+              <AlertTitle className="text-green-800 dark:text-green-300">Check-in Successful ✅</AlertTitle>
+              <AlertDescription className="text-green-700 dark:text-green-400">
                 You have successfully checked into: <strong>{checkedInEvent}</strong>
               </AlertDescription>
             </Alert>

@@ -29,7 +29,7 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-8rem)] py-12 container">
+    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-8rem)] py-12 container animate-fade-in-up">
       <div className="text-center space-y-4">
         <div className="inline-block p-4 bg-primary/10 rounded-full">
           <Disc3 className="w-16 h-16 text-primary" />
@@ -42,7 +42,7 @@ export default function Home() {
         </p>
       </div>
 
-      <Card className="mt-10 w-full max-w-sm animate-fade-in-up">
+      <Card className="mt-10 w-full max-w-sm">
         <CardHeader>
           <CardTitle>Simulate Login</CardTitle>
           <CardDescription>Select a role to experience the app.</CardDescription>

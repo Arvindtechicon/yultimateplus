@@ -1,7 +1,7 @@
 "use client";
 
 import Link from 'next/link';
-import { Disc3, LogOut, User as UserIcon, Map, QrCode } from 'lucide-react';
+import { Disc3, LogOut, User as UserIcon, Map, QrCode, LayoutDashboard, Calendar } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,11 +22,10 @@ export default function Header() {
   const pathname = usePathname();
 
   const navLinks = [
-    { href: '/', label: 'Home' },
-    { href: '/events', label: 'Events' },
+    { href: '/events', label: 'Events', icon: Calendar },
     { href: '/map', label: 'Map', icon: Map },
     { href: '/checkin', label: 'Check-in', icon: QrCode },
-    { href: '/dashboard', label: 'Dashboard', requiresAuth: true },
+    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, requiresAuth: true },
   ];
 
   return (
@@ -38,23 +37,23 @@ export default function Header() {
             Y-Ultimate Pulse
           </span>
         </Link>
-        <nav className="hidden items-center space-x-4 lg:flex lg:space-x-6">
+        <nav className="hidden items-center space-x-4 lg:flex lg:flex-1 lg:justify-center">
           {navLinks.map((link) => (
             (!link.requiresAuth || user) && (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`text-sm font-medium transition-colors hover:text-primary ${
-                  pathname === link.href ? '' : 'text-muted-foreground'
+                className={`flex items-center gap-2 text-sm font-medium transition-colors hover:text-primary ${
+                  pathname === link.href ? 'text-primary' : 'text-muted-foreground'
                 }`}
               >
-                {link.icon && <link.icon className="mr-2 h-4 w-4 inline-block" />}
+                {link.icon && <link.icon className="h-4 w-4" />}
                 {link.label}
               </Link>
             )
           ))}
         </nav>
-        <div className="flex flex-1 items-center justify-end space-x-4">
+        <div className="flex flex-1 items-center justify-end space-x-4 lg:flex-none">
           {loading ? (
             <Skeleton className="h-8 w-8 rounded-full" />
           ) : user ? (
@@ -80,7 +79,7 @@ export default function Header() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => router.push('/dashboard')}>
                   <UserIcon className="mr-2 h-4 w-4" />
-                  <span>Dashboard</span>
+                  <span>Profile</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={logout}>

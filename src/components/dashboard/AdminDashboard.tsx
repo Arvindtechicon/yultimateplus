@@ -24,7 +24,7 @@ export default function AdminDashboard() {
       <Card>
         <CardHeader>
           <CardTitle>All Events</CardTitle>
-          <CardDescription>All events in the system.</CardDescription>
+          <CardDescription>A complete overview of all events in the system.</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-6 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
           {events.map((event) => {
@@ -32,11 +32,11 @@ export default function AdminDashboard() {
             const organization = organizations.find(o => o.id === event.organizationId);
 
             return (
-              <Card key={event.id} className="overflow-hidden flex flex-col">
+              <Card key={event.id} className="overflow-hidden flex flex-col hover:shadow-xl transition-shadow duration-300">
                 <CardHeader>
                   <CardTitle className="text-xl flex justify-between items-center">
                     {event.name}
-                    <Badge variant="secondary">{event.type}</Badge>
+                    <Badge variant={event.type === 'Tournament' ? "default" : "secondary"}>{event.type}</Badge>
                   </CardTitle>
                   <div className="flex items-center gap-2 text-sm text-muted-foreground pt-2">
                     <Building className="w-4 h-4" />
