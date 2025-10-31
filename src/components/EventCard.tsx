@@ -12,6 +12,7 @@ import { Badge } from './ui/badge';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -36,6 +37,8 @@ import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { useEvents } from '@/context/EventContext';
 import { useToast } from '@/hooks/use-toast';
+import { useState } from 'react';
+import EditEventForm from './dashboard/EditEventForm';
 
 interface EventCardProps {
   event: Event;
@@ -44,8 +47,9 @@ interface EventCardProps {
 
 export default function EventCard({ event, showEditButton }: EventCardProps) {
   const { user } = useAuth();
-  const { toggleRegistration } = useEvents();
+  const { toggleRegistration, updateEvent } = useEvents();
   const { toast } = useToast();
+  const [isEditDialogOpen, setEditDialogOpen] = useState(false);
 
   const venue = venues.find((v) => v.id === event.venueId);
   const organization = organizations.find((o) => o.id === event.organizationId);
@@ -53,6 +57,7 @@ export default function EventCard({ event, showEditButton }: EventCardProps) {
   
   const isParticipant = user?.role === 'Participant';
   const isRegistered = isParticipant && event.participants.includes(user.id);
+  const myOrganizations = organizations.filter(org => user && org.organizers.includes(user.id));
 
   const handleRegistration = () => {
     if (user) {
@@ -62,6 +67,15 @@ export default function EventCard({ event, showEditButton }: EventCardProps) {
         description: isRegistered ? `You have been unregistered from ${event.name}.` : `You are now registered for ${event.name}.`,
       })
     }
+  }
+
+  const handleEditEvent = (updatedEvent: Omit<Event, 'id' | 'participants'>) => {
+    updateEvent(event.id, updatedEvent);
+    toast({
+        title: "Event Updated",
+        description: `${event.name} has been successfully updated.`,
+    });
+    setEditDialogOpen(false);
   }
 
   const itemVariants = {
@@ -174,10 +188,29 @@ export default function EventCard({ event, showEditButton }: EventCardProps) {
           </Link>
           {showEditButton && (
              <div className='col-span-2 mt-2'>
-                <Button variant="secondary" className="w-full">
-                    <Edit className="mr-2 h-4 w-4" />
-                    Edit Event
-                </Button>
+                <Dialog open={isEditDialogOpen} onOpenChange={setEditDialogOpen}>
+                    <DialogTrigger asChild>
+                        <Button variant="secondary" className="w-full">
+                            <Edit className="mr-2 h-4 w-4" />
+                            Edit Event
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[425px] glass-card">
+                        <DialogHeader>
+                            <DialogTitle>Edit Event</DialogTitle>
+                            <DialogDescription>
+                                Make changes to your event here. Click save when you're done.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <EditEventForm 
+                            event={event}
+                            organizations={myOrganizations} 
+                            venues={venues} 
+                            onSubmit={handleEditEvent} 
+                            onCancel={() => setEditDialogOpen(false)}
+                        />
+                    </DialogContent>
+                </Dialog>
             </div>
           )}
         </CardFooter>

@@ -7,6 +7,7 @@ import { events as initialEvents } from '@/lib/mockData';
 interface EventContextType {
   events: Event[];
   addEvent: (newEventData: Omit<Event, 'id' | 'participants'>) => void;
+  updateEvent: (eventId: number, updatedEventData: Omit<Event, 'id' | 'participants'>) => void;
   toggleRegistration: (eventId: number, userId: number) => void;
 }
 
@@ -26,6 +27,20 @@ export function EventProvider({ children }: { children: ReactNode }) {
     ]);
   }, []);
 
+  const updateEvent = useCallback((eventId: number, updatedEventData: Omit<Event, 'id' | 'participants'>) => {
+    setEvents(prevEvents => 
+        prevEvents.map(event => {
+            if (event.id === eventId) {
+                return {
+                    ...event,
+                    ...updatedEventData
+                };
+            }
+            return event;
+        })
+    );
+  }, []);
+
   const toggleRegistration = useCallback((eventId: number, userId: number) => {
     setEvents(prevEvents =>
       prevEvents.map(event => {
@@ -42,7 +57,7 @@ export function EventProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <EventContext.Provider value={{ events, addEvent, toggleRegistration }}>
+    <EventContext.Provider value={{ events, addEvent, updateEvent, toggleRegistration }}>
       {children}
     </EventContext.Provider>
   );
