@@ -1,22 +1,47 @@
-import type { User } from '@/lib/mockData';
-import { events, organizations } from '@/lib/mockData';
+import type { User, Event } from '@/lib/mockData';
+import { events as initialEvents, organizations, venues } from '@/lib/mockData';
 import { StatCard } from './StatCard';
 import { Calendar, Users, Building, PlusCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '../ui/button';
 import { motion } from 'framer-motion';
 import EventCard from '../EventCard';
+import { useState }from 'react';
+import AddEventForm from './AddEventForm';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+  } from "@/components/ui/dialog"
 
 interface OrganizerDashboardProps {
   user: User;
 }
 
 export default function OrganizerDashboard({ user }: OrganizerDashboardProps) {
+  const [events, setEvents] = useState<Event[]>(initialEvents);
+  const [isAddEventOpen, setAddEventOpen] = useState(false);
+
   const myOrganizations = organizations.filter(org => org.organizers.includes(user.id));
   const myOrgIds = myOrganizations.map(org => org.id);
   const myEvents = events.filter(event => myOrgIds.includes(event.organizationId));
 
   const totalParticipants = myEvents.reduce((acc, event) => acc + event.participants.length, 0);
+
+  const handleAddEvent = (newEvent: Omit<Event, 'id' | 'participants'>) => {
+    setEvents(prevEvents => [
+        ...prevEvents,
+        {
+            ...newEvent,
+            id: prevEvents.length + 1,
+            participants: [],
+        }
+    ]);
+    setAddEventOpen(false);
+  }
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -60,10 +85,28 @@ export default function OrganizerDashboard({ user }: OrganizerDashboardProps) {
               <CardTitle>Your Events</CardTitle>
               <CardDescription>A list of events you are organizing.</CardDescription>
             </div>
-            <Button>
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Add Event
-            </Button>
+            <Dialog open={isAddEventOpen} onOpenChange={setAddEventOpen}>
+                <DialogTrigger asChild>
+                    <Button>
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        Add Event
+                    </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px] glass-card">
+                    <DialogHeader>
+                    <DialogTitle>Create a New Event</DialogTitle>
+                    <DialogDescription>
+                        Fill out the details below to add a new event to your organization.
+                    </DialogDescription>
+                    </DialogHeader>
+                    <AddEventForm 
+                        organizations={myOrganizations} 
+                        venues={venues} 
+                        onSubmit={handleAddEvent} 
+                        onCancel={() => setAddEventOpen(false)}
+                    />
+                </DialogContent>
+            </Dialog>
           </CardHeader>
           <CardContent className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
             {myEvents.length > 0 ? myEvents.map(event => (
