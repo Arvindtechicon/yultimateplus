@@ -1,5 +1,5 @@
 import type { User } from '@/lib/mockData';
-import { events, venues } from '@/lib/mockData';
+import { venues } from '@/lib/mockData';
 import { CalendarCheck, Trophy } from 'lucide-react';
 import { StatCard } from './StatCard';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -9,12 +9,14 @@ import { Separator } from '@/components/ui/separator';
 import { Button } from '../ui/button';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { useEvents } from '@/context/EventContext';
 
 interface ParticipantDashboardProps {
   user: User;
 }
 
 export default function ParticipantDashboard({ user }: ParticipantDashboardProps) {
+  const { events } = useEvents();
   const registeredEvents = events.filter(event => event.participants.includes(user.id));
   const upcomingEvents = registeredEvents.filter(event => new Date(event.date) >= new Date()).sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   const pastEvents = registeredEvents.filter(event => new Date(event.date) < new Date()).sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime());

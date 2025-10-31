@@ -1,5 +1,5 @@
 import type { User, Event } from '@/lib/mockData';
-import { events as initialEvents, organizations, venues } from '@/lib/mockData';
+import { organizations, venues } from '@/lib/mockData';
 import { StatCard } from './StatCard';
 import { Calendar, Users, Building, PlusCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -15,14 +15,15 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-  } from "@/components/ui/dialog"
+  } from "@/components/ui/dialog";
+import { useEvents } from '@/context/EventContext';
 
 interface OrganizerDashboardProps {
   user: User;
 }
 
 export default function OrganizerDashboard({ user }: OrganizerDashboardProps) {
-  const [events, setEvents] = useState<Event[]>(initialEvents);
+  const { events, addEvent } = useEvents();
   const [isAddEventOpen, setAddEventOpen] = useState(false);
 
   const myOrganizations = organizations.filter(org => org.organizers.includes(user.id));
@@ -32,14 +33,7 @@ export default function OrganizerDashboard({ user }: OrganizerDashboardProps) {
   const totalParticipants = myEvents.reduce((acc, event) => acc + event.participants.length, 0);
 
   const handleAddEvent = (newEvent: Omit<Event, 'id' | 'participants'>) => {
-    setEvents(prevEvents => [
-        ...prevEvents,
-        {
-            ...newEvent,
-            id: prevEvents.length + 1,
-            participants: [],
-        }
-    ]);
+    addEvent(newEvent);
     setAddEventOpen(false);
   }
 

@@ -1,11 +1,13 @@
 "use client";
 
-import { events } from '@/lib/mockData';
 import { motion } from 'framer-motion';
 import DashboardLayout from '@/components/DashboardLayout';
 import EventCard from '@/components/EventCard';
+import { useEvents } from '@/context/EventContext';
 
 export default function EventListPage() {
+  const { events } = useEvents();
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {

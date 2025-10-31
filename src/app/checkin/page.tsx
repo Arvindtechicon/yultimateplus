@@ -6,11 +6,12 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { CheckCircle, XCircle, QrCode } from 'lucide-react';
-import { events } from '@/lib/mockData';
 import { motion, AnimatePresence } from 'framer-motion';
 import DashboardLayout from '@/components/DashboardLayout';
+import { useEvents } from '@/context/EventContext';
 
 export default function CheckinPage() {
+  const { events } = useEvents();
   const [qrValue, setQrValue] = useState('');
   const [checkinStatus, setCheckinStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [checkedInEvent, setCheckedInEvent] = useState<string | null>(null);

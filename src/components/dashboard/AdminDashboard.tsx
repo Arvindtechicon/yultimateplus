@@ -1,4 +1,4 @@
-import { users, events, organizations, venues } from '@/lib/mockData';
+import { users, organizations, venues } from '@/lib/mockData';
 import { StatCard } from './StatCard';
 import { Users, Calendar, Building, MapPin } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -7,8 +7,10 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { motion } from 'framer-motion';
 import EventCard from '../EventCard';
+import { useEvents } from '@/context/EventContext';
 
 export default function AdminDashboard() {
+    const { events } = useEvents();
 
     const containerVariants = {
         hidden: { opacity: 0 },

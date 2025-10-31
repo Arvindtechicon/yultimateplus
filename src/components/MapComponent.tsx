@@ -8,7 +8,7 @@ import {
   InfoWindow,
   DirectionsRenderer,
 } from '@react-google-maps/api';
-import { venues, events } from '@/lib/mockData';
+import { venues } from '@/lib/mockData';
 import {
   Card,
   CardContent,
@@ -21,6 +21,7 @@ import { Navigation, Pin } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useEvents } from '@/context/EventContext';
 
 const containerStyle = {
   width: '100%',
@@ -194,6 +195,7 @@ const darkMapOptions = {
 function MapComponent() {
   const searchParams = useSearchParams();
   const venueId = searchParams.get('venueId');
+  const { events } = useEvents();
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
