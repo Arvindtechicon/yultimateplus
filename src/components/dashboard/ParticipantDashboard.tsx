@@ -91,7 +91,7 @@ export default function ParticipantDashboard({ user }: ParticipantDashboardProps
                 </div>
               ) : (
                 <div className='text-center py-8'>
-                    <p className="text-sm text-muted-foreground">You have no upcoming events.</p>
+                    <p className="text-sm text-muted-foreground">You are not registered for any upcoming events.</p>
                     <Link href="/events" passHref>
                         <Button variant="link" className='mt-2'>Check out the Events page</Button>
                     </Link>
