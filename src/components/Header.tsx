@@ -66,9 +66,7 @@ export default function Header() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          ) : (
-             <Button onClick={() => router.push('/')}>Login</Button>
-          )}
+          ) : null}
         </div>
       </div>
     </header>
