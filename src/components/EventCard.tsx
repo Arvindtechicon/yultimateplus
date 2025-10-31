@@ -24,6 +24,8 @@ import {
   QrCode,
   Navigation,
   Edit,
+  LogIn,
+  LogOut,
 } from 'lucide-react';
 import type { Event } from '@/lib/mockData';
 import { venues, organizations } from '@/lib/mockData';
@@ -31,6 +33,9 @@ import { format } from 'date-fns';
 import Link from 'next/link';
 import QRCodeComponent from 'qrcode.react';
 import { motion } from 'framer-motion';
+import { useAuth } from '@/context/AuthContext';
+import { useEvents } from '@/context/EventContext';
+import { useToast } from '@/hooks/use-toast';
 
 interface EventCardProps {
   event: Event;
@@ -38,9 +43,26 @@ interface EventCardProps {
 }
 
 export default function EventCard({ event, showEditButton }: EventCardProps) {
+  const { user } = useAuth();
+  const { toggleRegistration } = useEvents();
+  const { toast } = useToast();
+
   const venue = venues.find((v) => v.id === event.venueId);
   const organization = organizations.find((o) => o.id === event.organizationId);
   const qrValue = JSON.stringify({ eventId: event.id, eventName: event.name });
+  
+  const isParticipant = user?.role === 'Participant';
+  const isRegistered = isParticipant && event.participants.includes(user.id);
+
+  const handleRegistration = () => {
+    if (user) {
+      toggleRegistration(event.id, user.id);
+      toast({
+        title: isRegistered ? "Unregistered" : "Registration Successful!",
+        description: isRegistered ? `You have been unregistered from ${event.name}.` : `You are now registered for ${event.name}.`,
+      })
+    }
+  }
 
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
@@ -88,28 +110,64 @@ export default function EventCard({ event, showEditButton }: EventCardProps) {
           </div>
         </CardContent>
         <CardFooter className="grid grid-cols-2 gap-2 pt-4">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="outline" className="w-full">
-                <QrCode className="mr-2 h-4 w-4" />
-                Show QR
+          
+          {isParticipant ? (
+            <>
+              <Button 
+                onClick={handleRegistration} 
+                className="w-full"
+                variant={isRegistered ? 'secondary' : 'default'}
+                >
+                {isRegistered ? <LogOut className='mr-2' /> : <LogIn className='mr-2' />}
+                {isRegistered ? 'Unregister' : 'Register'}
               </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px] glass-card">
-              <DialogHeader>
-                <DialogTitle className='text-center'>{event.name}</DialogTitle>
-              </DialogHeader>
-              <div className="flex flex-col items-center justify-center p-4 gap-4">
-                <div className="bg-white p-4 rounded-lg">
-                  <QRCodeComponent value={qrValue} size={256} />
+
+              {isRegistered && (
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" className="w-full">
+                        <QrCode className="mr-2 h-4 w-4" />
+                        Show QR
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[425px] glass-card">
+                      <DialogHeader>
+                        <DialogTitle className='text-center'>{event.name}</DialogTitle>
+                      </DialogHeader>
+                      <div className="flex flex-col items-center justify-center p-4 gap-4">
+                        <div className="bg-white p-4 rounded-lg">
+                          <QRCodeComponent value={qrValue} size={256} />
+                        </div>
+                        <p className="text-xs text-muted-foreground">Scan this to check in</p>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+              )}
+            </>
+          ) : (
+             <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="w-full">
+                  <QrCode className="mr-2 h-4 w-4" />
+                  Show QR
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px] glass-card">
+                <DialogHeader>
+                  <DialogTitle className='text-center'>{event.name}</DialogTitle>
+                </DialogHeader>
+                <div className="flex flex-col items-center justify-center p-4 gap-4">
+                  <div className="bg-white p-4 rounded-lg">
+                    <QRCodeComponent value={qrValue} size={256} />
+                  </div>
+                  <p className="text-xs text-muted-foreground">Scan this to check in</p>
                 </div>
-                <p className="text-xs text-muted-foreground">Scan this to check in</p>
-              </div>
-            </DialogContent>
-          </Dialog>
+              </DialogContent>
+            </Dialog>
+          )}
 
           <Link href={`/map?venueId=${event.venueId}`} passHref>
-            <Button className="w-full">
+            <Button className="w-full col-start-2">
               <Navigation className="mr-2 h-4 w-4" />
               Get Directions
             </Button>
