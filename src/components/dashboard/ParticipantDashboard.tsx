@@ -57,7 +57,7 @@ export default function ParticipantDashboard({ user }: ParticipantDashboardProps
       >
         <Card className='glass-card'>
           <CardHeader>
-            <CardTitle>Your Registered Events</CardTitle>
+            <CardTitle>Your Registered Events ({registeredEvents.length})</CardTitle>
             <CardDescription>All your upcoming and past events at a glance.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
