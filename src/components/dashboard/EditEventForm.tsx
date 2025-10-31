@@ -172,7 +172,7 @@ export default function EditEventForm({ event, organizations, venues, onSubmit, 
                     <FormControl>
                     <SelectTrigger>
                         <SelectValue placeholder="Select an organization" />
-                    </Trigger>
+                    </SelectTrigger>
                     </FormControl>
                     <SelectContent>
                     {organizations.map((org) => (
