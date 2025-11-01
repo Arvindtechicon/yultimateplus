@@ -44,6 +44,10 @@ export interface CoachingCenter {
   specialty: string;
   location: string;
   participants: number[];
+  coordinates: {
+    lat: number;
+    lng: number;
+  };
 }
 
 export interface Child {
@@ -87,6 +91,14 @@ export interface MockAlert {
     message: string;
     type: 'destructive' | 'default';
 }
+
+export interface Community {
+    name: string;
+    lat: number;
+    lng: number;
+    children: number;
+}
+
 
 export const mockAlerts: MockAlert[] = [
     { id: 1, message: "Attendance missing for Session S002", type: 'destructive' },
@@ -261,7 +273,12 @@ export const events: Event[] = [
 ];
 
 export const coachingCenters: CoachingCenter[] = [
-    { id: 1, name: 'Ultimate Performance Academy', specialty: 'Advanced Skills', location: 'Cityville', participants: [3] },
-    { id: 2, name: 'Frisbee Fundamentals', specialty: 'Beginner Training', location: 'Townsville', participants: [] },
-    { id: 3, name: 'Beach Ultimate Coaching', specialty: 'Beach Tactics', location: 'Beachtown', participants: [4,5] },
+    { id: 1, name: 'Ultimate Performance Academy', specialty: 'Advanced Skills', location: 'Cityville', participants: [3], coordinates: { lat: 40.7328, lng: -74.0160 } },
+    { id: 2, name: 'Frisbee Fundamentals', specialty: 'Beginner Training', location: 'Townsville', participants: [], coordinates: { lat: 34.0622, lng: -118.2537 } },
+    { id: 3, name: 'Beach Ultimate Coaching', specialty: 'Beach Tactics', location: 'Beachtown', participants: [4,5], coordinates: { lat: 33.7901, lng: -118.2037 } },
+];
+
+export const mockCommunities: Community[] = [
+    { name: 'VV Puram', lat: 12.2958, lng: 76.6394, children: 30 },
+    { name: 'Lalithadripura', lat: 12.2710, lng: 76.6930, children: 22 },
 ];
