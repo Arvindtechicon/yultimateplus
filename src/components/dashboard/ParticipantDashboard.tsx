@@ -222,7 +222,7 @@ export default function ParticipantDashboard({
               ) : (
                 <div className="text-center py-8">
                   <p className="text-sm text-muted-foreground">
-                    You are not registered for any upcoming events.
+                    You are not registered for any upcoming events. Events you register for will appear here.
                   </p>
                   <Link href="/events" passHref>
                     <Button variant="link" className="mt-2">
