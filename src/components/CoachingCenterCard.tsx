@@ -16,6 +16,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { useAppData } from '@/context/EventContext';
 import { useToast } from '@/hooks/use-toast';
+import Link from 'next/link';
 
 interface CoachingCenterCardProps {
   center: CoachingCenter;
@@ -29,7 +30,8 @@ export default function CoachingCenterCard({ center }: CoachingCenterCardProps) 
   const isParticipant = user?.role === 'Participant';
   const isRegistered = isParticipant && user && center.participants.includes(user.id);
 
-  const handleRegistration = () => {
+  const handleRegistration = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent navigation when clicking the button
     if (user && isParticipant) {
       toggleCoachingCenterRegistration(center.id, user.id);
       toast({
@@ -56,39 +58,40 @@ export default function CoachingCenterCard({ center }: CoachingCenterCardProps) 
   return (
     <motion.div
       variants={itemVariants}
-      whileHover={{ scale: 1.03 }}
       transition={{ type: 'spring', stiffness: 300 }}
     >
-      <Card className="glass-card flex flex-col h-full overflow-hidden">
-        <CardHeader>
-          <CardTitle className="text-xl font-bold">{center.name}</CardTitle>
-          <CardDescription className="flex items-center gap-2 pt-1">
-             <Badge variant="secondary">{center.specialty}</Badge>
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex-grow space-y-3 text-sm">
-          <div className="flex items-center gap-2">
-            <MapPin className="w-4 h-4 text-muted-foreground" />
-            <span>{center.location}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Users className="w-4 h-4 text-muted-foreground" />
-            <span>{center.participants.length} participants</span>
-          </div>
-        </CardContent>
-        {isParticipant && (
-          <CardFooter className="pt-4">
-            <Button
-              onClick={handleRegistration}
-              className="w-full"
-              variant={isRegistered ? 'secondary' : 'default'}
-            >
-              {isRegistered ? <LogOut className='mr-2 h-4 w-4' /> : <LogIn className='mr-2 h-4 w-4' />}
-              {isRegistered ? 'Unenroll' : 'Enroll Now'}
-            </Button>
-          </CardFooter>
-        )}
-      </Card>
+      <Link href={`/coaching/${center.id}`} className="block h-full group">
+        <Card className="glass-card flex flex-col h-full overflow-hidden transition-all duration-300 group-hover:scale-105 group-hover:border-primary/50">
+          <CardHeader>
+            <CardTitle className="text-xl font-bold">{center.name}</CardTitle>
+            <CardDescription className="flex items-center gap-2 pt-1">
+              <Badge variant="secondary">{center.specialty}</Badge>
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex-grow space-y-3 text-sm">
+            <div className="flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-muted-foreground" />
+              <span>{center.location}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Users className="w-4 h-4 text-muted-foreground" />
+              <span>{center.participants.length} participants</span>
+            </div>
+          </CardContent>
+          {isParticipant && (
+            <CardFooter className="pt-4">
+              <Button
+                onClick={handleRegistration}
+                className="w-full"
+                variant={isRegistered ? 'secondary' : 'default'}
+              >
+                {isRegistered ? <LogOut className='mr-2 h-4 w-4' /> : <LogIn className='mr-2 h-4 w-4' />}
+                {isRegistered ? 'Unenroll' : 'Enroll Now'}
+              </Button>
+            </CardFooter>
+          )}
+        </Card>
+      </Link>
     </motion.div>
   );
 }
