@@ -11,6 +11,7 @@ interface AppContextType {
   addEvent: (newEventData: Omit<Event, 'id' | 'participants'>) => void;
   updateEvent: (eventId: number, updatedEventData: Omit<Event, 'id' | 'participants'>) => void;
   toggleEventRegistration: (eventId: number, userId: number) => void;
+  addCoachingCenter: (newCenterData: Omit<CoachingCenter, 'id' | 'participants'>) => void;
   toggleCoachingCenterRegistration: (centerId: number, userId: number) => void;
 }
 
@@ -60,6 +61,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
+  const addCoachingCenter = useCallback((newCenterData: Omit<CoachingCenter, 'id' | 'participants'>) => {
+    setCoachingCenters(prevCenters => [
+      ...prevCenters,
+      {
+        ...newCenterData,
+        id: prevCenters.length > 0 ? Math.max(...prevCenters.map(c => c.id)) + 1 : 1,
+        participants: [],
+      }
+    ]);
+  }, []);
+
   const toggleCoachingCenterRegistration = useCallback((centerId: number, userId: number) => {
     setCoachingCenters(prevCenters =>
       prevCenters.map(center => {
@@ -76,7 +88,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AppContext.Provider value={{ events, coachingCenters, addEvent, updateEvent, toggleEventRegistration, toggleCoachingCenterRegistration }}>
+    <AppContext.Provider value={{ events, coachingCenters, addEvent, updateEvent, toggleEventRegistration, addCoachingCenter, toggleCoachingCenterRegistration }}>
       {children}
     </AppContext.Provider>
   );
