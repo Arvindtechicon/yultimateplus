@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { LineChart } from 'lucide-react';
+import { LineChart, BarChart as BarChartIcon } from 'lucide-react';
 import DashboardLayout from '@/components/DashboardLayout';
 import {
   Card,
@@ -10,6 +10,49 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
+} from '@/components/ui/chart';
+import {
+  ComposedChart,
+  Bar,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
+
+const chartData = [
+  { month: 'January', throws: 86, catches: 78, defense: 60 },
+  { month: 'February', throws: 88, catches: 82, defense: 65 },
+  { month: 'March', throws: 90, catches: 85, defense: 70 },
+  { month: 'April', throws: 92, catches: 88, defense: 75 },
+  { month: 'May', throws: 95, catches: 92, defense: 80 },
+  { month: 'June', throws: 93, catches: 90, defense: 82 },
+];
+
+const chartConfig = {
+  throws: {
+    label: 'Throws',
+    color: 'hsl(var(--primary))',
+  },
+  catches: {
+    label: 'Catches',
+    color: 'hsl(var(--secondary-foreground))',
+  },
+  defense: {
+    label: 'Defense',
+    color: 'hsl(var(--muted-foreground))',
+  },
+};
+
 
 export default function PerformancePage() {
   return (
@@ -39,17 +82,26 @@ export default function PerformancePage() {
         >
           <Card className="w-full max-w-4xl mx-auto glass-card">
             <CardHeader>
-              <CardTitle>Analytics Dashboard</CardTitle>
+              <CardTitle>Monthly Performance Metrics</CardTitle>
               <CardDescription>
-                Real-time data will be visualized here.
+                A visual breakdown of your performance over the last 6 months.
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center justify-center h-64 border-2 border-dashed rounded-lg">
-                <p className="text-muted-foreground">
-                  Performance charts and data will load here.
-                </p>
-              </div>
+              <ChartContainer config={chartConfig} className='h-[400px] w-full'>
+                <ResponsiveContainer width="100%" height="100%">
+                    <ComposedChart data={chartData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="month" />
+                        <YAxis />
+                        <Tooltip content={<ChartTooltipContent />} />
+                        <Legend content={<ChartLegendContent />} />
+                        <Bar dataKey="defense" fill="var(--color-defense)" barSize={20} radius={[4, 4, 0, 0]} />
+                        <Line type="monotone" dataKey="throws" stroke="var(--color-throws)" strokeWidth={2} />
+                        <Line type="monotone" dataKey="catches" stroke="var(--color-catches)" strokeWidth={2} />
+                    </ComposedChart>
+                </ResponsiveContainer>
+              </ChartContainer>
             </CardContent>
           </Card>
         </motion.div>
