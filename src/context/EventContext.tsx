@@ -1,7 +1,7 @@
 
 "use client";
 
-import { createContext, useContext, useState, type ReactNode, useCallback } from 'react';
+import { createContext, useContext, useState, type ReactNode, useCallback, useEffect } from 'react';
 import type { Event, CoachingCenter, Session, Child, Assessment, HomeVisit, MockAlert } from '@/lib/mockData';
 import { 
     events as initialEvents, 
@@ -33,14 +33,51 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
+const getInitialState = <T,>(key: string, fallback: T): T => {
+    if (typeof window === 'undefined') {
+        return fallback;
+    }
+    try {
+        const stored = localStorage.getItem(key);
+        if (stored) {
+            return JSON.parse(stored);
+        }
+    } catch (error) {
+        console.error(`Error reading localStorage key "${key}":`, error);
+        localStorage.removeItem(key);
+    }
+    return fallback;
+};
+
+
 export function AppProvider({ children: componentChildren }: { children: ReactNode }) {
-  const [events, setEvents] = useState<Event[]>(initialEvents);
-  const [coachingCenters, setCoachingCenters] = useState<CoachingCenter[]>(initialCoachingCenters);
-  const [sessions, setSessions] = useState<Session[]>(initialSessions);
+  const [events, setEvents] = useState<Event[]>(() => getInitialState('y-ultimate-events', initialEvents));
+  const [coachingCenters, setCoachingCenters] = useState<CoachingCenter[]>(() => getInitialState('y-ultimate-coaching-centers', initialCoachingCenters));
+  const [sessions, setSessions] = useState<Session[]>(() => getInitialState('y-ultimate-sessions', initialSessions));
   const [children, setChildren] = useState<Child[]>(initialChildrenData);
-  const [assessments, setAssessments] = useState<Assessment[]>(initialAssessments);
-  const [homeVisits, setHomeVisits] = useState<HomeVisit[]>(initialHomeVisits);
+  const [assessments, setAssessments] = useState<Assessment[]>(() => getInitialState('y-ultimate-assessments', initialAssessments));
+  const [homeVisits, setHomeVisits] = useState<HomeVisit[]>(() => getInitialState('y-ultimate-home-visits', initialHomeVisits));
   const [alerts, setAlerts] = useState<MockAlert[]>(initialAlerts);
+
+  useEffect(() => {
+    localStorage.setItem('y-ultimate-events', JSON.stringify(events));
+  }, [events]);
+
+  useEffect(() => {
+    localStorage.setItem('y-ultimate-coaching-centers', JSON.stringify(coachingCenters));
+  }, [coachingCenters]);
+  
+  useEffect(() => {
+    localStorage.setItem('y-ultimate-sessions', JSON.stringify(sessions));
+  }, [sessions]);
+
+  useEffect(() => {
+    localStorage.setItem('y-ultimate-assessments', JSON.stringify(assessments));
+  }, [assessments]);
+
+  useEffect(() => {
+    localStorage.setItem('y-ultimate-home-visits', JSON.stringify(homeVisits));
+  }, [homeVisits]);
 
 
   const addEvent = useCallback((newEventData: Omit<Event, 'id' | 'participants'>) => {
