@@ -91,6 +91,13 @@ export default function EventCard({ event, showEditButton }: EventCardProps) {
     setEditDialogOpen(false);
   }
 
+  const handleDirectionsClick = () => {
+    if (venue) {
+      const url = `https://www.google.com/maps/search/?api=1&query=${venue.coordinates.lat},${venue.coordinates.lng}`;
+      window.open(url, '_blank');
+    }
+  };
+
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
     visible: {
@@ -194,12 +201,10 @@ export default function EventCard({ event, showEditButton }: EventCardProps) {
             </Dialog>
           )}
 
-          <Link href={`/map?venueId=${event.venueId}`} passHref>
-            <Button className="w-full col-start-2">
-              <Navigation className="mr-2 h-4 w-4" />
-              Get Directions
-            </Button>
-          </Link>
+          <Button onClick={handleDirectionsClick} className="w-full col-start-2">
+            <Navigation className="mr-2 h-4 w-4" />
+            Get Directions
+          </Button>
           {showEditButton && (
              <div className='col-span-2 mt-2 grid grid-cols-2 gap-2'>
                 <Dialog open={isEditDialogOpen} onOpenChange={setEditDialogOpen}>
