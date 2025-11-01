@@ -10,10 +10,10 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { CheckCircle, XCircle, QrCode, VideoOff, User, Video } from 'lucide-react';
+import { CheckCircle, XCircle, QrCode, VideoOff, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import DashboardLayout from '@/components/DashboardLayout';
-import { useEvents } from '@/context/EventContext';
+import { useApp } from '@/context/EventContext';
 import type { Event } from '@/lib/mockData';
 import QrScanner from 'react-qr-scanner';
 import { useToast } from '@/hooks/use-toast';
@@ -24,7 +24,7 @@ interface CheckedInData {
 }
 
 export default function CheckinPage() {
-  const { events } = useEvents();
+  const { events } = useApp();
   const [checkinStatus, setCheckinStatus] = useState<
     'idle' | 'success' | 'error'
   >('idle');
@@ -110,7 +110,7 @@ export default function CheckinPage() {
         setCheckinStatus('idle');
         setCheckedInData(null);
         setIsScanning(true);
-    }, 3000);
+    }, 5000);
   };
 
 

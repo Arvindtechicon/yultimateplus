@@ -1,20 +1,24 @@
+
 "use client";
 
 import { createContext, useContext, useState, type ReactNode, useCallback } from 'react';
-import type { Event } from '@/lib/mockData';
-import { events as initialEvents } from '@/lib/mockData';
+import type { Event, CoachingCenter } from '@/lib/mockData';
+import { events as initialEvents, coachingCenters as initialCoachingCenters } from '@/lib/mockData';
 
-interface EventContextType {
+interface AppContextType {
   events: Event[];
+  coachingCenters: CoachingCenter[];
   addEvent: (newEventData: Omit<Event, 'id' | 'participants'>) => void;
   updateEvent: (eventId: number, updatedEventData: Omit<Event, 'id' | 'participants'>) => void;
-  toggleRegistration: (eventId: number, userId: number) => void;
+  toggleEventRegistration: (eventId: number, userId: number) => void;
+  toggleCoachingRegistration: (centerId: number, userId: number) => void;
 }
 
-const EventContext = createContext<EventContextType | undefined>(undefined);
+const AppContext = createContext<AppContextType | undefined>(undefined);
 
-export function EventProvider({ children }: { children: ReactNode }) {
+export function AppProvider({ children }: { children: ReactNode }) {
   const [events, setEvents] = useState<Event[]>(initialEvents);
+  const [coachingCenters, setCoachingCenters] = useState<CoachingCenter[]>(initialCoachingCenters);
 
   const addEvent = useCallback((newEventData: Omit<Event, 'id' | 'participants'>) => {
     setEvents(prevEvents => [
@@ -41,7 +45,7 @@ export function EventProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
-  const toggleRegistration = useCallback((eventId: number, userId: number) => {
+  const toggleEventRegistration = useCallback((eventId: number, userId: number) => {
     setEvents(prevEvents =>
       prevEvents.map(event => {
         if (event.id === eventId) {
@@ -56,17 +60,32 @@ export function EventProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
+  const toggleCoachingRegistration = useCallback((centerId: number, userId: number) => {
+    setCoachingCenters(prevCenters =>
+      prevCenters.map(center => {
+        if (center.id === centerId) {
+          const isRegistered = center.participants.includes(userId);
+          const newParticipants = isRegistered
+            ? center.participants.filter(id => id !== userId)
+            : [...center.participants, userId];
+          return { ...center, participants: newParticipants };
+        }
+        return center;
+      })
+    );
+  }, []);
+
   return (
-    <EventContext.Provider value={{ events, addEvent, updateEvent, toggleRegistration }}>
+    <AppContext.Provider value={{ events, coachingCenters, addEvent, updateEvent, toggleEventRegistration, toggleCoachingRegistration }}>
       {children}
-    </EventContext.Provider>
+    </AppContext.Provider>
   );
 }
 
-export function useEvents() {
-  const context = useContext(EventContext);
+export function useApp() {
+  const context = useContext(AppContext);
   if (context === undefined) {
-    throw new Error('useEvents must be used within an EventProvider');
+    throw new Error('useApp must be used within an AppProvider');
   }
   return context;
 }

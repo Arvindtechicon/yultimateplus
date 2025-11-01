@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { useState, useMemo } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import EventCard from '@/components/EventCard';
-import { useEvents } from '@/context/EventContext';
+import { useApp } from '@/context/EventContext';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -17,7 +17,7 @@ import { Search } from 'lucide-react';
 import { venues } from '@/lib/mockData';
 
 export default function EventListPage() {
-  const { events } = useEvents();
+  const { events } = useApp();
   const [searchQuery, setSearchQuery] = useState('');
   const [dateFilter, setDateFilter] = useState('all');
 

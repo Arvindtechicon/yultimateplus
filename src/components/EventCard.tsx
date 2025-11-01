@@ -36,7 +36,7 @@ import Link from 'next/link';
 import QRCodeComponent from 'qrcode.react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
-import { useEvents } from '@/context/EventContext';
+import { useApp } from '@/context/EventContext';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
 import EditEventForm from './dashboard/EditEventForm';
@@ -48,7 +48,7 @@ interface EventCardProps {
 
 export default function EventCard({ event, showEditButton }: EventCardProps) {
   const { user } = useAuth();
-  const { toggleRegistration, updateEvent } = useEvents();
+  const { toggleEventRegistration, updateEvent } = useApp();
   const { toast } = useToast();
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
 
@@ -68,7 +68,7 @@ export default function EventCard({ event, showEditButton }: EventCardProps) {
 
   const handleRegistration = () => {
     if (user && isParticipant) {
-      toggleRegistration(event.id, user.id);
+      toggleEventRegistration(event.id, user.id);
       toast({
         title: isRegistered ? "Unregistered" : "Registration Successful!",
         description: isRegistered ? `You have been unregistered from ${event.name}.` : `You are now registered for ${event.name}.`,

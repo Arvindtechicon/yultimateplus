@@ -6,7 +6,7 @@ import './globals.css';
 import { cn } from '@/lib/utils';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { MotionWrapper } from '@/components/MotionWrapper';
-import { EventProvider } from '@/context/EventContext';
+import { AppProvider } from '@/context/EventContext';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -35,12 +35,12 @@ export default function RootLayout({
           disableTransitionOnChange
         >
             <AuthProvider>
-              <EventProvider>
+              <AppProvider>
                 <MotionWrapper>
                     {children}
                 </MotionWrapper>
                 <Toaster />
-              </EventProvider>
+              </AppProvider>
             </AuthProvider>
         </ThemeProvider>
       </body>

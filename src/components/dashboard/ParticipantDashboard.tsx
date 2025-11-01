@@ -2,7 +2,7 @@
 
 import type { User } from '@/lib/mockData';
 import { venues } from '@/lib/mockData';
-import { CalendarCheck, Search, Trophy, X } from 'lucide-react';
+import { CalendarCheck, Search, Trophy, X, BookOpen } from 'lucide-react';
 import { StatCard } from './StatCard';
 import {
   Card,
@@ -17,7 +17,7 @@ import { Separator } from '@/components/ui/separator';
 import { Button } from '../ui/button';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { useEvents } from '@/context/EventContext';
+import { useApp } from '@/context/EventContext';
 import { useMemo, useState } from 'react';
 import { Input } from '../ui/input';
 import EventCard from '../EventCard';
@@ -29,7 +29,7 @@ interface ParticipantDashboardProps {
 export default function ParticipantDashboard({
   user,
 }: ParticipantDashboardProps) {
-  const { events } = useEvents();
+  const { events, coachingCenters } = useApp();
   const [searchQuery, setSearchQuery] = useState('');
 
   const registeredEvents = events.filter((event) =>
@@ -45,6 +45,9 @@ export default function ParticipantDashboard({
     .sort(
       (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
     );
+    
+  const registeredCoaching = coachingCenters.filter(center => center.participants.includes(user.id));
+
 
   const searchResults = useMemo(() => {
     if (!searchQuery) return [];
@@ -80,7 +83,7 @@ export default function ParticipantDashboard({
         Welcome, {user.name.split(' ')[0]}!
       </motion.h1>
       <motion.div
-        className="grid gap-6 md:grid-cols-2"
+        className="grid gap-6 md:grid-cols-3"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -96,6 +99,12 @@ export default function ParticipantDashboard({
           value={pastEvents.length}
           icon={Trophy}
           description="Events you've attended"
+        />
+        <StatCard
+            title="Coaching Enrollments"
+            value={registeredCoaching.length}
+            icon={BookOpen}
+            description="Your active coaching sessions"
         />
       </motion.div>
 
@@ -158,6 +167,7 @@ export default function ParticipantDashboard({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
+        className="grid md:grid-cols-2 gap-8"
       >
         <Card className="glass-card">
           <CardHeader>
@@ -222,11 +232,11 @@ export default function ParticipantDashboard({
               ) : (
                 <div className="text-center py-8">
                   <p className="text-sm text-muted-foreground">
-                    You are not registered for any upcoming events. Events you register for will appear here.
+                    You are not registered for any upcoming events.
                   </p>
                   <Link href="/events" passHref>
                     <Button variant="link" className="mt-2">
-                      Check out the Events page
+                      Browse Events
                     </Button>
                   </Link>
                 </div>
@@ -262,6 +272,35 @@ export default function ParticipantDashboard({
                 </p>
               )}
             </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="glass-card">
+          <CardHeader>
+            <CardTitle>Your Coaching Centers</CardTitle>
+            <CardDescription>All your active coaching and training enrollments.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {registeredCoaching.length > 0 ? (
+                <div className="space-y-4">
+                    {registeredCoaching.map(center => (
+                        <div key={center.id} className="p-4 border rounded-lg hover:bg-muted/50 transition-colors">
+                            <p className="font-semibold">{center.name}</p>
+                            <p className="text-sm text-muted-foreground">{center.specialty}</p>
+                            <p className="text-sm text-muted-foreground mt-2">Coach: {center.coach}</p>
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                <div className="text-center py-8">
+                    <p className="text-sm text-muted-foreground">You are not enrolled in any coaching centers.</p>
+                     <Link href="/coaching" passHref>
+                    <Button variant="link" className="mt-2">
+                      Browse Coaching Centers
+                    </Button>
+                  </Link>
+                </div>
+            )}
           </CardContent>
         </Card>
       </motion.div>

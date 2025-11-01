@@ -7,10 +7,10 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { motion } from 'framer-motion';
 import EventCard from '../EventCard';
-import { useEvents } from '@/context/EventContext';
+import { useApp } from '@/context/EventContext';
 
 export default function AdminDashboard() {
-    const { events } = useEvents();
+    const { events } = useApp();
 
     const containerVariants = {
         hidden: { opacity: 0 },

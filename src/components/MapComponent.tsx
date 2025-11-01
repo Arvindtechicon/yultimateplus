@@ -21,7 +21,7 @@ import { Navigation, Pin } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useEvents } from '@/context/EventContext';
+import { useApp } from '@/context/EventContext';
 
 const containerStyle = {
   width: '100%',
@@ -195,7 +195,7 @@ const darkMapOptions = {
 function MapComponent() {
   const searchParams = useSearchParams();
   const venueId = searchParams.get('venueId');
-  const { events } = useEvents();
+  const { events } = useApp();
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',

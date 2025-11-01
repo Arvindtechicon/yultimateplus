@@ -16,14 +16,14 @@ import {
     DialogTitle,
     DialogTrigger,
   } from "@/components/ui/dialog";
-import { useEvents } from '@/context/EventContext';
+import { useApp } from '@/context/EventContext';
 
 interface OrganizerDashboardProps {
   user: User;
 }
 
 export default function OrganizerDashboard({ user }: OrganizerDashboardProps) {
-  const { events, addEvent } = useEvents();
+  const { events, addEvent } = useApp();
   const [isAddEventOpen, setAddEventOpen] = useState(false);
 
   const myOrganizations = organizations.filter(org => org.organizers.includes(user.id));
