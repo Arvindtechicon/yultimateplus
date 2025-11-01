@@ -14,12 +14,38 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Search } from 'lucide-react';
+import { Search, PlusCircle } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import AddEventForm from '@/components/dashboard/AddEventForm';
+import type { Event } from '@/lib/mockData';
 
 export default function EventListPage() {
-  const { events, venues } = useAppData();
+  const { events, venues, addEvent, organizations } = useAppData();
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [dateFilter, setDateFilter] = useState('all');
+  const [isAddEventOpen, setAddEventOpen] = useState(false);
+
+  const canAddEvent = user?.role === 'Admin' || user?.role === 'Organizer';
+
+  const myOrganizations = useMemo(() => {
+    if (user?.role === 'Admin') {
+      return organizations;
+    }
+    if (user?.role === 'Organizer') {
+      return organizations.filter((org) => org.organizers.includes(user.id));
+    }
+    return [];
+  }, [user, organizations]);
 
   const filteredEvents = useMemo(() => {
     let filtered = events;
@@ -45,6 +71,11 @@ export default function EventListPage() {
 
     return filtered;
   }, [events, searchQuery, dateFilter, venues]);
+
+  const handleAddEvent = (newEvent: Omit<Event, 'id' | 'participants'>) => {
+    addEvent(newEvent);
+    setAddEventOpen(false);
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -98,6 +129,29 @@ export default function EventListPage() {
                     <SelectItem value="past">Past</SelectItem>
                 </SelectContent>
             </Select>
+            {canAddEvent && (
+              <Dialog open={isAddEventOpen} onOpenChange={setAddEventOpen}>
+                <DialogTrigger asChild>
+                  <Button className="h-11">
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Add Event
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px] glass-card">
+                  <DialogHeader>
+                    <DialogTitle>Create a New Event</DialogTitle>
+                    <DialogDescription>
+                      Fill out the details for the new event.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <AddEventForm
+                    organizations={myOrganizations}
+                    onSubmit={handleAddEvent}
+                    onCancel={() => setAddEventOpen(false)}
+                  />
+                </DialogContent>
+              </Dialog>
+            )}
         </motion.div>
 
 

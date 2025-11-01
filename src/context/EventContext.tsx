@@ -2,7 +2,7 @@
 "use client";
 
 import { createContext, useContext, useState, type ReactNode, useCallback, useEffect } from 'react';
-import type { Event, CoachingCenter, Session, Child, Assessment, HomeVisit, MockAlert, Venue, ImagePlaceholder } from '@/lib/mockData';
+import type { Event, CoachingCenter, Session, Child, Assessment, HomeVisit, MockAlert, Venue, ImagePlaceholder, Organization } from '@/lib/mockData';
 import { 
     events as initialEvents, 
     coachingCenters as initialCoachingCenters, 
@@ -11,7 +11,8 @@ import {
     mockAssessments as initialAssessments,
     mockHomeVisits as initialHomeVisits,
     mockAlerts as initialAlerts,
-    venues as initialVenues
+    venues as initialVenues,
+    organizations as initialOrganizations
 } from '@/lib/mockData';
 
 interface AppContextType {
@@ -23,11 +24,12 @@ interface AppContextType {
   homeVisits: HomeVisit[];
   alerts: MockAlert[];
   venues: Venue[];
+  organizations: Organization[];
   tempEventImages: { [eventId: number]: ImagePlaceholder[] };
   addEvent: (newEventData: Omit<Event, 'id' | 'participants'>) => void;
   updateEvent: (eventId: number, updatedEventData: Omit<Event, 'id' | 'participants'>) => void;
   toggleEventRegistration: (eventId: number, userId: number) => void;
-  addCoachingCenter: (newCenterData: Omit<CoachingCenter, 'id' | 'participants'>) => void;
+  addCoachingCenter: (newCenterData: Omit<CoachingCenter, 'id' | 'participants' | 'coordinates'>) => void;
   toggleCoachingCenterRegistration: (centerId: number, userId: number) => void;
   markSessionAttendance: (sessionId: string, childId: string) => void;
   addAssessment: (newAssessmentData: Omit<Assessment, 'date'>) => void;
@@ -64,6 +66,7 @@ export function AppDataProvider({ children: componentChildren }: { children: Rea
   const [homeVisits, setHomeVisits] = useState<HomeVisit[]>(() => getInitialState('y-ultimate-home-visits', initialHomeVisits));
   const [alerts, setAlerts] = useState<MockAlert[]>(initialAlerts);
   const [venues, setVenues] = useState<Venue[]>(() => getInitialState('y-ultimate-venues', initialVenues));
+  const [organizations, setOrganizations] = useState<Organization[]>(() => getInitialState('y-ultimate-organizations', initialOrganizations));
   const [tempEventImages, setTempEventImages] = useState<{ [eventId: number]: ImagePlaceholder[] }>(() => getInitialState('y-ultimate-temp-images', {}));
 
   useEffect(() => {
@@ -93,6 +96,10 @@ export function AppDataProvider({ children: componentChildren }: { children: Rea
   useEffect(() => {
     localStorage.setItem('y-ultimate-temp-images', JSON.stringify(tempEventImages));
   }, [tempEventImages]);
+
+  useEffect(() => {
+    localStorage.setItem('y-ultimate-organizations', JSON.stringify(organizations));
+  }, [organizations]);
 
 
   const addEvent = useCallback((newEventData: Omit<Event, 'id' | 'participants'>) => {
@@ -135,11 +142,12 @@ export function AppDataProvider({ children: componentChildren }: { children: Rea
     );
   }, []);
 
-  const addCoachingCenter = useCallback((newCenterData: Omit<CoachingCenter, 'id' | 'participants'>) => {
+  const addCoachingCenter = useCallback((newCenterData: Omit<CoachingCenter, 'id' | 'participants' | 'coordinates'>) => {
     setCoachingCenters(prevCenters => [
       ...prevCenters,
       {
         ...newCenterData,
+        fee: Number(newCenterData.fee) || 0,
         id: prevCenters.length > 0 ? Math.max(...prevCenters.map(c => c.id)) + 1 : 1,
         participants: [],
         // Assign mock coordinates for new centers
@@ -229,6 +237,7 @@ export function AppDataProvider({ children: componentChildren }: { children: Rea
       homeVisits,
       alerts,
       venues,
+      organizations,
       tempEventImages,
       addEvent,
       updateEvent,
