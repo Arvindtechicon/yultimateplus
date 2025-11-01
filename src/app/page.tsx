@@ -34,7 +34,7 @@ export default function Home() {
 
   const loginOptions = [
     { role: 'Admin' as const, icon: Shield, title: 'Tournament Organizer', description: 'Oversee and manage the entire platform.' },
-    { role: 'Organizer' as const, icon: User, title: 'Organizer', description: 'Create and manage your own events.' },
+    { role: 'Organizer' as const, icon: User, title: 'Coach', description: 'Create and manage your own events.' },
     { role: 'Participant' as const, icon: Trophy, title: 'Participant', description: 'Join events and track your activity.' },
   ];
 
