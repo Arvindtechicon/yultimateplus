@@ -9,7 +9,7 @@ import {
   InfoWindow,
   DirectionsRenderer,
 } from '@react-google-maps/api';
-import { venues, coachingCenters, mockCommunities, mockSessions, type Community } from '@/lib/mockData';
+import { venues as initialVenues } from '@/lib/mockData';
 import {
   Card,
   CardContent,
@@ -18,23 +18,20 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Navigation, Pin, Users, BookOpen } from 'lucide-react';
+import { Navigation, Pin } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useAppData } from '@/context/EventContext';
 import { cn } from '@/lib/utils';
-import { Badge } from './ui/badge';
 
 
 type PointOfInterest = {
     id: string;
     name: string;
-    type: 'venue' | 'center' | 'community';
+    type: 'venue';
     coordinates: { lat: number, lng: number };
     description: string;
-    children?: number;
-    sessions?: number;
 };
 
 const containerStyle = {
@@ -209,8 +206,6 @@ const darkMapOptions = {
 const getIconUrl = (type: PointOfInterest['type']) => {
     const color = {
         venue: 'FF6B6B', // red
-        center: '4ECDC4', // teal
-        community: '45B7D1' // blue
     }[type];
     return `https://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|${color}`;
 }
@@ -218,7 +213,7 @@ const getIconUrl = (type: PointOfInterest['type']) => {
 function MapComponent() {
   const searchParams = useSearchParams();
   const venueId = searchParams.get('venueId');
-  const { events } = useAppData();
+  const { events, venues } = useAppData();
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
@@ -236,8 +231,6 @@ function MapComponent() {
 
   const pointsOfInterest: PointOfInterest[] = [
     ...venues.map(v => ({ id: `v-${v.id}`, name: v.name, type: 'venue' as const, coordinates: v.coordinates, description: v.location })),
-    ...coachingCenters.map(c => ({ id: `c-${c.id}`, name: c.name, type: 'center' as const, coordinates: c.coordinates, description: c.specialty })),
-    ...mockCommunities.map(c => ({ id: `com-${c.name}`, name: c.name, type: 'community' as const, coordinates: { lat: c.lat, lng: c.lng }, description: `${c.children} children`, children: c.children, sessions: mockSessions.filter(s => s.community === c.name).length }))
   ]
 
   useEffect(() => {
@@ -258,13 +251,13 @@ function MapComponent() {
   }, []);
 
   useEffect(() => {
-    if (venueId) {
+    if (isLoaded && venueId) {
       const venue = pointsOfInterest.find((v) => v.id === `v-${venueId}`);
       if (venue) {
-        handlePoiSelect(venue, false);
+        handlePoiSelect(venue);
       }
     }
-  }, [venueId]);
+  }, [venueId, isLoaded]);
 
   const handleGetDirections = () => {
     if (!selectedPoi || !userLocation) return;
@@ -286,12 +279,7 @@ function MapComponent() {
     );
   };
 
-  const handlePoiSelect = (poi: PointOfInterest, openInMaps: boolean = true) => {
-    if (openInMaps) {
-        const { lat, lng } = poi.coordinates;
-        const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
-        window.open(url, '_blank');
-    }
+  const handlePoiSelect = (poi: PointOfInterest) => {
     setSelectedPoi(poi);
     setMapCenter(poi.coordinates);
     setZoom(14);
@@ -301,8 +289,6 @@ function MapComponent() {
   const getIconForPoi = (type: PointOfInterest['type']) => {
     switch (type) {
       case 'venue': return <Pin className="w-5 h-5 text-red-500" />;
-      case 'center': return <BookOpen className="w-5 h-5 text-teal-500" />;
-      case 'community': return <Users className="w-5 h-5 text-blue-500" />;
       default: return <Pin className="w-5 h-5 text-primary" />;
     }
   }
@@ -321,7 +307,7 @@ function MapComponent() {
         animate={{x: 0, opacity: 1}}
         className="lg:col-span-1 space-y-4 overflow-y-auto p-4 bg-background/80 backdrop-blur-sm"
       >
-        <h2 className="text-2xl font-bold px-2">Points of Interest</h2>
+        <h2 className="text-2xl font-bold px-2">Event Venues</h2>
         {pointsOfInterest.map((poi, i) => (
           <motion.div
             key={poi.id}
@@ -351,11 +337,6 @@ function MapComponent() {
                         </ul>
                     </div>
                 )}
-                 {poi.type === 'community' && (
-                    <div className="mt-2 text-sm text-muted-foreground">
-                        {poi.sessions} active sessions
-                    </div>
-                 )}
               </CardContent>
             </Card>
           </motion.div>
@@ -385,7 +366,7 @@ function MapComponent() {
             </div>
             {!selectedPoi && (
               <p className="text-sm text-muted-foreground mt-2">
-                Select a point of interest from the list to get directions.
+                Select an event venue from the list to get directions.
               </p>
             )}
           </Card>
@@ -415,7 +396,6 @@ function MapComponent() {
                 <motion.div initial={{opacity:0, y:10}} animate={{opacity:1, y:0}}>
                   <h3 className="font-bold text-gray-800">{selectedPoi.name}</h3>
                    <p className='text-gray-600 text-sm'>{selectedPoi.description}</p>
-                   {selectedPoi.type === 'community' && <p className='text-gray-600 text-sm'>{selectedPoi.sessions} active sessions</p>}
                 </motion.div>
               </InfoWindow>
             )}
