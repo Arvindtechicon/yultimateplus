@@ -14,6 +14,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  CardDescription,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,6 +24,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useAppData } from '@/context/EventContext';
 import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
 
 
 type PointOfInterest = {
@@ -258,7 +260,7 @@ function MapComponent() {
         handlePoiSelect(venue);
       }
     }
-  }, [venueId, isLoaded]);
+  }, [venueId, isLoaded, pointsOfInterest]);
 
   const handleGetDirections = () => {
     if (!selectedPoi || !userLocation) return;
@@ -307,9 +309,34 @@ function MapComponent() {
       <motion.div 
         initial={{x: -100, opacity: 0}}
         animate={{x: 0, opacity: 1}}
-        className="lg:col-span-1 space-y-4 overflow-y-auto p-4 bg-background/80 backdrop-blur-sm"
+        className="lg:col-span-1 flex flex-col p-4 bg-background/80 backdrop-blur-sm"
       >
-        <h2 className="text-2xl font-bold px-2">Points of Interest</h2>
+        <div className='p-2 space-y-4'>
+            <h2 className="text-2xl font-bold">Points of Interest</h2>
+             <Card className="p-4 glass-card">
+                <div className="flex gap-2">
+                <Input
+                    placeholder="Enter your starting location"
+                    value={userLocation}
+                    onChange={(e) => setUserLocation(e.target.value)}
+                    disabled={!selectedPoi}
+                />
+                <Button
+                    onClick={handleGetDirections}
+                    disabled={!selectedPoi || !userLocation}
+                >
+                    <Navigation className="mr-2 h-4 w-4" />
+                    Get Directions
+                </Button>
+                </div>
+                {!selectedPoi && (
+                <p className="text-sm text-muted-foreground mt-2">
+                    Select a point of interest from the list to get directions.
+                </p>
+                )}
+            </Card>
+        </div>
+        <div className='overflow-y-auto space-y-4 p-2 flex-grow'>
         {pointsOfInterest.map((poi, i) => (
           <motion.div
             key={poi.id}
@@ -324,15 +351,21 @@ function MapComponent() {
               onClick={() => handlePoiSelect(poi)}
             >
               <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  {getIconForPoi(poi.type)}
-                  {poi.name}
-                </CardTitle>
+                <div className='flex justify-between items-start'>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                        {getIconForPoi(poi.type)}
+                        {poi.name}
+                    </CardTitle>
+                    <Badge variant={poi.type === 'venue' ? 'destructive' : 'secondary'}>
+                        {poi.type === 'venue' ? 'Event Venue' : 'Coaching Center'}
+                    </Badge>
+                </div>
+                <CardDescription>{poi.description}</CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground">{poi.description}</p>
+                
                 {poi.type === 'venue' && (
-                    <div className="mt-4">
+                    <div className="mt-2">
                         <h4 className="font-semibold text-sm mb-2">Events at this venue:</h4>
                         <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
                             {events.filter(e => e.venueId === parseInt(poi.id.split('-')[1])).map(e => <li key={e.id}>{e.name}</li>)}
@@ -340,7 +373,7 @@ function MapComponent() {
                     </div>
                 )}
                  {poi.type === 'coachingCenter' && (
-                    <div className="mt-4">
+                    <div className="mt-2">
                         <h4 className="font-semibold text-sm mb-2">Details:</h4>
                         <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
                             <li>Specialty: {coachingCenters.find(c => c.id === parseInt(poi.id.split('-')[1]))?.specialty}</li>
@@ -352,36 +385,9 @@ function MapComponent() {
             </Card>
           </motion.div>
         ))}
+        </div>
       </motion.div>
       <div className="lg:col-span-2 h-full flex flex-col relative">
-        <motion.div 
-          initial={{opacity: 0, y: -20}}
-          animate={{opacity: 1, y: 0}}
-          className="absolute top-4 left-4 right-4 z-10"
-        >
-          <Card className="p-4 glass-card">
-            <div className="flex gap-2">
-              <Input
-                placeholder="Enter your starting location"
-                value={userLocation}
-                onChange={(e) => setUserLocation(e.target.value)}
-                disabled={!selectedPoi}
-              />
-              <Button
-                onClick={handleGetDirections}
-                disabled={!selectedPoi || !userLocation}
-              >
-                <Navigation className="mr-2 h-4 w-4" />
-                Get Directions
-              </Button>
-            </div>
-            {!selectedPoi && (
-              <p className="text-sm text-muted-foreground mt-2">
-                Select a point of interest from the list to get directions.
-              </p>
-            )}
-          </Card>
-        </motion.div>
         <div className="flex-grow">
           <GoogleMap
             mapContainerStyle={containerStyle}
@@ -429,4 +435,5 @@ function MapComponent() {
 
 export default MapComponent;
 
+    
     
