@@ -2,7 +2,7 @@
 
 import type { User } from '@/lib/mockData';
 import { venues } from '@/lib/mockData';
-import { CalendarCheck, Search, Trophy, X } from 'lucide-react';
+import { CalendarCheck, Search, Trophy, X, BookOpen } from 'lucide-react';
 import { StatCard } from './StatCard';
 import {
   Card,
@@ -29,7 +29,7 @@ interface ParticipantDashboardProps {
 export default function ParticipantDashboard({
   user,
 }: ParticipantDashboardProps) {
-  const { events } = useApp();
+  const { events, coachingCenters } = useApp();
   const [searchQuery, setSearchQuery] = useState('');
 
   const registeredEvents = events.filter((event) =>
@@ -45,7 +45,10 @@ export default function ParticipantDashboard({
     .sort(
       (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
     );
-    
+
+  const enrolledCoachingCenters = coachingCenters.filter((center) => 
+    center.participants.includes(user.id)
+  );
 
   const searchResults = useMemo(() => {
     if (!searchQuery) return [];
@@ -81,7 +84,7 @@ export default function ParticipantDashboard({
         Welcome, {user.name.split(' ')[0]}!
       </motion.h1>
       <motion.div
-        className="grid gap-6 md:grid-cols-2"
+        className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -97,6 +100,12 @@ export default function ParticipantDashboard({
           value={pastEvents.length}
           icon={Trophy}
           description="Events you've attended"
+        />
+        <StatCard
+          title="Coaching Enrollments"
+          value={enrolledCoachingCenters.length}
+          icon={BookOpen}
+          description="Your current coaching programs"
         />
       </motion.div>
 
@@ -155,117 +164,158 @@ export default function ParticipantDashboard({
         </Card>
       </motion.div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-      >
-        <Card className="glass-card">
-          <CardHeader>
-            <CardTitle>
-              Your Registered Events ({registeredEvents.length})
-            </CardTitle>
-            <CardDescription>
-              All your upcoming and past events at a glance.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Upcoming</h3>
-              {upcomingEvents.length > 0 ? (
-                <div className="grid gap-4">
-                  {upcomingEvents.map((event) => {
-                    const venue = venues.find((v) => v.id === event.venueId);
-                    return (
-                      <div
+      <div className="grid gap-8 lg:grid-cols-2">
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+        >
+            <Card className="glass-card">
+            <CardHeader>
+                <CardTitle>
+                Your Registered Events ({registeredEvents.length})
+                </CardTitle>
+                <CardDescription>
+                All your upcoming and past events at a glance.
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+                <div>
+                <h3 className="text-lg font-semibold mb-4">Upcoming</h3>
+                {upcomingEvents.length > 0 ? (
+                    <div className="grid gap-4">
+                    {upcomingEvents.map((event) => {
+                        const venue = venues.find((v) => v.id === event.venueId);
+                        return (
+                        <div
+                            key={event.id}
+                            className="p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                        >
+                            <div className="flex justify-between items-start gap-4">
+                            <div>
+                                <p className="font-semibold">{event.name}</p>
+                                <p className="text-sm text-muted-foreground">
+                                {format(new Date(event.date), 'PPPP p')}
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                {venue?.name} - {venue?.location}
+                                </p>
+                            </div>
+                            <div className="text-right">
+                                <Badge
+                                variant={
+                                    event.type === 'Tournament'
+                                    ? 'default'
+                                    : 'secondary'
+                                }
+                                >
+                                {event.type}
+                                </Badge>
+                                <p className="text-xs text-primary mt-1">
+                                Starts{' '}
+                                {formatDistanceToNow(new Date(event.date), {
+                                    addSuffix: true,
+                                })}
+                                </p>
+                            </div>
+                            </div>
+                            <div className="flex justify-end mt-4">
+                            <Link href={`/map?venueId=${event.venueId}`} passHref>
+                                <Button size="sm" variant="outline">
+                                View on Map
+                                </Button>
+                            </Link>
+                            </div>
+                        </div>
+                        );
+                    })}
+                    </div>
+                ) : (
+                    <div className="text-center py-8">
+                    <p className="text-sm text-muted-foreground">
+                        You are not registered for any upcoming events.
+                    </p>
+                    <Link href="/events" passHref>
+                        <Button variant="link" className="mt-2">
+                        Browse Events
+                        </Button>
+                    </Link>
+                    </div>
+                )}
+                </div>
+
+                <Separator />
+
+                <div>
+                <h3 className="text-lg font-semibold mb-4">Past</h3>
+                {pastEvents.length > 0 ? (
+                    <div className="grid gap-4">
+                    {pastEvents.map((event) => (
+                        <div
                         key={event.id}
-                        className="p-4 border rounded-lg hover:bg-muted/50 transition-colors"
-                      >
-                        <div className="flex justify-between items-start gap-4">
-                          <div>
+                        className="p-4 border rounded-lg opacity-70"
+                        >
+                        <div className="flex justify-between items-start">
+                            <div>
                             <p className="font-semibold">{event.name}</p>
                             <p className="text-sm text-muted-foreground">
-                              {format(new Date(event.date), 'PPPP p')}
+                                {format(new Date(event.date), 'MMMM d, yyyy')}
                             </p>
-                            <p className="text-sm text-muted-foreground">
-                              {venue?.name} - {venue?.location}
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <Badge
-                              variant={
-                                event.type === 'Tournament'
-                                  ? 'default'
-                                  : 'secondary'
-                              }
-                            >
-                              {event.type}
-                            </Badge>
-                            <p className="text-xs text-primary mt-1">
-                              Starts{' '}
-                              {formatDistanceToNow(new Date(event.date), {
-                                addSuffix: true,
-                              })}
-                            </p>
-                          </div>
+                            </div>
+                            <Badge variant="outline">{event.type}</Badge>
                         </div>
-                        <div className="flex justify-end mt-4">
-                          <Link href={`/map?venueId=${event.venueId}`} passHref>
-                            <Button size="sm" variant="outline">
-                              View on Map
-                            </Button>
-                          </Link>
                         </div>
-                      </div>
-                    );
-                  })}
+                    ))}
+                    </div>
+                ) : (
+                    <p className="text-sm text-muted-foreground text-center py-4">
+                    You haven't attended any events yet.
+                    </p>
+                )}
                 </div>
-              ) : (
-                <div className="text-center py-8">
-                  <p className="text-sm text-muted-foreground">
-                    You are not registered for any upcoming events.
-                  </p>
-                  <Link href="/events" passHref>
-                    <Button variant="link" className="mt-2">
-                      Browse Events
-                    </Button>
-                  </Link>
-                </div>
-              )}
-            </div>
-
-            <Separator />
-
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Past</h3>
-              {pastEvents.length > 0 ? (
-                <div className="grid gap-4">
-                  {pastEvents.map((event) => (
-                    <div
-                      key={event.id}
-                      className="p-4 border rounded-lg opacity-70"
-                    >
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-semibold">{event.name}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {format(new Date(event.date), 'MMMM d, yyyy')}
-                          </p>
-                        </div>
-                        <Badge variant="outline">{event.type}</Badge>
-                      </div>
+            </CardContent>
+            </Card>
+        </motion.div>
+        
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+        >
+          <Card className="glass-card h-full">
+            <CardHeader>
+              <CardTitle>Your Coaching Enrollments</CardTitle>
+              <CardDescription>
+                Your currently enrolled coaching programs.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {enrolledCoachingCenters.length > 0 ? (
+                <div className="space-y-4">
+                  {enrolledCoachingCenters.map(center => (
+                    <div key={center.id} className="p-4 border rounded-lg hover:bg-muted/50 transition-colors">
+                      <p className="font-semibold">{center.name}</p>
+                      <p className="text-sm text-muted-foreground">{center.specialty}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{center.location}</p>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground text-center py-4">
-                  You haven't attended any events yet.
-                </p>
+                <div className="text-center py-8">
+                  <p className="text-sm text-muted-foreground">
+                    You are not enrolled in any coaching centers.
+                  </p>
+                  <Link href="/coaching" passHref>
+                    <Button variant="link" className="mt-2">
+                      Browse Coaching Centers
+                    </Button>
+                  </Link>
+                </div>
               )}
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
     </div>
   );
 }
