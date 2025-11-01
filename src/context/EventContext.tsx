@@ -2,7 +2,7 @@
 "use client";
 
 import { createContext, useContext, useState, type ReactNode, useCallback, useEffect } from 'react';
-import type { Event, CoachingCenter, Session, Child, Assessment, HomeVisit, MockAlert, Venue } from '@/lib/mockData';
+import type { Event, CoachingCenter, Session, Child, Assessment, HomeVisit, MockAlert, Venue, ImagePlaceholder } from '@/lib/mockData';
 import { 
     events as initialEvents, 
     coachingCenters as initialCoachingCenters, 
@@ -23,6 +23,7 @@ interface AppContextType {
   homeVisits: HomeVisit[];
   alerts: MockAlert[];
   venues: Venue[];
+  tempEventImages: { [eventId: number]: ImagePlaceholder[] };
   addEvent: (newEventData: Omit<Event, 'id' | 'participants'>) => void;
   updateEvent: (eventId: number, updatedEventData: Omit<Event, 'id' | 'participants'>) => void;
   toggleEventRegistration: (eventId: number, userId: number) => void;
@@ -32,6 +33,7 @@ interface AppContextType {
   addAssessment: (newAssessmentData: Omit<Assessment, 'date'>) => void;
   addHomeVisit: (newHomeVisitData: Omit<HomeVisit, 'id'>) => void;
   addVenue: (venueName: string) => Venue;
+  addImageToEvent: (eventId: number, image: ImagePlaceholder) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -62,6 +64,7 @@ export function AppDataProvider({ children: componentChildren }: { children: Rea
   const [homeVisits, setHomeVisits] = useState<HomeVisit[]>(() => getInitialState('y-ultimate-home-visits', initialHomeVisits));
   const [alerts, setAlerts] = useState<MockAlert[]>(initialAlerts);
   const [venues, setVenues] = useState<Venue[]>(() => getInitialState('y-ultimate-venues', initialVenues));
+  const [tempEventImages, setTempEventImages] = useState<{ [eventId: number]: ImagePlaceholder[] }>(() => getInitialState('y-ultimate-temp-images', {}));
 
   useEffect(() => {
     localStorage.setItem('y-ultimate-events', JSON.stringify(events));
@@ -86,6 +89,10 @@ export function AppDataProvider({ children: componentChildren }: { children: Rea
   useEffect(() => {
     localStorage.setItem('y-ultimate-venues', JSON.stringify(venues));
     }, [venues]);
+  
+  useEffect(() => {
+    localStorage.setItem('y-ultimate-temp-images', JSON.stringify(tempEventImages));
+  }, [tempEventImages]);
 
 
   const addEvent = useCallback((newEventData: Omit<Event, 'id' | 'participants'>) => {
@@ -206,6 +213,13 @@ export function AppDataProvider({ children: componentChildren }: { children: Rea
     return newVenue;
   }, [venues]);
 
+  const addImageToEvent = useCallback((eventId: number, image: ImagePlaceholder) => {
+    setTempEventImages(prev => ({
+        ...prev,
+        [eventId]: [...(prev[eventId] || []), image]
+    }));
+  }, []);
+
   const contextValue = {
       events,
       coachingCenters,
@@ -215,6 +229,7 @@ export function AppDataProvider({ children: componentChildren }: { children: Rea
       homeVisits,
       alerts,
       venues,
+      tempEventImages,
       addEvent,
       updateEvent,
       toggleEventRegistration,
@@ -224,6 +239,7 @@ export function AppDataProvider({ children: componentChildren }: { children: Rea
       addAssessment,
       addHomeVisit,
       addVenue,
+      addImageToEvent,
   }
 
   return (

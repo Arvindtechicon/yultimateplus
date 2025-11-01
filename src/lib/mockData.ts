@@ -99,6 +99,14 @@ export interface Community {
     children: number;
 }
 
+export interface ImagePlaceholder {
+    id: string;
+    description: string;
+    imageUrl: string;
+    imageHint: string;
+    eventId?: number;
+  }
+
 
 export const mockAlerts: MockAlert[] = [
     { id: 1, message: "Attendance missing for Session S002", type: 'destructive' },
