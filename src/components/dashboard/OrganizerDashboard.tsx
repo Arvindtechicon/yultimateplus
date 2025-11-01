@@ -1,5 +1,5 @@
 
-import type { User, Event, Child } from '@/lib/mockData';
+import type { User, Event, Child, HomeVisit } from '@/lib/mockData';
 import { organizations, venues, mockSessions, mockChildren } from '@/lib/mockData';
 import { StatCard } from './StatCard';
 import { Calendar, Users, Building, PlusCircle, Home, QrCode, Percent, BookUser } from 'lucide-react';
@@ -28,11 +28,15 @@ import { Calendar as CalendarComponent } from '../ui/calendar';
 import { Textarea } from '../ui/textarea';
 import QrScanner from 'react-qr-scanner';
 import { cn } from '@/lib/utils';
-import { FormControl } from '../ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import LogHomeVisitForm from './LogHomeVisitForm';
 
 
 export default function OrganizerDashboard({ user }: { user: User }) {
-  const { events, addEvent } = useApp();
+  const { events, addEvent, addHomeVisit: logHomeVisit } = useApp();
   const [isAddEventOpen, setAddEventOpen] = useState(false);
   const [isAttendanceModalOpen, setAttendanceModalOpen] = useState(false);
   const [isHomeVisitModalOpen, setHomeVisitModalOpen] = useState(false);
@@ -62,25 +66,11 @@ export default function OrganizerDashboard({ user }: { user: User }) {
     setAddEventOpen(false);
   }
 
-  const handleLogHomeVisit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const childId = formData.get('childId');
-    const date = formData.get('date');
-    const notes = formData.get('notes');
-
-    if (!childId || !date || !notes) {
-      toast({
-        variant: "destructive",
-        title: "Missing fields",
-        description: "Please fill out all fields to log a home visit.",
-      });
-      return;
-    }
-
-    toast({
+  const handleLogHomeVisit = (data: Omit<HomeVisit, 'id'>) => {
+    logHomeVisit(data);
+     toast({
         title: "Home Visit Logged",
-        description: `Visit for ${mockChildren.find(c => c.id === childId)?.name} on ${format(new Date(date.toString()), "PPP")} has been logged.`
+        description: `Visit for ${mockChildren.find(c => c.id === data.childId)?.name} on ${format(new Date(data.date.toString()), "PPP")} has been logged.`
     })
     setHomeVisitModalOpen(false);
   }
@@ -170,53 +160,11 @@ export default function OrganizerDashboard({ user }: { user: User }) {
                                 <DialogTitle>Log Home Visit</DialogTitle>
                                 <DialogDescription>Fill in the details for your home visit.</DialogDescription>
                             </DialogHeader>
-                            <form className='space-y-4 py-4' onSubmit={handleLogHomeVisit}>
-                                <div className="space-y-2">
-                                    <Label htmlFor="childId">Child</Label>
-                                    <Select name="childId" required>
-                                        <SelectTrigger id="childId">
-                                            <SelectValue placeholder="Select a child" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {mockChildren.map(child => (
-                                                <SelectItem key={child.id} value={child.id}>{child.name}</SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Date of Visit</Label>
-                                     <Popover>
-                                        <PopoverTrigger asChild>
-                                            <FormControl>
-                                                <Button
-                                                name="date"
-                                                variant={"outline"}
-                                                className={cn("w-full justify-start text-left font-normal"
-                                                )}
-                                                >
-                                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                                <span>Pick a date</span>
-                                                </Button>
-                                            </FormControl>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-auto p-0">
-                                        <CalendarComponent
-                                            mode="single"
-                                            initialFocus
-                                        />
-                                        </PopoverContent>
-                                    </Popover>
-                                </div>
-                                 <div className="space-y-2">
-                                    <Label htmlFor="notes">Visit Notes</Label>
-                                    <Textarea id="notes" name="notes" placeholder="Enter notes from your visit..." required/>
-                                 </div>
-                                 <div className="flex justify-end gap-2 pt-4">
-                                    <Button type="button" variant="ghost" onClick={() => setHomeVisitModalOpen(false)}>Cancel</Button>
-                                    <Button type="submit">Log Visit</Button>
-                                </div>
-                            </form>
+                            <LogHomeVisitForm 
+                                children={mockChildren}
+                                onSubmit={handleLogHomeVisit}
+                                onCancel={() => setHomeVisitModalOpen(false)}
+                            />
                         </DialogContent>
                     </Dialog>
                 </CardContent>

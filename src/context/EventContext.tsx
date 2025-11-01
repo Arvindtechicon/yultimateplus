@@ -129,12 +129,13 @@ export function AppProvider({ children: componentChildren }: { children: ReactNo
     ]);
   }, []);
 
-  const addHomeVisit = useCallback((newHomeVisitData: Omit<HomeVisit, 'id'>) => {
+  const addHomeVisit = useCallback((newHomeVisitData: Omit<HomeVisit, 'id' | 'date'>) => {
     setHomeVisits(prev => [
         ...prev,
         {
             ...newHomeVisitData,
-            id: `HV${prev.length + 1}`
+            id: `HV${prev.length + 1}`,
+            date: newHomeVisitData.date.toISOString(),
         }
     ])
   }, []);
