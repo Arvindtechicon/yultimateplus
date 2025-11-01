@@ -14,6 +14,11 @@ export interface Event {
   organizationId: number;
   type: 'Tournament' | 'Workshop' | 'Meetup';
   participants: number[]; // array of user IDs
+  winners?: {
+    first: string;
+    second: string;
+    third: string;
+  }
 }
 
 export interface Venue {
@@ -62,6 +67,11 @@ export const events: Event[] = [
     organizationId: 1,
     type: 'Tournament',
     participants: [3, 4, 5],
+    winners: {
+        first: 'John Smith',
+        second: 'Jane Doe',
+        third: 'Participant User',
+    }
   },
   {
     id: 2,

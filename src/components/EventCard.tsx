@@ -27,9 +27,10 @@ import {
   Edit,
   LogIn,
   LogOut,
+  Trophy,
 } from 'lucide-react';
 import type { Event } from '@/lib/mockData';
-import { venues, organizations } from '@/lib/mockData';
+import { venues, organizations, users } from '@/lib/mockData';
 import { format } from 'date-fns';
 import Link from 'next/link';
 import QRCodeComponent from 'qrcode.react';
@@ -57,6 +58,7 @@ export default function EventCard({ event, showEditButton }: EventCardProps) {
   const isParticipant = user?.role === 'Participant';
   const isRegistered = isParticipant && user && event.participants.includes(user.id);
   const myOrganizations = organizations.filter(org => user && org.organizers.includes(user.id));
+  const isPastEvent = new Date(event.date) < new Date();
 
   const qrValue = JSON.stringify({ 
     eventId: event.id, 
@@ -136,6 +138,7 @@ export default function EventCard({ event, showEditButton }: EventCardProps) {
                 onClick={handleRegistration} 
                 className="w-full"
                 variant={isRegistered ? 'secondary' : 'default'}
+                disabled={isPastEvent}
                 >
                 {isRegistered ? <LogOut className='mr-2' /> : <LogIn className='mr-2' />}
                 {isRegistered ? 'Unregister' : 'Register'}
@@ -192,7 +195,7 @@ export default function EventCard({ event, showEditButton }: EventCardProps) {
             </Button>
           </Link>
           {showEditButton && (
-             <div className='col-span-2 mt-2'>
+             <div className='col-span-2 mt-2 grid grid-cols-2 gap-2'>
                 <Dialog open={isEditDialogOpen} onOpenChange={setEditDialogOpen}>
                     <DialogTrigger asChild>
                         <Button variant="secondary" className="w-full">
@@ -216,6 +219,56 @@ export default function EventCard({ event, showEditButton }: EventCardProps) {
                         />
                     </DialogContent>
                 </Dialog>
+                {event.winners && (
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" className="w-full">
+                        <Trophy className="mr-2 h-4 w-4" />
+                        View Winners
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-sm glass-card">
+                      <DialogHeader>
+                        <DialogTitle className='flex items-center gap-2'>
+                          <Trophy className="w-6 h-6 text-primary" />
+                          Winners: {event.name}
+                        </DialogTitle>
+                        <DialogDescription>
+                          Congratulations to the winners of the event!
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="py-4 space-y-4">
+                          <div className='flex items-center gap-4 p-3 rounded-lg bg-yellow-400/20'>
+                            <div className='p-2 bg-yellow-500 rounded-full text-white'>
+                              <Trophy className='w-5 h-5'/>
+                            </div>
+                            <div>
+                              <p className='text-xs font-semibold text-yellow-600'>1st Place</p>
+                              <p className='font-bold text-lg text-yellow-800 dark:text-yellow-300'>{event.winners.first}</p>
+                            </div>
+                          </div>
+                           <div className='flex items-center gap-4 p-3 rounded-lg bg-gray-400/20'>
+                            <div className='p-2 bg-gray-500 rounded-full text-white'>
+                              <Trophy className='w-5 h-5'/>
+                            </div>
+                            <div>
+                              <p className='text-xs font-semibold text-gray-600'>2nd Place</p>
+                              <p className='font-bold text-lg text-gray-800 dark:text-gray-300'>{event.winners.second}</p>
+                            </div>
+                          </div>
+                           <div className='flex items-center gap-4 p-3 rounded-lg bg-orange-400/20'>
+                            <div className='p-2 bg-orange-500 rounded-full text-white'>
+                              <Trophy className='w-5 h-5'/>
+                            </div>
+                            <div>
+                              <p className='text-xs font-semibold text-orange-600'>3rd Place</p>
+                              <p className='font-bold text-lg text-orange-800 dark:text-orange-300'>{event.winners.third}</p>
+                            </div>
+                          </div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                )}
             </div>
           )}
         </CardFooter>
