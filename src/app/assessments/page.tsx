@@ -62,7 +62,7 @@ export default function AssessmentsPage() {
             LSAS Assessments
           </h1>
           <p className="max-w-[600px] mx-auto text-muted-foreground md:text-xl mt-4">
-            Track and manage child assessments for key life skills.
+            An assessment framework for evaluating an athlete’s technical, tactical, physical, and psychological skills over time.
           </p>
         </motion.div>
 
