@@ -23,13 +23,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { useApp } from '@/context/EventContext';
+import { useAppData } from '@/context/EventContext';
 import { useAuth } from '@/context/AuthContext';
 import DashboardLayout from '@/components/DashboardLayout';
 
 export default function MyEventsPage() {
   const { user } = useAuth();
-  const { events, addEvent } = useApp();
+  const { events, addEvent } = useAppData();
   const [isAddEventOpen, setAddEventOpen] = useState(false);
 
   // Ensure user is defined and is an Organizer before proceeding
