@@ -261,7 +261,7 @@ function MapComponent() {
     if (venueId) {
       const venue = pointsOfInterest.find((v) => v.id === `v-${venueId}`);
       if (venue) {
-        handlePoiSelect(venue);
+        handlePoiSelect(venue, false);
       }
     }
   }, [venueId]);
@@ -286,7 +286,12 @@ function MapComponent() {
     );
   };
 
-  const handlePoiSelect = (poi: PointOfInterest) => {
+  const handlePoiSelect = (poi: PointOfInterest, openInMaps: boolean = true) => {
+    if (openInMaps) {
+        const { lat, lng } = poi.coordinates;
+        const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+        window.open(url, '_blank');
+    }
     setSelectedPoi(poi);
     setMapCenter(poi.coordinates);
     setZoom(14);
