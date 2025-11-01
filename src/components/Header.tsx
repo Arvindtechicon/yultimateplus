@@ -1,7 +1,7 @@
 "use client";
 
 import Link from 'next/link';
-import { Disc3, LogOut, User as UserIcon } from 'lucide-react';
+import { Disc3, LogOut, User as UserIcon, Menu } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,14 +17,24 @@ import { useRouter } from 'next/navigation';
 import { Skeleton } from './ui/skeleton';
 import { DarkModeToggle } from './DarkModeToggle';
 
-export default function Header() {
+interface HeaderProps {
+    onMenuClick?: () => void;
+}
+
+export default function Header({ onMenuClick }: HeaderProps) {
   const { user, logout, loading } = useAuth();
   const router = useRouter();
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-lg">
       <div className="container flex h-16 items-center">
-        <Link href="/" className="mr-6 flex items-center space-x-2">
+        <div className="md:hidden">
+            <Button size="icon" variant="ghost" onClick={onMenuClick}>
+                <Menu className="h-6 w-6" />
+                <span className="sr-only">Toggle Menu</span>
+            </Button>
+        </div>
+        <Link href="/" className="mr-6 hidden md:flex items-center space-x-2">
           <Disc3 className="h-6 w-6 text-primary" />
           <span className="font-bold sm:inline-block">
             Y-Ultimate Pulse
