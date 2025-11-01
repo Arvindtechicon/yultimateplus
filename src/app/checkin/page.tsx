@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { CheckCircle, XCircle, QrCode, VideoOff, User } from 'lucide-react';
+import { CheckCircle, XCircle, QrCode, VideoOff, User, Video } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import DashboardLayout from '@/components/DashboardLayout';
 import { useEvents } from '@/context/EventContext';
@@ -32,9 +32,34 @@ export default function CheckinPage() {
   const [hasCameraPermission, setHasCameraPermission] = useState(true);
   const [isScanning, setIsScanning] = useState(true);
   const { toast } = useToast();
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+
+  useEffect(() => {
+    const getCameraPermission = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        setHasCameraPermission(true);
+        if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+        }
+      } catch (error) {
+        console.error('Error accessing camera:', error);
+        setHasCameraPermission(false);
+        toast({
+          variant: 'destructive',
+          title: 'Camera Access Denied',
+          description: 'Please enable camera permissions in your browser settings.',
+        });
+      }
+    };
+
+    getCameraPermission();
+  }, [toast]);
+
 
   const handleScan = (data: { text: string } | null) => {
-    if (data && isScanning) {
+    if (data?.text && isScanning) {
       setIsScanning(false); // Stop scanning once a code is found
       handleCheckIn(data.text);
     }
@@ -42,13 +67,8 @@ export default function CheckinPage() {
 
   const handleError = (err: any) => {
     console.error(err);
-    if (err?.name === 'NotAllowedError' || err?.name === 'PermissionDeniedError') {
+    if (err?.name === 'NotAllowedError' || err?.name === 'PermissionDeniedError' || err?.name === "NotFoundError") {
         setHasCameraPermission(false);
-        toast({
-            variant: 'destructive',
-            title: 'Camera Access Denied',
-            description: 'Please enable camera permissions in your browser settings.',
-        });
     }
   };
 
@@ -71,6 +91,7 @@ export default function CheckinPage() {
       userName = parsedQr.userName;
       foundEvent = events.find((event) => event.id === eventId);
     } catch (error) {
+      // Fallback for non-JSON QR codes (e.g., just an event ID)
       const eventId = parseInt(qrValue, 10);
       if (!isNaN(eventId)) {
         foundEvent = events.find((e) => e.id === eventId);
@@ -84,7 +105,12 @@ export default function CheckinPage() {
       setCheckinStatus('error');
     }
     
-    setTimeout(() => setIsScanning(true), 3000);
+    // Reset scanner after a delay
+    setTimeout(() => {
+        setCheckinStatus('idle');
+        setCheckedInData(null);
+        setIsScanning(true);
+    }, 3000);
   };
 
 
@@ -109,7 +135,7 @@ export default function CheckinPage() {
             <CardContent>
               <div className="space-y-4">
                 <div className="rounded-lg overflow-hidden relative w-full aspect-video bg-muted flex items-center justify-center">
-                  {hasCameraPermission ? (
+                  {isScanning && hasCameraPermission && (
                     <QrScanner
                       delay={300}
                       onError={handleError}
@@ -117,10 +143,12 @@ export default function CheckinPage() {
                       className="w-full h-full object-cover"
                       constraints={{ video: { facingMode: 'environment' } }}
                     />
-                  ) : (
+                  )}
+                  {!hasCameraPermission && (
                     <div className='text-center text-muted-foreground p-4'>
                         <VideoOff className='w-12 h-12 mx-auto mb-2'/>
-                        <p>Camera access is required to scan QR codes.</p>
+                        <p>Camera access is required.</p>
+                        <p className='text-xs'>Please grant permission in your browser.</p>
                     </div>
                   )}
                   <div className="absolute inset-0 border-4 border-primary/50 rounded-lg pointer-events-none"></div>
@@ -128,7 +156,7 @@ export default function CheckinPage() {
               </div>
 
               <AnimatePresence>
-                {checkinStatus === 'success' && checkedInData && (
+                {checkinStatus !== 'idle' && (
                   <motion.div
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -140,44 +168,36 @@ export default function CheckinPage() {
                     }}
                     className="mt-6"
                   >
-                    <Alert
-                      variant="default"
-                      className="bg-green-50/50 dark:bg-green-900/30 border-green-500/30"
-                    >
-                      <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
-                      <AlertTitle className="text-green-800 dark:text-green-300 font-bold text-lg">
-                        Check-in Successful!
-                      </AlertTitle>
-                      <AlertDescription className="text-green-700 dark:text-green-400 space-y-1">
-                        <p>Event: <strong>{checkedInData.event.name}</strong></p>
-                        {checkedInData.userName && (
-                            <div className='flex items-center gap-2 pt-1'>
-                                <User className='h-4 w-4'/>
-                                <span>Participant: <strong>{checkedInData.userName}</strong></span>
-                            </div>
-                        )}
-                      </AlertDescription>
-                    </Alert>
-                  </motion.div>
-                )}
-
-                {checkinStatus === 'error' && (
-                  <motion.div
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -10 }}
-                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                    className="mt-6"
-                  >
-                    <Alert variant="destructive">
-                      <XCircle className="h-5 w-5" />
-                      <AlertTitle className="font-bold text-lg">
-                        Check-in Failed
-                      </AlertTitle>
-                      <AlertDescription>
-                        Invalid or unrecognized event QR code. Please try again.
-                      </AlertDescription>
-                    </Alert>
+                    {checkinStatus === 'success' && checkedInData ? (
+                      <Alert
+                        variant="default"
+                        className="bg-green-50/50 dark:bg-green-900/30 border-green-500/30"
+                      >
+                        <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+                        <AlertTitle className="text-green-800 dark:text-green-300 font-bold text-lg">
+                          Check-in Successful!
+                        </AlertTitle>
+                        <AlertDescription className="text-green-700 dark:text-green-400 space-y-1">
+                          <p>Event: <strong>{checkedInData.event.name}</strong></p>
+                          {checkedInData.userName && (
+                              <div className='flex items-center gap-2 pt-1'>
+                                  <User className='h-4 w-4'/>
+                                  <span>Participant: <strong>{checkedInData.userName}</strong></span>
+                              </div>
+                          )}
+                        </AlertDescription>
+                      </Alert>
+                    ) : (
+                      <Alert variant="destructive">
+                        <XCircle className="h-5 w-5" />
+                        <AlertTitle className="font-bold text-lg">
+                          Check-in Failed
+                        </AlertTitle>
+                        <AlertDescription>
+                          Invalid or unrecognized QR code. Please try again.
+                        </AlertDescription>
+                      </Alert>
+                    )}
                   </motion.div>
                 )}
               </AnimatePresence>

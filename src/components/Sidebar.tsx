@@ -51,7 +51,7 @@ export default function Sidebar({ user }: SidebarProps) {
         ],
         Organizer: [
             ...baseLinks,
-            { href: '/dashboard/my-events', label: 'My Events', icon: Trophy },
+            { href: '/dashboard/my-events', label: 'My Events', icon: Trophy, disabled: false },
         ],
         Participant: [
             ...baseLinks
@@ -82,7 +82,7 @@ export default function Sidebar({ user }: SidebarProps) {
                         className={cn(
                         "flex h-9 w-9 items-center justify-center rounded-lg transition-colors md:h-8 md:w-8",
                         {
-                            "bg-accent text-accent-foreground": pathname === link.href,
+                            "bg-accent text-accent-foreground": pathname === link.href && !link.disabled,
                             "text-muted-foreground hover:text-foreground": pathname !== link.href,
                             "cursor-not-allowed opacity-50": link.disabled
                         }
