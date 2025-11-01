@@ -1,6 +1,6 @@
-import { users, organizations, venues } from '@/lib/mockData';
+import { users, organizations, venues, mockChildren, mockSessions } from '@/lib/mockData';
 import { StatCard } from './StatCard';
-import { Users, Calendar, Building, MapPin } from 'lucide-react';
+import { Users, Calendar, Building, MapPin, Percent, UserCheck, BarChart3, Download } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -8,9 +8,64 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { motion } from 'framer-motion';
 import EventCard from '../EventCard';
 import { useApp } from '@/context/EventContext';
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend as RechartsLegend } from 'recharts';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
+import { useMemo } from 'react';
+
+const COLORS = ['hsl(var(--primary))', 'hsl(var(--secondary-foreground))'];
+
 
 export default function AdminDashboard() {
     const { events } = useApp();
+    const { toast } = useToast();
+
+    const genderData = useMemo(() => {
+        const maleCount = mockChildren.filter(c => c.gender === 'Male').length;
+        const femaleCount = mockChildren.filter(c => c.gender === 'Female').length;
+        return [
+            { name: 'Male', value: maleCount },
+            { name: 'Female', value: femaleCount },
+        ];
+    }, []);
+
+    const sessionDates = useMemo(() => mockSessions.map(s => new Date(s.date)), []);
+
+    const communityData = useMemo(() => {
+        const communities: { [key: string]: { children: number, sessions: number, attendance: number[] } } = {};
+        
+        mockChildren.forEach(child => {
+            if (!communities[child.community]) {
+                communities[child.community] = { children: 0, sessions: 0, attendance: [] };
+            }
+            communities[child.community].children++;
+        });
+
+        mockSessions.forEach(session => {
+            if (communities[session.community]) {
+                communities[session.community].sessions++;
+                if (session.status === 'completed') {
+                    const totalPossible = mockChildren.filter(c => c.community === session.community).length;
+                    const attendancePercentage = (session.participants.length / totalPossible) * 100;
+                    communities[session.community].attendance.push(attendancePercentage);
+                }
+            }
+        });
+
+        return Object.entries(communities).map(([name, data]) => {
+            const avgAttendance = data.attendance.length > 0 ? data.attendance.reduce((a, b) => a + b, 0) / data.attendance.length : 0;
+            return { name, ...data, avgAttendance };
+        });
+    }, []);
+
+    const handleDownloadReport = () => {
+        // This is a mock download. In a real app, you would generate a CSV string.
+        toast({
+            title: "Report Generated",
+            description: "Programme report has been downloaded (simulated)."
+        })
+    }
 
     const containerVariants = {
         hidden: { opacity: 0 },
@@ -38,33 +93,134 @@ export default function AdminDashboard() {
         animate="visible"
       >
         <StatCard title="Total Users" value={users.length} icon={Users} description="All registered users" />
+        <StatCard title="Total Children" value={mockChildren.length} icon={UserCheck} description="Children in programmes" />
         <StatCard title="Total Events" value={events.length} icon={Calendar} description="Across all organizations" />
-        <StatCard title="Organizations" value={organizations.length} icon={Building} />
-        <StatCard title="Venues" value={venues.length} icon={MapPin} />
+        <StatCard title="Total Sessions" value={mockSessions.length} icon={BarChart3} description="Coaching sessions held" />
       </motion.div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-      >
-        <Card className='glass-card'>
-          <CardHeader>
-            <CardTitle>All Events</CardTitle>
-            <CardDescription>A complete overview of all events in the system.</CardDescription>
-          </CardHeader>
-          <CardContent className="grid gap-6 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-            {events.map((event) => (
-                <EventCard event={event} key={event.id} />
-            ))}
-          </CardContent>
-        </Card>
-      </motion.div>
+      <div className="grid gap-8 lg:grid-cols-3">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className='lg:col-span-2'
+        >
+            <Card className='glass-card'>
+                <CardHeader>
+                    <CardTitle>Community Overview</CardTitle>
+                    <CardDescription>Key metrics for each community.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Community</TableHead>
+                                <TableHead>Children</TableHead>
+                                <TableHead>Sessions</TableHead>
+                                <TableHead>Avg. Attendance</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {communityData.map(community => (
+                                <TableRow key={community.name}>
+                                    <TableCell className="font-medium">{community.name}</TableCell>
+                                    <TableCell>{community.children}</TableCell>
+                                    <TableCell>{community.sessions}</TableCell>
+                                    <TableCell>
+                                        <div className='flex items-center gap-2'>
+                                            <Percent className='h-4 w-4 text-muted-foreground' />
+                                            <span>{community.avgAttendance.toFixed(1)}%</span>
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </CardContent>
+            </Card>
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+        >
+            <Card className='glass-card'>
+                <CardHeader>
+                    <CardTitle>Gender Participation</CardTitle>
+                    <CardDescription>Breakdown of child participation by gender.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="w-full h-48">
+                        <ResponsiveContainer>
+                            <PieChart>
+                                <Pie data={genderData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label>
+                                    {genderData.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                    ))}
+                                </Pie>
+                                <RechartsLegend />
+                            </PieChart>
+                        </ResponsiveContainer>
+                    </div>
+                </CardContent>
+            </Card>
+        </motion.div>
+      </div>
+
+      <div className="grid gap-8 lg:grid-cols-3">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            >
+                <Card className='glass-card'>
+                    <CardHeader>
+                        <CardTitle>Coach Activity Heatmap</CardTitle>
+                        <CardDescription>Visualization of all scheduled sessions.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex justify-center">
+                        <CalendarComponent
+                            mode="multiple"
+                            selected={sessionDates}
+                            className="p-0"
+                            classNames={{
+                                day_selected: "bg-primary/80 text-primary-foreground hover:bg-primary/90",
+                            }}
+                        />
+                    </CardContent>
+                </Card>
+            </motion.div>
+            <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className='lg:col-span-2'
+            >
+                 <Card className='glass-card'>
+                    <CardHeader>
+                        <CardTitle>Programme Report Generator</CardTitle>
+                        <CardDescription>Download a CSV of program data.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="p-8 border-2 border-dashed border-muted-foreground/30 rounded-lg flex flex-col items-center text-center">
+                           <h3 className='text-lg font-semibold'>Generate Detailed Reports</h3>
+                           <p className='text-muted-foreground text-sm max-w-sm mt-2 mb-4'>
+                                Export a comprehensive CSV file containing data on children, sessions, attendance, assessments, and home visits for analysis and reporting.
+                           </p>
+                            <Button onClick={handleDownloadReport}>
+                                <Download className='mr-2 h-4 w-4' />
+                                Download Report (CSV)
+                            </Button>
+                        </div>
+                    </CardContent>
+                </Card>
+            </motion.div>
+      </div>
       
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
+        transition={{ delay: 0.7 }}
       >
         <Card className='glass-card'>
           <CardHeader>
