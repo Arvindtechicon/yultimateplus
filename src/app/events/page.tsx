@@ -66,7 +66,7 @@ export default function EventListPage() {
           className="text-center mb-8"
         >
           <h1 className="text-4xl md:text-5xl font-bold tracking-tighter">
-            All Events
+            Events
           </h1>
           <p className="max-w-[600px] mx-auto text-muted-foreground md:text-xl mt-4">
             Browse through all the exciting Ultimate Frisbee events.
