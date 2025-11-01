@@ -53,14 +53,19 @@ export default function EventCard({ event, showEditButton }: EventCardProps) {
 
   const venue = venues.find((v) => v.id === event.venueId);
   const organization = organizations.find((o) => o.id === event.organizationId);
-  const qrValue = JSON.stringify({ eventId: event.id, eventName: event.name });
-  
+
   const isParticipant = user?.role === 'Participant';
-  const isRegistered = isParticipant && event.participants.includes(user.id);
+  const isRegistered = isParticipant && user && event.participants.includes(user.id);
   const myOrganizations = organizations.filter(org => user && org.organizers.includes(user.id));
 
+  const qrValue = JSON.stringify({ 
+    eventId: event.id, 
+    eventName: event.name,
+    ...(isParticipant && user && { userId: user.id, userName: user.name })
+  });
+
   const handleRegistration = () => {
-    if (user) {
+    if (user && isParticipant) {
       toggleRegistration(event.id, user.id);
       toast({
         title: isRegistered ? "Unregistered" : "Registration Successful!",
@@ -174,7 +179,7 @@ export default function EventCard({ event, showEditButton }: EventCardProps) {
                   <div className="bg-white p-4 rounded-lg">
                     <QRCodeComponent value={qrValue} size={256} />
                   </div>
-                  <p className="text-xs text-muted-foreground">Scan this to check in</p>
+                  <p className="text-xs text-muted-foreground">Scan this for event details</p>
                 </div>
               </DialogContent>
             </Dialog>

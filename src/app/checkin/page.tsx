@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { CheckCircle, XCircle, QrCode, VideoOff } from 'lucide-react';
+import { CheckCircle, XCircle, QrCode, VideoOff, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import DashboardLayout from '@/components/DashboardLayout';
 import { useEvents } from '@/context/EventContext';
@@ -18,12 +18,17 @@ import type { Event } from '@/lib/mockData';
 import QrScanner from 'react-qr-scanner';
 import { useToast } from '@/hooks/use-toast';
 
+interface CheckedInData {
+    event: Event;
+    userName?: string;
+}
+
 export default function CheckinPage() {
   const { events } = useEvents();
   const [checkinStatus, setCheckinStatus] = useState<
     'idle' | 'success' | 'error'
   >('idle');
-  const [checkedInEvent, setCheckedInEvent] = useState<Event | null>(null);
+  const [checkedInData, setCheckedInData] = useState<CheckedInData | null>(null);
   const [hasCameraPermission, setHasCameraPermission] = useState(true);
   const [isScanning, setIsScanning] = useState(true);
   const { toast } = useToast();
@@ -49,7 +54,7 @@ export default function CheckinPage() {
 
   const handleCheckIn = (qrValue: string) => {
     setCheckinStatus('idle');
-    setCheckedInEvent(null);
+    setCheckedInData(null);
 
     if (!qrValue || !qrValue.trim()) {
       setCheckinStatus('error');
@@ -58,14 +63,14 @@ export default function CheckinPage() {
     }
 
     let foundEvent: Event | undefined;
+    let userName: string | undefined;
 
-    // Try parsing as JSON first
     try {
       const parsedQr = JSON.parse(qrValue);
       const eventId = parsedQr.eventId;
+      userName = parsedQr.userName;
       foundEvent = events.find((event) => event.id === eventId);
     } catch (error) {
-      // If JSON parsing fails, try treating it as a simple ID
       const eventId = parseInt(qrValue, 10);
       if (!isNaN(eventId)) {
         foundEvent = events.find((e) => e.id === eventId);
@@ -74,12 +79,11 @@ export default function CheckinPage() {
 
     if (foundEvent) {
       setCheckinStatus('success');
-      setCheckedInEvent(foundEvent);
+      setCheckedInData({ event: foundEvent, userName });
     } else {
       setCheckinStatus('error');
     }
     
-    // Resume scanning after a delay
     setTimeout(() => setIsScanning(true), 3000);
   };
 
@@ -124,7 +128,7 @@ export default function CheckinPage() {
               </div>
 
               <AnimatePresence>
-                {checkinStatus === 'success' && checkedInEvent && (
+                {checkinStatus === 'success' && checkedInData && (
                   <motion.div
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -144,9 +148,14 @@ export default function CheckinPage() {
                       <AlertTitle className="text-green-800 dark:text-green-300 font-bold text-lg">
                         Check-in Successful!
                       </AlertTitle>
-                      <AlertDescription className="text-green-700 dark:text-green-400">
-                        Welcome to <strong>{checkedInEvent.name}</strong>.
-                        Enjoy the event!
+                      <AlertDescription className="text-green-700 dark:text-green-400 space-y-1">
+                        <p>Event: <strong>{checkedInData.event.name}</strong></p>
+                        {checkedInData.userName && (
+                            <div className='flex items-center gap-2 pt-1'>
+                                <User className='h-4 w-4'/>
+                                <span>Participant: <strong>{checkedInData.userName}</strong></span>
+                            </div>
+                        )}
                       </AlertDescription>
                     </Alert>
                   </motion.div>
