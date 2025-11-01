@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useParams } from 'next/navigation';
@@ -14,7 +15,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { MapPin, Users, BookOpen, LogIn, LogOut, ArrowLeft } from 'lucide-react';
+import { MapPin, Users, BookOpen, LogIn, LogOut, ArrowLeft, Info, IndianRupee, Calendar } from 'lucide-react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { useToast } from '@/hooks/use-toast';
@@ -117,6 +118,31 @@ export default function CoachingCenterDetailPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
             >
+                <Card className='glass-card'>
+                    <CardHeader>
+                        <CardTitle className='flex items-center gap-2'><Info />About this program</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <p className="text-muted-foreground">{center.description}</p>
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                            <div className='flex items-center gap-2'>
+                                <IndianRupee className='w-5 h-5 text-primary' />
+                                <div>
+                                    <p className='font-semibold'>Fee</p>
+                                    <p className='text-muted-foreground'>₹{center.fee.toLocaleString()}</p>
+                                </div>
+                            </div>
+                             <div className='flex items-center gap-2'>
+                                <Calendar className='w-5 h-5 text-primary' />
+                                <div>
+                                    <p className='font-semibold'>Schedule</p>
+                                    <p className='text-muted-foreground'>{center.schedule}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
               <Card className='glass-card'>
                   <CardHeader>
                     <CardTitle className='flex items-center gap-2'><Users />Participants ({participants.length})</CardTitle>

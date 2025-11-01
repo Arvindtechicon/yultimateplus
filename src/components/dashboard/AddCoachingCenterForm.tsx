@@ -21,6 +21,9 @@ const formSchema = z.object({
   name: z.string().min(3, { message: "Center name must be at least 3 characters." }),
   specialty: z.string().min(3, { message: "Specialty must be at least 3 characters." }),
   location: z.string().min(3, { message: "Location must be at least 3 characters." }),
+  description: z.string().min(10, { message: "Description must be at least 10 characters." }),
+  fee: z.coerce.number().min(0, { message: "Fee must be a positive number." }),
+  schedule: z.string().min(3, { message: "Schedule must be at least 3 characters." }),
 });
 
 type AddCenterFormValues = z.infer<typeof formSchema>;
@@ -37,6 +40,9 @@ export default function AddCoachingCenterForm({ onSubmit, onCancel }: AddCoachin
       name: "",
       specialty: "",
       location: "",
+      description: "",
+      fee: 0,
+      schedule: "",
     },
   });
 
@@ -62,30 +68,73 @@ export default function AddCoachingCenterForm({ onSubmit, onCancel }: AddCoachin
         />
         <FormField
           control={form.control}
-          name="specialty"
+          name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Specialty</FormLabel>
+              <FormLabel>Description</FormLabel>
               <FormControl>
-                <Input placeholder="e.g. Advanced Skills" {...field} />
+                <Textarea placeholder="Describe the coaching center..." {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-         <FormField
-          control={form.control}
-          name="location"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Location</FormLabel>
-              <FormControl>
-                <Input placeholder="e.g. Cityville" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="grid grid-cols-2 gap-4">
+            <FormField
+            control={form.control}
+            name="specialty"
+            render={({ field }) => (
+                <FormItem>
+                <FormLabel>Specialty</FormLabel>
+                <FormControl>
+                    <Input placeholder="e.g. Advanced Skills" {...field} />
+                </FormControl>
+                <FormMessage />
+                </FormItem>
+            )}
+            />
+            <FormField
+            control={form.control}
+            name="location"
+            render={({ field }) => (
+                <FormItem>
+                <FormLabel>Location</FormLabel>
+                <FormControl>
+                    <Input placeholder="e.g. Cityville" {...field} />
+                </FormControl>
+                <FormMessage />
+                </FormItem>
+            )}
+            />
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+            <FormField
+            control={form.control}
+            name="fee"
+            render={({ field }) => (
+                <FormItem>
+                <FormLabel>Fee (INR)</FormLabel>
+                <FormControl>
+                    <Input type="number" placeholder="e.g. 5000" {...field} />
+                </FormControl>
+                <FormMessage />
+                </FormItem>
+            )}
+            />
+            <FormField
+            control={form.control}
+            name="schedule"
+            render={({ field }) => (
+                <FormItem>
+                <FormLabel>Schedule</FormLabel>
+                <FormControl>
+                    <Input placeholder="e.g. Mon, Wed, Fri: 6-8 PM" {...field} />
+                </FormControl>
+                <FormMessage />
+                </FormItem>
+            )}
+            />
+        </div>
         <div className="flex justify-end gap-2 pt-4">
             <Button type="button" variant="ghost" onClick={onCancel}>Cancel</Button>
             <Button type="submit">Create Center</Button>

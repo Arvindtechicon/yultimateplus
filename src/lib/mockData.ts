@@ -48,6 +48,9 @@ export interface CoachingCenter {
     lat: number;
     lng: number;
   };
+  description: string;
+  fee: number;
+  schedule: string;
 }
 
 export interface Child {
@@ -281,9 +284,9 @@ export const events: Event[] = [
 ];
 
 export const coachingCenters: CoachingCenter[] = [
-    { id: 1, name: 'Ultimate Performance Academy', specialty: 'Advanced Skills', location: 'Cityville', participants: [3], coordinates: { lat: 40.7328, lng: -74.0160 } },
-    { id: 2, name: 'Frisbee Fundamentals', specialty: 'Beginner Training', location: 'Townsville', participants: [], coordinates: { lat: 34.0622, lng: -118.2537 } },
-    { id: 3, name: 'Beach Ultimate Coaching', specialty: 'Beach Tactics', location: 'Beachtown', participants: [4,5], coordinates: { lat: 33.7901, lng: -118.2037 } },
+    { id: 1, name: 'Ultimate Performance Academy', specialty: 'Advanced Skills', location: 'Cityville', participants: [3], coordinates: { lat: 40.7328, lng: -74.0160 }, description: 'Elevate your game with our elite training program designed for competitive players.', fee: 5000, schedule: 'Mon, Wed, Fri: 6 PM - 8 PM' },
+    { id: 2, name: 'Frisbee Fundamentals', specialty: 'Beginner Training', location: 'Townsville', participants: [], coordinates: { lat: 34.0622, lng: -118.2537 }, description: 'Learn the basics of Ultimate Frisbee in a fun and supportive environment. Perfect for new players.', fee: 2500, schedule: 'Sat: 10 AM - 12 PM' },
+    { id: 3, name: 'Beach Ultimate Coaching', specialty: 'Beach Tactics', location: 'Beachtown', participants: [4,5], coordinates: { lat: 33.7901, lng: -118.2037 }, description: 'Master the art of playing on the sand, focusing on strategy, endurance, and handling the wind.', fee: 4000, schedule: 'Sun: 2 PM - 4 PM' },
 ];
 
 export const mockCommunities: Community[] = [
