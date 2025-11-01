@@ -15,6 +15,7 @@ import {
   Building,
   LineChart,
   ClipboardCheck,
+  Group,
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -39,23 +40,33 @@ export default function Sidebar({ user }: SidebarProps) {
         { href: '/events', label: 'Events', icon: Calendar },
         { href: '/map', label: 'Map', icon: Map },
         { href: '/checkin', label: 'Check-in', icon: QrCode },
+    ]
+
+    const participantLinks = [
+        ...baseLinks,
         { href: '/performance', label: 'Performance Report', icon: LineChart },
         { href: '/assessments', label: 'LSAS Assessments', icon: ClipboardCheck },
     ]
 
+    const organizerLinks = [
+        ...baseLinks,
+        { href: '/team-performance', label: 'Team Performance', icon: Group },
+        { href: '/assessments', label: 'LSAS Assessments', icon: ClipboardCheck },
+        { href: '/dashboard/my-events', label: 'My Events', icon: Trophy, disabled: false },
+    ]
+    
+    const adminLinks = [
+        ...baseLinks,
+        { href: '/team-performance', label: 'Team Performance', icon: Group },
+        { href: '/assessments', label: 'LSAS Assessments', icon: ClipboardCheck },
+        { href: '/dashboard/users', label: 'Users', icon: Users, disabled: true },
+        { href: '/dashboard/organizations', label: 'Organizations', icon: Building, disabled: true },
+    ]
+
     const roleLinks = {
-        Admin: [
-            ...baseLinks,
-            { href: '/dashboard/users', label: 'Users', icon: Users, disabled: true },
-            { href: '/dashboard/organizations', label: 'Organizations', icon: Building, disabled: true },
-        ],
-        Organizer: [
-            ...baseLinks,
-            { href: '/dashboard/my-events', label: 'My Events', icon: Trophy, disabled: false },
-        ],
-        Participant: [
-            ...baseLinks
-        ]
+        Admin: adminLinks,
+        Organizer: organizerLinks,
+        Participant: participantLinks
     }
     return roleLinks[role] || [];
   }
