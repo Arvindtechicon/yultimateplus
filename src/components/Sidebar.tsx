@@ -18,6 +18,7 @@ import {
   Group,
   BookOpen,
   BarChart2,
+  Image,
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -43,6 +44,7 @@ export default function Sidebar({ user }: SidebarProps) {
         { href: '/coaching', label: 'Coaching', icon: BookOpen },
         { href: '/map', label: 'Map', icon: Map },
         { href: '/checkin', label: 'Check-in', icon: QrCode },
+        { href: '/gallery', label: 'Gallery', icon: Image },
     ]
 
     const participantLinks = [
