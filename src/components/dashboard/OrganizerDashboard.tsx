@@ -1,3 +1,4 @@
+
 import type { User, Event, Child } from '@/lib/mockData';
 import { organizations, venues, mockSessions, mockChildren } from '@/lib/mockData';
 import { StatCard } from './StatCard';
@@ -27,6 +28,7 @@ import { Calendar as CalendarComponent } from '../ui/calendar';
 import { Textarea } from '../ui/textarea';
 import QrScanner from 'react-qr-scanner';
 import { cn } from '@/lib/utils';
+import { FormControl } from '../ui/form';
 
 
 export default function OrganizerDashboard({ user }: { user: User }) {
@@ -186,6 +188,7 @@ export default function OrganizerDashboard({ user }: { user: User }) {
                                     <Label>Date of Visit</Label>
                                      <Popover>
                                         <PopoverTrigger asChild>
+                                            <FormControl>
                                                 <Button
                                                 name="date"
                                                 variant={"outline"}
@@ -195,7 +198,7 @@ export default function OrganizerDashboard({ user }: { user: User }) {
                                                 <CalendarIcon className="mr-2 h-4 w-4" />
                                                 <span>Pick a date</span>
                                                 </Button>
-                                        </FormControl>
+                                            </FormControl>
                                         </PopoverTrigger>
                                         <PopoverContent className="w-auto p-0">
                                         <CalendarComponent
