@@ -33,7 +33,6 @@ export default function Home() {
   };
 
   const loginOptions = [
-    { role: 'Admin' as const, icon: Shield, title: 'Admin', description: 'Oversee and manage the entire platform.' },
     { role: 'Organizer' as const, icon: User, title: 'Coach and Organizer', description: 'Create and manage your own events.' },
     { role: 'Participant' as const, icon: Trophy, title: 'Participant', description: 'Join events and track your activity.' },
   ];
@@ -87,7 +86,7 @@ export default function Home() {
         </motion.div>
 
         <motion.div 
-            className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-4xl"
+            className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
@@ -111,6 +110,17 @@ export default function Home() {
               </Card>
             </motion.div>
           ))}
+        </motion.div>
+        <motion.div 
+            className="mt-8 text-center"
+            initial={{y:20, opacity:0}}
+            animate={{y:0, opacity:1}}
+            transition={{delay: 0.5}}
+            >
+             <Button variant="link" onClick={() => handleLogin('Admin')}>
+                <Shield className="mr-2 h-4 w-4" />
+                Login as Admin
+            </Button>
         </motion.div>
       </main>
     </div>
