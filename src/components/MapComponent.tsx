@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   GoogleMap,
   useJsApiLoader,
@@ -231,10 +231,10 @@ function MapComponent() {
   const [zoom, setZoom] = useState(12);
   const [currentTheme, setCurrentTheme] = useState('light');
 
-  const pointsOfInterest: PointOfInterest[] = [
+  const pointsOfInterest: PointOfInterest[] = useMemo(() => [
     ...venues.map(v => ({ id: `v-${v.id}`, name: v.name, type: 'venue' as const, coordinates: v.coordinates, description: v.location })),
     ...coachingCenters.map(c => ({ id: `c-${c.id}`, name: c.name, type: 'coachingCenter' as const, coordinates: c.coordinates, description: c.location })),
-  ]
+  ], [venues, coachingCenters]);
 
   useEffect(() => {
     // Detect theme for map styles
@@ -439,6 +439,3 @@ function MapComponent() {
 }
 
 export default MapComponent;
-
-    
-    
