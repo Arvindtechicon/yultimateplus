@@ -1,6 +1,6 @@
 
 import type { User, Event, Child, HomeVisit } from '@/lib/mockData';
-import { organizations, venues, mockSessions, mockChildren } from '@/lib/mockData';
+import { organizations, mockSessions, mockChildren } from '@/lib/mockData';
 import { StatCard } from './StatCard';
 import { Calendar, Users, Building, PlusCircle, Home, QrCode, Percent, BookUser, AlertTriangle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -37,7 +37,7 @@ import { Alert, AlertTitle } from '../ui/alert';
 
 
 export default function OrganizerDashboard({ user }: { user: User }) {
-  const { events, addEvent, addHomeVisit, alerts, markSessionAttendance } = useAppData();
+  const { events, addEvent, addHomeVisit, alerts, markSessionAttendance, venues } = useAppData();
   const [isAddEventOpen, setAddEventOpen] = useState(false);
   const [isAttendanceModalOpen, setAttendanceModalOpen] = useState(false);
   const [isHomeVisitModalOpen, setHomeVisitModalOpen] = useState(false);
@@ -275,7 +275,6 @@ export default function OrganizerDashboard({ user }: { user: User }) {
                     </DialogHeader>
                     <AddEventForm 
                         organizations={myOrganizations} 
-                        venues={venues} 
                         onSubmit={handleAddEvent} 
                         onCancel={() => setAddEventOpen(false)}
                     />

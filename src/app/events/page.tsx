@@ -1,3 +1,4 @@
+
 "use client";
 
 import { motion } from 'framer-motion';
@@ -14,10 +15,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Search } from 'lucide-react';
-import { venues } from '@/lib/mockData';
 
 export default function EventListPage() {
-  const { events } = useAppData();
+  const { events, venues } = useAppData();
   const [searchQuery, setSearchQuery] = useState('');
   const [dateFilter, setDateFilter] = useState('all');
 
@@ -44,7 +44,7 @@ export default function EventListPage() {
     }
 
     return filtered;
-  }, [events, searchQuery, dateFilter]);
+  }, [events, searchQuery, dateFilter, venues]);
 
   const containerVariants = {
     hidden: { opacity: 0 },

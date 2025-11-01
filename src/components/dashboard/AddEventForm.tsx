@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -27,12 +28,13 @@ import { cn } from "@/lib/utils";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import type { Organization, Venue, Event } from "@/lib/mockData";
+import { useAppData } from "@/context/EventContext";
 
 const formSchema = z.object({
   name: z.string().min(3, { message: "Event name must be at least 3 characters." }),
   description: z.string().min(10, { message: "Description must be at least 10 characters." }),
   date: z.date({ required_error: "A date is required." }),
-  venueId: z.string().min(1, { message: "Please select a venue." }),
+  venueName: z.string().min(3, { message: "Venue name must be at least 3 characters." }),
   organizationId: z.string().min(1, { message: "Please select an organization." }),
   type: z.enum(["Tournament", "Workshop", "Meetup"]),
 });
@@ -41,27 +43,35 @@ type AddEventFormValues = z.infer<typeof formSchema>;
 
 interface AddEventFormProps {
   organizations: Organization[];
-  venues: Venue[];
   onSubmit: (data: Omit<Event, 'id' | 'participants'>) => void;
   onCancel: () => void;
 }
 
-export default function AddEventForm({ organizations, venues, onSubmit, onCancel }: AddEventFormProps) {
+export default function AddEventForm({ organizations, onSubmit, onCancel }: AddEventFormProps) {
+    const { venues, addVenue } = useAppData();
   const form = useForm<AddEventFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       description: "",
+      venueName: "",
       type: "Meetup",
     },
   });
 
   const handleSubmit = (data: AddEventFormValues) => {
+    let venue = venues.find(v => v.name.toLowerCase() === data.venueName.toLowerCase());
+    if (!venue) {
+        venue = addVenue(data.venueName);
+    }
+    
     onSubmit({
-      ...data,
+      name: data.name,
+      description: data.description,
       date: data.date.toISOString(),
-      venueId: parseInt(data.venueId),
+      venueId: venue.id,
       organizationId: parseInt(data.organizationId),
+      type: data.type,
     });
   };
 
@@ -136,24 +146,13 @@ export default function AddEventForm({ organizations, venues, onSubmit, onCancel
         <div className="grid grid-cols-2 gap-4">
             <FormField
             control={form.control}
-            name="venueId"
+            name="venueName"
             render={({ field }) => (
                 <FormItem>
                 <FormLabel>Venue</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                    <SelectTrigger>
-                        <SelectValue placeholder="Select a venue" />
-                    </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                    {venues.map((venue) => (
-                        <SelectItem key={venue.id} value={String(venue.id)}>
-                        {venue.name}
-                        </SelectItem>
-                    ))}
-                    </SelectContent>
-                </Select>
+                <FormControl>
+                    <Input placeholder="Enter a venue name" {...field} />
+                </FormControl>
                 <FormMessage />
                 </FormItem>
             )}

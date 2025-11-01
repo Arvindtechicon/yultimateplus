@@ -2,7 +2,7 @@
 "use client";
 
 import { createContext, useContext, useState, type ReactNode, useCallback, useEffect } from 'react';
-import type { Event, CoachingCenter, Session, Child, Assessment, HomeVisit, MockAlert } from '@/lib/mockData';
+import type { Event, CoachingCenter, Session, Child, Assessment, HomeVisit, MockAlert, Venue } from '@/lib/mockData';
 import { 
     events as initialEvents, 
     coachingCenters as initialCoachingCenters, 
@@ -10,7 +10,8 @@ import {
     mockChildren as initialChildrenData,
     mockAssessments as initialAssessments,
     mockHomeVisits as initialHomeVisits,
-    mockAlerts as initialAlerts
+    mockAlerts as initialAlerts,
+    venues as initialVenues
 } from '@/lib/mockData';
 
 interface AppContextType {
@@ -21,6 +22,7 @@ interface AppContextType {
   assessments: Assessment[];
   homeVisits: HomeVisit[];
   alerts: MockAlert[];
+  venues: Venue[];
   addEvent: (newEventData: Omit<Event, 'id' | 'participants'>) => void;
   updateEvent: (eventId: number, updatedEventData: Omit<Event, 'id' | 'participants'>) => void;
   toggleEventRegistration: (eventId: number, userId: number) => void;
@@ -29,6 +31,7 @@ interface AppContextType {
   markSessionAttendance: (sessionId: string, childId: string) => void;
   addAssessment: (newAssessmentData: Omit<Assessment, 'date'>) => void;
   addHomeVisit: (newHomeVisitData: Omit<HomeVisit, 'id'>) => void;
+  addVenue: (venueName: string) => Venue;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -54,10 +57,11 @@ export function AppDataProvider({ children: componentChildren }: { children: Rea
   const [events, setEvents] = useState<Event[]>(() => getInitialState('y-ultimate-events', initialEvents));
   const [coachingCenters, setCoachingCenters] = useState<CoachingCenter[]>(() => getInitialState('y-ultimate-coaching-centers', initialCoachingCenters));
   const [sessions, setSessions] = useState<Session[]>(() => getInitialState('y-ultimate-sessions', initialSessions));
-  const [children, setChildren] = useState<Child[]>(initialChildrenData);
+  const [appChildren, setAppChildren] = useState<Child[]>(initialChildrenData);
   const [assessments, setAssessments] = useState<Assessment[]>(() => getInitialState('y-ultimate-assessments', initialAssessments));
   const [homeVisits, setHomeVisits] = useState<HomeVisit[]>(() => getInitialState('y-ultimate-home-visits', initialHomeVisits));
   const [alerts, setAlerts] = useState<MockAlert[]>(initialAlerts);
+  const [venues, setVenues] = useState<Venue[]>(() => getInitialState('y-ultimate-venues', initialVenues));
 
   useEffect(() => {
     localStorage.setItem('y-ultimate-events', JSON.stringify(events));
@@ -78,6 +82,10 @@ export function AppDataProvider({ children: componentChildren }: { children: Rea
   useEffect(() => {
     localStorage.setItem('y-ultimate-home-visits', JSON.stringify(homeVisits));
   }, [homeVisits]);
+
+  useEffect(() => {
+    localStorage.setItem('y-ultimate-venues', JSON.stringify(venues));
+    }, [venues]);
 
 
   const addEvent = useCallback((newEventData: Omit<Event, 'id' | 'participants'>) => {
@@ -127,6 +135,11 @@ export function AppDataProvider({ children: componentChildren }: { children: Rea
         ...newCenterData,
         id: prevCenters.length > 0 ? Math.max(...prevCenters.map(c => c.id)) + 1 : 1,
         participants: [],
+        // Assign mock coordinates for new centers
+        coordinates: {
+            lat: 40.7128 + (Math.random() - 0.5) * 0.1,
+            lng: -74.0060 + (Math.random() - 0.5) * 0.1,
+        }
       }
     ]);
   }, []);
@@ -179,14 +192,29 @@ export function AppDataProvider({ children: componentChildren }: { children: Rea
     ])
   }, []);
 
+  const addVenue = useCallback((venueName: string): Venue => {
+    const newVenue: Venue = {
+        id: venues.length > 0 ? Math.max(...venues.map(v => v.id)) + 1 : 1,
+        name: venueName,
+        location: `${venueName} Location`,
+        coordinates: {
+            lat: 12.2958 + (Math.random() - 0.5) * 0.1,
+            lng: 76.6394 + (Math.random() - 0.5) * 0.1,
+        },
+    };
+    setVenues(prevVenues => [...prevVenues, newVenue]);
+    return newVenue;
+  }, [venues]);
+
   const contextValue = {
       events,
       coachingCenters,
       sessions,
-      children,
+      children: appChildren,
       assessments,
       homeVisits,
       alerts,
+      venues,
       addEvent,
       updateEvent,
       toggleEventRegistration,
@@ -194,7 +222,8 @@ export function AppDataProvider({ children: componentChildren }: { children: Rea
       toggleCoachingCenterRegistration,
       markSessionAttendance,
       addAssessment,
-      addHomeVisit
+      addHomeVisit,
+      addVenue,
   }
 
   return (

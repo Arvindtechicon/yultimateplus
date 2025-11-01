@@ -1,8 +1,9 @@
+
 'use client';
 
 import { useState } from 'react';
 import type { User, Event } from '@/lib/mockData';
-import { organizations, venues } from '@/lib/mockData';
+import { organizations } from '@/lib/mockData';
 import { PlusCircle, Trophy } from 'lucide-react';
 import {
   Card,
@@ -104,7 +105,6 @@ export default function MyEventsPage() {
                   </DialogHeader>
                   <AddEventForm
                     organizations={myOrganizations}
-                    venues={venues}
                     onSubmit={handleAddEvent}
                     onCancel={() => setAddEventOpen(false)}
                   />

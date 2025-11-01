@@ -1,3 +1,4 @@
+
 'use client';
 import {
   Card,
@@ -31,7 +32,7 @@ import {
   Eye,
 } from 'lucide-react';
 import type { Event } from '@/lib/mockData';
-import { venues, organizations, users } from '@/lib/mockData';
+import { organizations, users } from '@/lib/mockData';
 import { format } from 'date-fns';
 import Link from 'next/link';
 import QRCodeComponent from 'qrcode.react';
@@ -51,7 +52,7 @@ interface EventCardProps {
 
 export default function EventCard({ event, showEditButton }: EventCardProps) {
   const { user } = useAuth();
-  const { toggleEventRegistration, updateEvent } = useAppData();
+  const { toggleEventRegistration, updateEvent, venues } = useAppData();
   const { toast } = useToast();
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
 
@@ -218,7 +219,6 @@ export default function EventCard({ event, showEditButton }: EventCardProps) {
                         <EditEventForm 
                             event={event}
                             organizations={myOrganizations} 
-                            venues={venues} 
                             onSubmit={handleEditEvent} 
                             onCancel={() => setEditDialogOpen(false)}
                         />
