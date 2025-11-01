@@ -17,6 +17,7 @@ import {
   ClipboardCheck,
   Group,
   BookOpen,
+  BarChart2,
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -55,6 +56,7 @@ export default function Sidebar({ user }: SidebarProps) {
         { href: '/team-performance', label: 'Team Performance', icon: Group },
         { href: '/assessments', label: 'LSAS Assessments', icon: ClipboardCheck },
         { href: '/home-visits', label: 'Home Visits', icon: Home },
+        { href: '/reports', label: 'Reports', icon: BarChart2 },
         { href: '/dashboard/my-events', label: 'My Events', icon: Trophy, disabled: false },
     ]
     
@@ -63,6 +65,7 @@ export default function Sidebar({ user }: SidebarProps) {
         { href: '/team-performance', label: 'Team Performance', icon: Group },
         { href: '/assessments', label: 'LSAS Assessments', icon: ClipboardCheck },
         { href: '/home-visits', label: 'Home Visits', icon: Home },
+        { href: '/reports', label: 'Reports', icon: BarChart2 },
         { href: '/dashboard/users', label: 'Users', icon: Users, disabled: true },
         { href: '/dashboard/organizations', label: 'Organizations', icon: Building, disabled: true },
     ]
