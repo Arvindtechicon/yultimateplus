@@ -219,7 +219,7 @@ export default function EventCard({ event, showEditButton }: EventCardProps) {
                         />
                     </DialogContent>
                 </Dialog>
-                {event.winners && (
+                {isPastEvent && event.winners && (
                   <Dialog>
                     <DialogTrigger asChild>
                       <Button variant="outline" className="w-full">
@@ -238,31 +238,31 @@ export default function EventCard({ event, showEditButton }: EventCardProps) {
                         </DialogDescription>
                       </DialogHeader>
                       <div className="py-4 space-y-4">
-                          <div className='flex items-center gap-4 p-3 rounded-lg bg-yellow-400/20'>
+                          <div className='flex items-center gap-4 p-3 rounded-lg bg-yellow-400/20 dark:bg-yellow-400/10'>
                             <div className='p-2 bg-yellow-500 rounded-full text-white'>
                               <Trophy className='w-5 h-5'/>
                             </div>
                             <div>
-                              <p className='text-xs font-semibold text-yellow-600'>1st Place</p>
-                              <p className='font-bold text-lg text-yellow-800 dark:text-yellow-300'>{event.winners.first}</p>
+                              <p className='text-xs font-semibold text-yellow-600 dark:text-yellow-400'>1st Place</p>
+                              <p className='font-bold text-lg text-yellow-800 dark:text-yellow-200'>{event.winners.first}</p>
                             </div>
                           </div>
-                           <div className='flex items-center gap-4 p-3 rounded-lg bg-gray-400/20'>
+                           <div className='flex items-center gap-4 p-3 rounded-lg bg-gray-400/20 dark:bg-gray-400/10'>
                             <div className='p-2 bg-gray-500 rounded-full text-white'>
                               <Trophy className='w-5 h-5'/>
                             </div>
                             <div>
-                              <p className='text-xs font-semibold text-gray-600'>2nd Place</p>
+                              <p className='text-xs font-semibold text-gray-600 dark:text-gray-400'>2nd Place</p>
                               <p className='font-bold text-lg text-gray-800 dark:text-gray-300'>{event.winners.second}</p>
                             </div>
                           </div>
-                           <div className='flex items-center gap-4 p-3 rounded-lg bg-orange-400/20'>
+                           <div className='flex items-center gap-4 p-3 rounded-lg bg-orange-400/20 dark:bg-orange-400/10'>
                             <div className='p-2 bg-orange-500 rounded-full text-white'>
                               <Trophy className='w-5 h-5'/>
                             </div>
                             <div>
-                              <p className='text-xs font-semibold text-orange-600'>3rd Place</p>
-                              <p className='font-bold text-lg text-orange-800 dark:text-orange-300'>{event.winners.third}</p>
+                              <p className='text-xs font-semibold text-orange-600 dark:text-orange-400'>3rd Place</p>
+                              <p className='font-bold text-lg text-orange-800 dark:text-orange-200'>{event.winners.third}</p>
                             </div>
                           </div>
                       </div>
