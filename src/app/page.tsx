@@ -105,7 +105,7 @@ export default function Home() {
                 <CardContent>
                   <Button onClick={() => handleLogin(option.role)} className="w-full">
                     <LogIn className="mr-2 h-4 w-4" />
-                    Login as {option.title}
+                    Login as {option.role === 'Admin' ? 'Organizer' : option.title}
                   </Button>
                 </CardContent>
               </Card>
