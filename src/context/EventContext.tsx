@@ -2,14 +2,15 @@
 "use client";
 
 import { createContext, useContext, useState, type ReactNode, useCallback } from 'react';
-import type { Event, CoachingCenter, Session, Child, Assessment, HomeVisit } from '@/lib/mockData';
+import type { Event, CoachingCenter, Session, Child, Assessment, HomeVisit, MockAlert } from '@/lib/mockData';
 import { 
     events as initialEvents, 
     coachingCenters as initialCoachingCenters, 
     mockSessions as initialSessions,
-    mockChildren as initialChildren,
+    mockChildren as initialChildrenData,
     mockAssessments as initialAssessments,
     mockHomeVisits as initialHomeVisits,
+    mockAlerts as initialAlerts
 } from '@/lib/mockData';
 
 interface AppContextType {
@@ -19,6 +20,7 @@ interface AppContextType {
   children: Child[];
   assessments: Assessment[];
   homeVisits: HomeVisit[];
+  alerts: MockAlert[];
   addEvent: (newEventData: Omit<Event, 'id' | 'participants'>) => void;
   updateEvent: (eventId: number, updatedEventData: Omit<Event, 'id' | 'participants'>) => void;
   toggleEventRegistration: (eventId: number, userId: number) => void;
@@ -35,9 +37,10 @@ export function AppProvider({ children: componentChildren }: { children: ReactNo
   const [events, setEvents] = useState<Event[]>(initialEvents);
   const [coachingCenters, setCoachingCenters] = useState<CoachingCenter[]>(initialCoachingCenters);
   const [sessions, setSessions] = useState<Session[]>(initialSessions);
-  const [children, setChildren] = useState<Child[]>(initialChildren);
+  const [children, setChildren] = useState<Child[]>(initialChildrenData);
   const [assessments, setAssessments] = useState<Assessment[]>(initialAssessments);
   const [homeVisits, setHomeVisits] = useState<HomeVisit[]>(initialHomeVisits);
+  const [alerts, setAlerts] = useState<MockAlert[]>(initialAlerts);
 
 
   const addEvent = useCallback((newEventData: Omit<Event, 'id' | 'participants'>) => {
@@ -129,13 +132,12 @@ export function AppProvider({ children: componentChildren }: { children: ReactNo
     ]);
   }, []);
 
-  const addHomeVisit = useCallback((newHomeVisitData: Omit<HomeVisit, 'id' | 'date'>) => {
+  const addHomeVisit = useCallback((newHomeVisitData: Omit<HomeVisit, 'id'>) => {
     setHomeVisits(prev => [
         ...prev,
         {
             ...newHomeVisitData,
             id: `HV${prev.length + 1}`,
-            date: newHomeVisitData.date.toISOString(),
         }
     ])
   }, []);
@@ -147,6 +149,7 @@ export function AppProvider({ children: componentChildren }: { children: ReactNo
       children,
       assessments,
       homeVisits,
+      alerts,
       addEvent,
       updateEvent,
       toggleEventRegistration,

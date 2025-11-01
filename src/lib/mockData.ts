@@ -82,6 +82,17 @@ export interface HomeVisit {
     notes: string;
 }
 
+export interface MockAlert {
+    id: number;
+    message: string;
+    type: 'destructive' | 'default';
+}
+
+export const mockAlerts: MockAlert[] = [
+    { id: 1, message: "Attendance missing for Session S002", type: 'destructive' },
+    { id: 2, message: "Endline assessment due for Sneha Rao", type: 'default' },
+];
+
 export const mockChildren: Child[] = [
   {
     id: 'CH001',

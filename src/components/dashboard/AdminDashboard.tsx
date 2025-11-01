@@ -1,6 +1,6 @@
 import { users, organizations, venues, mockChildren, mockSessions } from '@/lib/mockData';
 import { StatCard } from './StatCard';
-import { Users, Calendar, Building, MapPin, Percent, UserCheck, BarChart3, Download } from 'lucide-react';
+import { Users, Calendar, Building, MapPin, Percent, UserCheck, BarChart3, Download, AlertTriangle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -13,12 +13,13 @@ import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useMemo } from 'react';
+import { Alert, AlertTitle } from '../ui/alert';
 
 const COLORS = ['hsl(var(--primary))', 'hsl(var(--secondary-foreground))'];
 
 
 export default function AdminDashboard() {
-    const { events } = useApp();
+    const { events, alerts } = useApp();
     const { toast } = useToast();
 
     const genderData = useMemo(() => {
@@ -79,13 +80,31 @@ export default function AdminDashboard() {
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-8">
-      <motion.h1 
+      <motion.div 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-3xl font-bold"
+        className="flex justify-between items-start"
       >
-        Admin Dashboard
-    </motion.h1>
+        <h1 className="text-3xl font-bold">
+            Admin Dashboard
+        </h1>
+      </motion.div>
+
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="space-y-4"
+      >
+          {alerts.map(a => (
+            <Alert key={a.id} variant={a.type}>
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>{a.message}</AlertTitle>
+            </Alert>
+          ))}
+      </motion.div>
+
+
       <motion.div 
         className="grid gap-6 md:grid-cols-2 lg:grid-cols-4"
         variants={containerVariants}

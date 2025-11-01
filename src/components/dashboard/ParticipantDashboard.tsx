@@ -2,7 +2,7 @@
 
 import type { User } from '@/lib/mockData';
 import { venues, mockChildren, mockAssessments, mockSessions } from '@/lib/mockData';
-import { CalendarCheck, Search, Trophy, X, BookOpen, Home, BarChart2 } from 'lucide-react';
+import { CalendarCheck, Search, Trophy, X, BookOpen, Home, BarChart2, AlertTriangle } from 'lucide-react';
 import { StatCard } from './StatCard';
 import {
   Card,
@@ -39,6 +39,7 @@ import {
   Tooltip,
   Legend,
 } from 'recharts';
+import { Alert, AlertTitle } from '../ui/alert';
 
 interface ParticipantDashboardProps {
   user: User;
@@ -54,7 +55,7 @@ const chartConfig = {
 export default function ParticipantDashboard({
   user,
 }: ParticipantDashboardProps) {
-  const { events, coachingCenters } = useApp();
+  const { events, coachingCenters, alerts } = useApp();
 
   // Hardcode to the first child for demonstration purposes
   const child = mockChildren[0];
@@ -102,13 +103,30 @@ export default function ParticipantDashboard({
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-8">
-      <motion.h1
+      <motion.div 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-3xl font-bold"
+        className="flex justify-between items-start"
+        >
+        <h1 className="text-3xl font-bold">
+            Welcome, {child.name.split(' ')[0]}!
+        </h1>
+      </motion.div>
+
+       <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="space-y-4"
       >
-        Welcome, {child.name.split(' ')[0]}!
-      </motion.h1>
+          {alerts.map(a => (
+            <Alert key={a.id} variant={a.type}>
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>{a.message}</AlertTitle>
+            </Alert>
+          ))}
+      </motion.div>
+
       <motion.div
         className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
         variants={containerVariants}

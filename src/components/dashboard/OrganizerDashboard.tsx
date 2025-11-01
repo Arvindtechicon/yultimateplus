@@ -2,7 +2,7 @@
 import type { User, Event, Child, HomeVisit } from '@/lib/mockData';
 import { organizations, venues, mockSessions, mockChildren } from '@/lib/mockData';
 import { StatCard } from './StatCard';
-import { Calendar, Users, Building, PlusCircle, Home, QrCode, Percent, BookUser } from 'lucide-react';
+import { Calendar, Users, Building, PlusCircle, Home, QrCode, Percent, BookUser, AlertTriangle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '../ui/button';
 import { motion } from 'framer-motion';
@@ -33,10 +33,11 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import LogHomeVisitForm from './LogHomeVisitForm';
+import { Alert, AlertTitle } from '../ui/alert';
 
 
 export default function OrganizerDashboard({ user }: { user: User }) {
-  const { events, addEvent, addHomeVisit: logHomeVisit } = useApp();
+  const { events, addEvent, addHomeVisit, alerts } = useApp();
   const [isAddEventOpen, setAddEventOpen] = useState(false);
   const [isAttendanceModalOpen, setAttendanceModalOpen] = useState(false);
   const [isHomeVisitModalOpen, setHomeVisitModalOpen] = useState(false);
@@ -67,7 +68,7 @@ export default function OrganizerDashboard({ user }: { user: User }) {
   }
 
   const handleLogHomeVisit = (data: Omit<HomeVisit, 'id'>) => {
-    logHomeVisit(data);
+    addHomeVisit(data);
      toast({
         title: "Home Visit Logged",
         description: `Visit for ${mockChildren.find(c => c.id === data.childId)?.name} on ${format(new Date(data.date.toString()), "PPP")} has been logged.`
@@ -104,6 +105,20 @@ export default function OrganizerDashboard({ user }: { user: User }) {
       >
         Coach Dashboard
       </motion.h1>
+
+       <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="space-y-4"
+      >
+          {alerts.map(a => (
+            <Alert key={a.id} variant={a.type}>
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>{a.message}</AlertTitle>
+            </Alert>
+          ))}
+      </motion.div>
 
       <motion.div 
         className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
