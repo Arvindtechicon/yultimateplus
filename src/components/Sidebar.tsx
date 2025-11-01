@@ -51,7 +51,7 @@ export default function Sidebar({ user }: SidebarProps) {
         ],
         Organizer: [
             ...baseLinks,
-            { href: '/dashboard/my-events', label: 'My Events', icon: Trophy, disabled: true },
+            { href: '/dashboard/my-events', label: 'My Events', icon: Trophy },
         ],
         Participant: [
             ...baseLinks
