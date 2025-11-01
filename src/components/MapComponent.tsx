@@ -22,7 +22,7 @@ import { Navigation, Pin, Users, BookOpen } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useApp } from '@/context/EventContext';
+import { useAppData } from '@/context/EventContext';
 import { cn } from '@/lib/utils';
 import { Badge } from './ui/badge';
 
@@ -218,7 +218,7 @@ const getIconUrl = (type: PointOfInterest['type']) => {
 function MapComponent() {
   const searchParams = useSearchParams();
   const venueId = searchParams.get('venueId');
-  const { events } = useApp();
+  const { events } = useAppData();
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',

@@ -28,13 +28,13 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useApp } from '@/context/EventContext';
+import { useAppData } from '@/context/EventContext';
 import AddAssessmentForm from '@/components/dashboard/AddAssessmentForm';
 import ViewAssessmentProgress from '@/components/dashboard/ViewAssessmentProgress';
 import type { Assessment, Child } from '@/lib/mockData';
 
 export default function AssessmentsPage() {
-  const { children, assessments, addAssessment } = useApp();
+  const { children, assessments, addAssessment } = useAppData();
   const [isAddModalOpen, setAddModalOpen] = useState(false);
 
   const handleAddAssessment = (data: Omit<Assessment, 'date'>) => {

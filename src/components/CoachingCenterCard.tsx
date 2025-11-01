@@ -14,7 +14,7 @@ import { MapPin, Users, LogIn, LogOut } from 'lucide-react';
 import type { CoachingCenter } from '@/lib/mockData';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
-import { useApp } from '@/context/EventContext';
+import { useAppData } from '@/context/EventContext';
 import { useToast } from '@/hooks/use-toast';
 
 interface CoachingCenterCardProps {
@@ -23,7 +23,7 @@ interface CoachingCenterCardProps {
 
 export default function CoachingCenterCard({ center }: CoachingCenterCardProps) {
   const { user } = useAuth();
-  const { toggleCoachingCenterRegistration } = useApp();
+  const { toggleCoachingCenterRegistration } = useAppData();
   const { toast } = useToast();
 
   const isParticipant = user?.role === 'Participant';

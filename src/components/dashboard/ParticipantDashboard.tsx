@@ -2,7 +2,7 @@
 
 import type { User } from '@/lib/mockData';
 import { venues, mockChildren, mockAssessments, mockSessions } from '@/lib/mockData';
-import { CalendarCheck, Search, Trophy, X, BookOpen, Home, BarChart2, AlertTriangle } from 'lucide-react';
+import { CalendarCheck, Search, Trophy, X, BookOpen, Home, BarChart2, AlertTriangle, QrCode } from 'lucide-react';
 import { StatCard } from './StatCard';
 import {
   Card,
@@ -17,7 +17,7 @@ import { Separator } from '@/components/ui/separator';
 import { Button } from '../ui/button';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { useApp } from '@/context/EventContext';
+import { useAppData } from '@/context/EventContext';
 import { useMemo, useState } from 'react';
 import { Input } from '../ui/input';
 import EventCard from '../EventCard';
@@ -40,6 +40,8 @@ import {
   Legend,
 } from 'recharts';
 import { Alert, AlertTitle } from '../ui/alert';
+import QRCodeComponent from 'qrcode.react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
 
 interface ParticipantDashboardProps {
   user: User;
@@ -55,7 +57,7 @@ const chartConfig = {
 export default function ParticipantDashboard({
   user,
 }: ParticipantDashboardProps) {
-  const { events, coachingCenters, alerts } = useApp();
+  const { events, coachingCenters, alerts } = useAppData();
 
   // Hardcode to the first child for demonstration purposes
   const child = mockChildren[0];
@@ -73,6 +75,12 @@ export default function ParticipantDashboard({
     }));
   }, [baseline, endline]);
   
+  const registeredEvents = useMemo(() => {
+    return events
+      .filter(event => event.participants.includes(user.id) && new Date(event.date) >= new Date())
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  }, [events, user.id]);
+
   const attendanceData = useMemo(() => {
       const childSessions = mockSessions.filter(s => s.status === 'completed');
       return childSessions.map(session => ({
@@ -151,6 +159,62 @@ export default function ParticipantDashboard({
           icon={Home}
           description="Visits logged by your coach"
         />
+      </motion.div>
+
+      <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+        >
+            <Card className="glass-card">
+                <CardHeader>
+                    <CardTitle>My Upcoming Events</CardTitle>
+                    <CardDescription>Your QR codes for check-in.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    {registeredEvents.length > 0 ? (
+                        <div className="space-y-4">
+                            {registeredEvents.map(event => {
+                                const qrValue = JSON.stringify({ eventId: event.id, eventName: event.name, userId: user.id, userName: user.name });
+                                return (
+                                    <div key={event.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
+                                        <div>
+                                            <p className="font-semibold">{event.name}</p>
+                                            <p className="text-sm text-muted-foreground">{format(new Date(event.date), 'PPPP p')}</p>
+                                        </div>
+                                        <Dialog>
+                                            <DialogTrigger asChild>
+                                                <Button variant="outline">
+                                                    <QrCode className="mr-2 h-4 w-4" />
+                                                    Show QR Code
+                                                </Button>
+                                            </DialogTrigger>
+                                            <DialogContent className="sm:max-w-[425px] glass-card">
+                                                <DialogHeader>
+                                                    <DialogTitle className='text-center'>{event.name}</DialogTitle>
+                                                </DialogHeader>
+                                                <div className="flex flex-col items-center justify-center p-4 gap-4">
+                                                    <div className="bg-white p-4 rounded-lg">
+                                                        <QRCodeComponent value={qrValue} size={256} />
+                                                    </div>
+                                                    <p className="text-xs text-muted-foreground text-center">Show this QR code to the event organizer to check in.</p>
+                                                </div>
+                                            </DialogContent>
+                                        </Dialog>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    ) : (
+                        <div className="text-center py-8">
+                            <p className="text-sm text-muted-foreground">You are not registered for any upcoming events.</p>
+                            <Button asChild variant="link" className='mt-2'>
+                                <Link href="/events">Browse Events</Link>
+                            </Button>
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
       </motion.div>
 
       <div className="grid gap-8 lg:grid-cols-2">

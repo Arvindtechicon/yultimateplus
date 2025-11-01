@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { useState, useMemo } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import CoachingCenterCard from '@/components/CoachingCenterCard';
-import { useApp } from '@/context/EventContext';
+import { useAppData } from '@/context/EventContext';
 import { BookOpen, PlusCircle, Search } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import {
@@ -22,7 +22,7 @@ import type { CoachingCenter } from '@/lib/mockData';
 
 export default function CoachingPage() {
   const { user } = useAuth();
-  const { coachingCenters, addCoachingCenter } = useApp();
+  const { coachingCenters, addCoachingCenter } = useAppData();
   const [isAddCenterOpen, setAddCenterOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 

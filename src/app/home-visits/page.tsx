@@ -28,13 +28,13 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { useApp } from '@/context/EventContext';
+import { useAppData } from '@/context/EventContext';
 import { format } from 'date-fns';
 import LogHomeVisitForm from '@/components/dashboard/LogHomeVisitForm';
 import type { HomeVisit, Child } from '@/lib/mockData';
 
 export default function HomeVisitsPage() {
-  const { children, homeVisits, addHomeVisit } = useApp();
+  const { children, homeVisits, addHomeVisit } = useAppData();
   const [isAddModalOpen, setAddModalOpen] = useState(false);
 
   const handleAddHomeVisit = (data: Omit<HomeVisit, 'id'>) => {

@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { motion } from 'framer-motion';
 import EventCard from '../EventCard';
-import { useApp } from '@/context/EventContext';
+import { useAppData } from '@/context/EventContext';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend as RechartsLegend } from 'recharts';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Button } from '@/components/ui/button';
@@ -19,7 +19,7 @@ const COLORS = ['hsl(var(--primary))', 'hsl(var(--secondary-foreground))'];
 
 
 export default function AdminDashboard() {
-    const { events, alerts } = useApp();
+    const { events, alerts } = useAppData();
     const { toast } = useToast();
 
     const genderData = useMemo(() => {

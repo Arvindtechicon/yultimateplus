@@ -50,7 +50,7 @@ const getInitialState = <T,>(key: string, fallback: T): T => {
 };
 
 
-export function AppProvider({ children: componentChildren }: { children: ReactNode }) {
+export function AppDataProvider({ children: componentChildren }: { children: ReactNode }) {
   const [events, setEvents] = useState<Event[]>(() => getInitialState('y-ultimate-events', initialEvents));
   const [coachingCenters, setCoachingCenters] = useState<CoachingCenter[]>(() => getInitialState('y-ultimate-coaching-centers', initialCoachingCenters));
   const [sessions, setSessions] = useState<Session[]>(() => getInitialState('y-ultimate-sessions', initialSessions));
@@ -204,10 +204,10 @@ export function AppProvider({ children: componentChildren }: { children: ReactNo
   );
 }
 
-export function useApp() {
+export function useAppData() {
   const context = useContext(AppContext);
   if (context === undefined) {
-    throw new Error('useApp must be used within an AppProvider');
+    throw new Error('useAppData must be used within an AppDataProvider');
   }
   return context;
 }

@@ -14,7 +14,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { CheckCircle, QrCode, User } from 'lucide-react';
 import { motion } from 'framer-motion';
 import DashboardLayout from '@/components/DashboardLayout';
-import { useApp } from '@/context/EventContext';
+import { useAppData } from '@/context/EventContext';
 import { mockChildren, type Session } from '@/lib/mockData';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from '@/components/ui/label';
@@ -28,7 +28,7 @@ import {
 import { format } from 'date-fns';
 
 export default function CheckinPage() {
-  const { sessions, markSessionAttendance } = useApp();
+  const { sessions, markSessionAttendance } = useAppData();
   const { toast } = useToast();
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
 
@@ -83,7 +83,7 @@ export default function CheckinPage() {
             <CardContent className='space-y-6'>
               <div className="space-y-2">
                 <Label htmlFor="session-select">Select a Session</Label>
-                <Select onValueChange={setSelectedSessionId}>
+                <Select onValueChange={setSelectedSessionId} value={selectedSessionId || ''}>
                     <SelectTrigger id="session-select">
                         <SelectValue placeholder="Choose a session..." />
                     </SelectTrigger>
@@ -101,11 +101,14 @@ export default function CheckinPage() {
                 <div className='space-y-4'>
                     <h3 className='font-semibold text-center'>Simulate QR Code Scan</h3>
                      <div className='grid grid-cols-2 gap-4'>
-                        <Button onClick={() => handleScan('CH001')}>
+                        <Button onClick={() => handleScan('CH001')} disabled={!selectedSessionId}>
                             Simulate Scan (Aarav)
                         </Button>
-                        <Button onClick={() => handleScan('CH002')}>
+                        <Button onClick={() => handleScan('CH002')} disabled={!selectedSessionId}>
                             Simulate Scan (Sneha)
+                        </Button>
+                         <Button onClick={() => handleScan('CH003')} disabled={!selectedSessionId}>
+                            Simulate Scan (Rohan)
                         </Button>
                     </div>
                 </div>
@@ -115,10 +118,10 @@ export default function CheckinPage() {
                 <motion.div initial={{opacity: 0}} animate={{opacity: 1}} className='mt-6'>
                     <Alert>
                         <CheckCircle className="h-5 w-5"/>
-                        <AlertTitle>Current Attendance</AlertTitle>
+                        <AlertTitle>Current Attendance for "{selectedSession.community}"</AlertTitle>
                         <AlertDescription>
                             <p>{selectedSession.participants.length} / {mockChildren.filter(c => c.community === selectedSession.community).length} children present.</p>
-                            <ul className='list-disc list-inside mt-2'>
+                            <ul className='list-disc list-inside mt-2 text-xs'>
                                 {selectedSession.participants.map(childId => {
                                     const child = mockChildren.find(c => c.id === childId);
                                     return <li key={childId}>{child?.name}</li>

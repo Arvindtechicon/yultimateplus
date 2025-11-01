@@ -17,7 +17,7 @@ import {
     DialogTitle,
     DialogTrigger,
   } from "@/components/ui/dialog";
-import { useApp } from '@/context/EventContext';
+import { useAppData } from '@/context/EventContext';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from '../ui/label';
@@ -37,10 +37,11 @@ import { Alert, AlertTitle } from '../ui/alert';
 
 
 export default function OrganizerDashboard({ user }: { user: User }) {
-  const { events, addEvent, addHomeVisit, alerts } = useApp();
+  const { events, addEvent, addHomeVisit, alerts, markSessionAttendance } = useAppData();
   const [isAddEventOpen, setAddEventOpen] = useState(false);
   const [isAttendanceModalOpen, setAttendanceModalOpen] = useState(false);
   const [isHomeVisitModalOpen, setHomeVisitModalOpen] = useState(false);
+  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
   const { toast } = useToast();
 
   const myOrganizations = organizations.filter(org => org.organizers.includes(user.id));
@@ -79,10 +80,29 @@ export default function OrganizerDashboard({ user }: { user: User }) {
   const handleScan = (data: { text: string } | null) => {
     if(data) {
         setAttendanceModalOpen(false);
-        toast({
-            title: "Attendance Marked!",
-            description: `Scanned: ${data.text}`
-        })
+        try {
+            const scannedData = JSON.parse(data.text);
+            if (scannedData.childId && scannedData.sessionId) {
+                markSessionAttendance(scannedData.sessionId, scannedData.childId);
+                const child = mockChildren.find(c => c.id === scannedData.childId);
+                toast({
+                    title: "Attendance Marked!",
+                    description: `${child?.name || 'Child'} marked present for session ${scannedData.sessionId}.`
+                })
+            } else {
+                 toast({
+                    variant: "destructive",
+                    title: "Invalid QR Code",
+                    description: "The scanned QR code is not valid for session attendance."
+                })
+            }
+        } catch (e) {
+            toast({
+                variant: "destructive",
+                title: "Scan Error",
+                description: "Could not read the QR code."
+            })
+        }
     }
   }
 
