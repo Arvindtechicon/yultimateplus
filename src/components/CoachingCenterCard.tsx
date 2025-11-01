@@ -63,8 +63,8 @@ export default function CoachingCenterCard({ center }: CoachingCenterCardProps) 
       <Card className="glass-card flex flex-col h-full overflow-hidden">
         <CardHeader>
           <CardTitle className="text-xl font-bold">{center.name}</CardTitle>
-          <CardDescription>
-            <Badge variant="secondary">{center.specialty}</Badge>
+          <CardDescription asChild>
+            <div><Badge variant="secondary">{center.specialty}</Badge></div>
           </CardDescription>
         </CardHeader>
         <CardContent className="flex-grow space-y-3 text-sm">
