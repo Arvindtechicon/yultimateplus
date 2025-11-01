@@ -34,7 +34,7 @@ export default function Home() {
 
   const loginOptions = [
     { role: 'Admin' as const, icon: Shield, title: 'Admin', description: 'Oversee and manage the entire platform.' },
-    { role: 'Organizer' as const, icon: User, title: 'Coach', description: 'Create and manage your own events.' },
+    { role: 'Organizer' as const, icon: User, title: 'Coach and Organizer', description: 'Create and manage your own events.' },
     { role: 'Participant' as const, icon: Trophy, title: 'Participant', description: 'Join events and track your activity.' },
   ];
 
@@ -105,7 +105,7 @@ export default function Home() {
                 <CardContent>
                   <Button onClick={() => handleLogin(option.role)} className="w-full">
                     <LogIn className="mr-2 h-4 w-4" />
-                    Login as {option.title}
+                    Login as {option.role === 'Organizer' ? 'Organizer' : option.title}
                   </Button>
                 </CardContent>
               </Card>
