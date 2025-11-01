@@ -125,7 +125,7 @@ export default function OrganizerDashboard({ user }: { user: User }) {
         animate={{ opacity: 1, y: 0 }}
         className="text-3xl font-bold"
       >
-        Coach Dashboard
+        Organizer Dashboard
       </motion.h1>
 
        <motion.div 
