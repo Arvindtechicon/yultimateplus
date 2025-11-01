@@ -289,6 +289,11 @@ function MapComponent() {
     setDirections(null);
   };
 
+  const handleOpenInGoogleMaps = (poi: PointOfInterest) => {
+    const url = `https://www.google.com/maps/search/?api=1&query=${poi.coordinates.lat},${poi.coordinates.lng}`;
+    window.open(url, '_blank');
+  };
+
   const getIconForPoi = (type: PointOfInterest['type']) => {
     switch (type) {
       case 'venue': return <Pin className="w-5 h-5 text-red-500" />;
@@ -348,7 +353,7 @@ function MapComponent() {
               className={cn(`cursor-pointer transition-all duration-300 glass-card hover:border-primary/60`,
                 selectedPoi?.id === poi.id ? 'border-primary shadow-lg' : ''
               )}
-              onClick={() => handlePoiSelect(poi)}
+              onClick={() => handleOpenInGoogleMaps(poi)}
             >
               <CardHeader>
                 <div className='flex justify-between items-start'>
