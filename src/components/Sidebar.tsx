@@ -16,7 +16,6 @@ import {
   LineChart,
   ClipboardCheck,
   Group,
-  BookOpen,
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -39,7 +38,6 @@ export default function Sidebar({ user }: SidebarProps) {
     const baseLinks = [
         { href: '/dashboard', label: 'Overview', icon: Home },
         { href: '/events', label: 'Events', icon: Calendar },
-        { href: '/coaching', label: 'Coaching', icon: BookOpen },
         { href: '/map', label: 'Map', icon: Map },
         { href: '/checkin', label: 'Check-in', icon: QrCode },
     ]

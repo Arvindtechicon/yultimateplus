@@ -2,23 +2,20 @@
 "use client";
 
 import { createContext, useContext, useState, type ReactNode, useCallback } from 'react';
-import type { Event, CoachingCenter } from '@/lib/mockData';
-import { events as initialEvents, coachingCenters as initialCoachingCenters } from '@/lib/mockData';
+import type { Event } from '@/lib/mockData';
+import { events as initialEvents } from '@/lib/mockData';
 
 interface AppContextType {
   events: Event[];
-  coachingCenters: CoachingCenter[];
   addEvent: (newEventData: Omit<Event, 'id' | 'participants'>) => void;
   updateEvent: (eventId: number, updatedEventData: Omit<Event, 'id' | 'participants'>) => void;
   toggleEventRegistration: (eventId: number, userId: number) => void;
-  toggleCoachingRegistration: (centerId: number, userId: number) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [events, setEvents] = useState<Event[]>(initialEvents);
-  const [coachingCenters, setCoachingCenters] = useState<CoachingCenter[]>(initialCoachingCenters);
 
   const addEvent = useCallback((newEventData: Omit<Event, 'id' | 'participants'>) => {
     setEvents(prevEvents => [
@@ -60,23 +57,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
-  const toggleCoachingRegistration = useCallback((centerId: number, userId: number) => {
-    setCoachingCenters(prevCenters =>
-      prevCenters.map(center => {
-        if (center.id === centerId) {
-          const isRegistered = center.participants.includes(userId);
-          const newParticipants = isRegistered
-            ? center.participants.filter(id => id !== userId)
-            : [...center.participants, userId];
-          return { ...center, participants: newParticipants };
-        }
-        return center;
-      })
-    );
-  }, []);
-
   return (
-    <AppContext.Provider value={{ events, coachingCenters, addEvent, updateEvent, toggleEventRegistration, toggleCoachingRegistration }}>
+    <AppContext.Provider value={{ events, addEvent, updateEvent, toggleEventRegistration }}>
       {children}
     </AppContext.Provider>
   );

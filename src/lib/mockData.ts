@@ -37,15 +37,6 @@ export interface Organization {
   organizers: number[]; // array of user IDs
 }
 
-export interface CoachingCenter {
-  id: number;
-  name: string;
-  specialty: string;
-  location: string;
-  coach: string;
-  participants: number[]; // array of user IDs
-}
-
 export const users: User[] = [
   { id: 1, name: 'Admin User', email: 'admin@yultimate.com', role: 'Admin' },
   { id: 2, name: 'Organizer User', email: 'organizer@yultimate.com', role: 'Organizer' },
@@ -113,9 +104,3 @@ export const events: Event[] = [
     participants: [4, 5],
   },
 ];
-
-export const coachingCenters: CoachingCenter[] = [
-    { id: 1, name: 'Ultimate Skills Academy', specialty: 'Advanced Throwing & Strategy', location: 'City Park Complex', coach: 'Coach Alex', participants: [3] },
-    { id: 2, name: 'Frisbee Fundamentals', specialty: 'Beginner & Intermediate Skills', location: 'Community Center Fields', coach: 'Coach Sarah', participants: [] },
-    { id: 3, name: 'Youth Ultimate Camp', specialty: 'Ages 10-16', location: 'Northside High School', coach: 'Coach Mike', participants: [4,5] },
-]
