@@ -135,7 +135,7 @@ export function AppDataProvider({ children: componentChildren }: { children: Rea
     );
   }, []);
 
-  const addCoachingCenter = useCallback((newCenterData: Omit<CoachingCenter, 'id' | 'participants' | 'coordinates'>) => {
+  const addCoachingCenter = useCallback((newCenterData: Omit<CoachingCenter, 'id' | 'participants'>) => {
     setCoachingCenters(prevCenters => [
       ...prevCenters,
       {
