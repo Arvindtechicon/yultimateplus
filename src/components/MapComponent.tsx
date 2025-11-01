@@ -9,7 +9,6 @@ import {
   InfoWindow,
   DirectionsRenderer,
 } from '@react-google-maps/api';
-import { venues as initialVenues } from '@/lib/mockData';
 import {
   Card,
   CardContent,
@@ -18,7 +17,7 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Navigation, Pin } from 'lucide-react';
+import { Navigation, Pin, BookOpen } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -29,7 +28,7 @@ import { cn } from '@/lib/utils';
 type PointOfInterest = {
     id: string;
     name: string;
-    type: 'venue';
+    type: 'venue' | 'coachingCenter';
     coordinates: { lat: number, lng: number };
     description: string;
 };
@@ -206,6 +205,7 @@ const darkMapOptions = {
 const getIconUrl = (type: PointOfInterest['type']) => {
     const color = {
         venue: 'FF6B6B', // red
+        coachingCenter: '4ECDC4' // teal
     }[type];
     return `https://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|${color}`;
 }
@@ -213,7 +213,7 @@ const getIconUrl = (type: PointOfInterest['type']) => {
 function MapComponent() {
   const searchParams = useSearchParams();
   const venueId = searchParams.get('venueId');
-  const { events, venues } = useAppData();
+  const { events, venues, coachingCenters } = useAppData();
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
@@ -231,6 +231,7 @@ function MapComponent() {
 
   const pointsOfInterest: PointOfInterest[] = [
     ...venues.map(v => ({ id: `v-${v.id}`, name: v.name, type: 'venue' as const, coordinates: v.coordinates, description: v.location })),
+    ...coachingCenters.map(c => ({ id: `c-${c.id}`, name: c.name, type: 'coachingCenter' as const, coordinates: c.coordinates, description: c.location })),
   ]
 
   useEffect(() => {
@@ -289,6 +290,7 @@ function MapComponent() {
   const getIconForPoi = (type: PointOfInterest['type']) => {
     switch (type) {
       case 'venue': return <Pin className="w-5 h-5 text-red-500" />;
+      case 'coachingCenter': return <BookOpen className="w-5 h-5 text-teal-500" />;
       default: return <Pin className="w-5 h-5 text-primary" />;
     }
   }
@@ -307,7 +309,7 @@ function MapComponent() {
         animate={{x: 0, opacity: 1}}
         className="lg:col-span-1 space-y-4 overflow-y-auto p-4 bg-background/80 backdrop-blur-sm"
       >
-        <h2 className="text-2xl font-bold px-2">Event Venues</h2>
+        <h2 className="text-2xl font-bold px-2">Points of Interest</h2>
         {pointsOfInterest.map((poi, i) => (
           <motion.div
             key={poi.id}
@@ -334,6 +336,15 @@ function MapComponent() {
                         <h4 className="font-semibold text-sm mb-2">Events at this venue:</h4>
                         <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
                             {events.filter(e => e.venueId === parseInt(poi.id.split('-')[1])).map(e => <li key={e.id}>{e.name}</li>)}
+                        </ul>
+                    </div>
+                )}
+                 {poi.type === 'coachingCenter' && (
+                    <div className="mt-4">
+                        <h4 className="font-semibold text-sm mb-2">Details:</h4>
+                        <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+                            <li>Specialty: {coachingCenters.find(c => c.id === parseInt(poi.id.split('-')[1]))?.specialty}</li>
+                            <li>Participants: {coachingCenters.find(c => c.id === parseInt(poi.id.split('-')[1]))?.participants.length}</li>
                         </ul>
                     </div>
                 )}
@@ -366,7 +377,7 @@ function MapComponent() {
             </div>
             {!selectedPoi && (
               <p className="text-sm text-muted-foreground mt-2">
-                Select an event venue from the list to get directions.
+                Select a point of interest from the list to get directions.
               </p>
             )}
           </Card>
@@ -383,7 +394,10 @@ function MapComponent() {
                 key={poi.id}
                 position={poi.coordinates}
                 onClick={() => handlePoiSelect(poi)}
-                icon={getIconUrl(poi.type)}
+                icon={{
+                    url: getIconUrl(poi.type),
+                    scaledSize: new google.maps.Size(30, 45)
+                }}
               />
             ))}
 
@@ -402,7 +416,7 @@ function MapComponent() {
             </AnimatePresence>
             {directions && <DirectionsRenderer directions={directions} options={{
                 polylineOptions: {
-                    strokeColor: '#8A2BE2',
+                    strokeColor: '#A020F0',
                     strokeWeight: 5,
                 }
             }}/>}
@@ -414,3 +428,5 @@ function MapComponent() {
 }
 
 export default MapComponent;
+
+    
