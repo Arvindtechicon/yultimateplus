@@ -60,7 +60,7 @@ export function Sidebar({ user, isOpen, setOpen }: SidebarProps) {
     ];
 
     const organizerLinks = [
-      ...baseLinks,
+      ...baseLinks.filter(link => link.href !== '/coaching'),
       { href: '/team-performance', label: 'Team Performance', icon: Group },
       {
         href: '/assessments',
