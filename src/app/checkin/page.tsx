@@ -9,12 +9,13 @@ import { CheckCircle, XCircle, QrCode } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import DashboardLayout from '@/components/DashboardLayout';
 import { useEvents } from '@/context/EventContext';
+import type { Event } from '@/lib/mockData';
 
 export default function CheckinPage() {
   const { events } = useEvents();
   const [qrValue, setQrValue] = useState('');
   const [checkinStatus, setCheckinStatus] = useState<'idle' | 'success' | 'error'>('idle');
-  const [checkedInEvent, setCheckedInEvent] = useState<string | null>(null);
+  const [checkedInEvent, setCheckedInEvent] = useState<Event | null>(null);
 
   const handleCheckIn = () => {
     setCheckinStatus('idle');
@@ -25,28 +26,28 @@ export default function CheckinPage() {
       return;
     }
 
+    let foundEvent: Event | undefined;
+
+    // Try parsing as JSON first
     try {
       const parsedQr = JSON.parse(qrValue);
       const eventId = parsedQr.eventId;
       
-      const event = events.find(event => event.id === eventId);
+      foundEvent = events.find(event => event.id === eventId);
+    } catch (error) {
+      // If JSON parsing fails, try treating it as a simple ID
+      const eventId = parseInt(qrValue, 10);
+      if (!isNaN(eventId)) {
+        foundEvent = events.find(e => e.id === eventId);
+      }
+    }
 
-      if (event) {
+    if (foundEvent) {
         setCheckinStatus('success');
-        setCheckedInEvent(event.name);
+        setCheckedInEvent(foundEvent);
       } else {
         setCheckinStatus('error');
       }
-    } catch (error) {
-      const eventId = parseInt(qrValue, 10);
-      if (!isNaN(eventId) && events.some(event => event.id === eventId)) {
-        const event = events.find(e => e.id === eventId);
-        setCheckinStatus('success');
-        setCheckedInEvent(event?.name || `Event ID: ${eventId}`);
-      } else {
-         setCheckinStatus('error');
-      }
-    }
   };
 
   return (
@@ -71,9 +72,10 @@ export default function CheckinPage() {
             <div className="space-y-4">
               <Input
                 type="text"
-                placeholder='e.g., {"eventId":1}'
+                placeholder='e.g., {"eventId":1} or 1'
                 value={qrValue}
                 onChange={(e) => setQrValue(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleCheckIn()}
                 aria-label="QR Code Value"
                 className="h-12 text-center text-lg"
               />
@@ -83,7 +85,7 @@ export default function CheckinPage() {
             </div>
 
             <AnimatePresence>
-              {checkinStatus === 'success' && (
+              {checkinStatus === 'success' && checkedInEvent && (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -95,7 +97,7 @@ export default function CheckinPage() {
                     <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
                     <AlertTitle className="text-green-800 dark:text-green-300 font-bold text-lg">Check-in Successful!</AlertTitle>
                     <AlertDescription className="text-green-700 dark:text-green-400">
-                      Welcome to <strong>{checkedInEvent}</strong>. Enjoy the event!
+                      Welcome to <strong>{checkedInEvent.name}</strong>. Enjoy the event!
                     </AlertDescription>
                   </Alert>
                 </motion.div>
@@ -113,7 +115,7 @@ export default function CheckinPage() {
                     <XCircle className="h-5 w-5" />
                     <AlertTitle className='font-bold text-lg'>Check-in Failed</AlertTitle>
                     <AlertDescription>
-                      Invalid or unrecognized event QR code. Please try again.
+                      Invalid or unrecognized event ID. Please try again.
                     </AlertDescription>
                   </Alert>
                 </motion.div>
