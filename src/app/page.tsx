@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/context/AuthContext';
-import { Disc3, LogIn, User, Shield, Trophy } from 'lucide-react';
+import { Disc3, LogIn, User, Shield, Trophy, Briefcase } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type { User as UserType } from '@/lib/mockData';
 import { motion } from 'framer-motion';
@@ -33,7 +33,8 @@ export default function Home() {
   };
 
   const loginOptions = [
-    { role: 'Organizer' as const, icon: User, title: 'Coach', description: 'Create and manage your own events.' },
+    { role: 'Organizer' as const, icon: User, title: 'Coach', description: 'Manage sessions and track child progress.' },
+    { role: 'Organizer' as const, icon: Briefcase, title: 'Organizer', description: 'Create and manage your own events.' },
     { role: 'Participant' as const, icon: Trophy, title: 'Participant', description: 'Join events and track your activity.' },
   ];
 
@@ -86,13 +87,13 @@ export default function Home() {
         </motion.div>
 
         <motion.div 
-            className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl"
+            className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-5xl"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
         >
           {loginOptions.map((option) => (
-            <motion.div key={option.role} variants={itemVariants}>
+            <motion.div key={option.title} variants={itemVariants}>
               <Card className="text-center glass-card hover:scale-105 hover:border-primary/50 transition-all duration-300 group">
                 <CardHeader>
                     <div className="mx-auto bg-primary/10 dark:bg-primary/20 p-4 rounded-full w-fit mb-2 group-hover:scale-110 transition-transform duration-300">
