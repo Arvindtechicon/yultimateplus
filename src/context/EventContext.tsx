@@ -2,17 +2,19 @@
 "use client";
 
 import { createContext, useContext, useState, type ReactNode, useCallback } from 'react';
-import type { Event, CoachingCenter } from '@/lib/mockData';
-import { events as initialEvents, coachingCenters as initialCoachingCenters } from '@/lib/mockData';
+import type { Event, CoachingCenter, Session } from '@/lib/mockData';
+import { events as initialEvents, coachingCenters as initialCoachingCenters, mockSessions as initialSessions } from '@/lib/mockData';
 
 interface AppContextType {
   events: Event[];
   coachingCenters: CoachingCenter[];
+  sessions: Session[];
   addEvent: (newEventData: Omit<Event, 'id' | 'participants'>) => void;
   updateEvent: (eventId: number, updatedEventData: Omit<Event, 'id' | 'participants'>) => void;
   toggleEventRegistration: (eventId: number, userId: number) => void;
   addCoachingCenter: (newCenterData: Omit<CoachingCenter, 'id' | 'participants'>) => void;
   toggleCoachingCenterRegistration: (centerId: number, userId: number) => void;
+  markSessionAttendance: (sessionId: string, childId: string) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -20,6 +22,7 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export function AppProvider({ children }: { children: ReactNode }) {
   const [events, setEvents] = useState<Event[]>(initialEvents);
   const [coachingCenters, setCoachingCenters] = useState<CoachingCenter[]>(initialCoachingCenters);
+  const [sessions, setSessions] = useState<Session[]>(initialSessions);
 
   const addEvent = useCallback((newEventData: Omit<Event, 'id' | 'participants'>) => {
     setEvents(prevEvents => [
@@ -87,8 +90,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
+  const markSessionAttendance = useCallback((sessionId: string, childId: string) => {
+    setSessions(prevSessions =>
+      prevSessions.map(session => {
+        if (session.id === sessionId) {
+          if (!session.participants.includes(childId)) {
+            return { ...session, participants: [...session.participants, childId] };
+          }
+        }
+        return session;
+      })
+    );
+  }, []);
+
   return (
-    <AppContext.Provider value={{ events, coachingCenters, addEvent, updateEvent, toggleEventRegistration, addCoachingCenter, toggleCoachingCenterRegistration }}>
+    <AppContext.Provider value={{ events, coachingCenters, sessions, addEvent, updateEvent, toggleEventRegistration, addCoachingCenter, toggleCoachingCenterRegistration, markSessionAttendance }}>
       {children}
     </AppContext.Provider>
   );

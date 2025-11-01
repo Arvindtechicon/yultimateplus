@@ -1,6 +1,7 @@
+
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -10,109 +11,56 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { CheckCircle, XCircle, QrCode, VideoOff, User } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { CheckCircle, QrCode, User } from 'lucide-react';
+import { motion } from 'framer-motion';
 import DashboardLayout from '@/components/DashboardLayout';
 import { useApp } from '@/context/EventContext';
-import type { Event } from '@/lib/mockData';
-import QrScanner from 'react-qr-scanner';
+import { mockChildren, type Session } from '@/lib/mockData';
 import { useToast } from '@/hooks/use-toast';
-
-interface CheckedInData {
-    event: Event;
-    userName?: string;
-}
+import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+  } from '@/components/ui/select';
+import { format } from 'date-fns';
 
 export default function CheckinPage() {
-  const { events } = useApp();
-  const [checkinStatus, setCheckinStatus] = useState<
-    'idle' | 'success' | 'error'
-  >('idle');
-  const [checkedInData, setCheckedInData] = useState<CheckedInData | null>(null);
-  const [hasCameraPermission, setHasCameraPermission] = useState(true);
-  const [isScanning, setIsScanning] = useState(true);
+  const { sessions, markSessionAttendance } = useApp();
   const { toast } = useToast();
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
 
-
-  useEffect(() => {
-    const getCameraPermission = async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        setHasCameraPermission(true);
-        if (videoRef.current) {
-            videoRef.current.srcObject = stream;
-        }
-      } catch (error) {
-        console.error('Error accessing camera:', error);
-        setHasCameraPermission(false);
+  const handleScan = (childId: string) => {
+    if (!selectedSessionId) {
         toast({
-          variant: 'destructive',
-          title: 'Camera Access Denied',
-          description: 'Please enable camera permissions in your browser settings.',
+            variant: "destructive",
+            title: "No Session Selected",
+            description: "Please select a session before marking attendance.",
         });
-      }
-    };
-
-    getCameraPermission();
-  }, [toast]);
-
-
-  const handleScan = (data: { text: string } | null) => {
-    if (data?.text && isScanning) {
-      setIsScanning(false); // Stop scanning once a code is found
-      handleCheckIn(data.text);
-    }
-  };
-
-  const handleError = (err: any) => {
-    console.error(err);
-    if (err?.name === 'NotAllowedError' || err?.name === 'PermissionDeniedError' || err?.name === "NotFoundError") {
-        setHasCameraPermission(false);
-    }
-  };
-
-  const handleCheckIn = (qrValue: string) => {
-    setCheckinStatus('idle');
-    setCheckedInData(null);
-
-    if (!qrValue || !qrValue.trim()) {
-      setCheckinStatus('error');
-      setTimeout(() => setIsScanning(true), 3000); // Allow scanning again after a delay
-      return;
+        return;
     }
 
-    let foundEvent: Event | undefined;
-    let userName: string | undefined;
+    const child = mockChildren.find(c => c.id === childId);
+    const session = sessions.find(s => s.id === selectedSessionId);
 
-    try {
-      const parsedQr = JSON.parse(qrValue);
-      const eventId = parsedQr.eventId;
-      userName = parsedQr.userName;
-      foundEvent = events.find((event) => event.id === eventId);
-    } catch (error) {
-      // Fallback for non-JSON QR codes (e.g., just an event ID)
-      const eventId = parseInt(qrValue, 10);
-      if (!isNaN(eventId)) {
-        foundEvent = events.find((e) => e.id === eventId);
-      }
-    }
-
-    if (foundEvent) {
-      setCheckinStatus('success');
-      setCheckedInData({ event: foundEvent, userName });
+    if (child && session) {
+        markSessionAttendance(selectedSessionId, childId);
+        toast({
+            title: "Check-in Successful!",
+            description: `${child.name} marked present for session in ${session.community}.`,
+        });
     } else {
-      setCheckinStatus('error');
+        toast({
+            variant: "destructive",
+            title: "Check-in Failed",
+            description: "Could not find the child or session.",
+        });
     }
-    
-    // Reset scanner after a delay
-    setTimeout(() => {
-        setCheckinStatus('idle');
-        setCheckedInData(null);
-        setIsScanning(true);
-    }, 5000);
   };
 
+  const selectedSession = sessions.find(s => s.id === selectedSessionId);
 
   return (
     <DashboardLayout>
@@ -127,80 +75,60 @@ export default function CheckinPage() {
               <div className="mx-auto bg-primary/10 dark:bg-primary/20 p-4 rounded-full w-fit mb-4">
                 <QrCode className="w-10 h-10 text-primary" />
               </div>
-              <CardTitle className="text-3xl font-bold">Event Check-in</CardTitle>
+              <CardTitle className="text-3xl font-bold">Session Check-in</CardTitle>
               <CardDescription>
-                Scan a participant's QR code to mark their attendance.
+                Select a session and simulate scanning a child's QR code.
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="rounded-lg overflow-hidden relative w-full aspect-video bg-muted flex items-center justify-center">
-                  {isScanning && hasCameraPermission && (
-                    <QrScanner
-                      delay={300}
-                      onError={handleError}
-                      onScan={handleScan}
-                      className="w-full h-full object-cover"
-                      constraints={{ video: { facingMode: 'environment' } }}
-                    />
-                  )}
-                  {!hasCameraPermission && (
-                    <div className='text-center text-muted-foreground p-4'>
-                        <VideoOff className='w-12 h-12 mx-auto mb-2'/>
-                        <p>Camera access is required.</p>
-                        <p className='text-xs'>Please grant permission in your browser.</p>
-                    </div>
-                  )}
-                  <div className="absolute inset-0 border-4 border-primary/50 rounded-lg pointer-events-none"></div>
-                </div>
+            <CardContent className='space-y-6'>
+              <div className="space-y-2">
+                <Label htmlFor="session-select">Select a Session</Label>
+                <Select onValueChange={setSelectedSessionId}>
+                    <SelectTrigger id="session-select">
+                        <SelectValue placeholder="Choose a session..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {sessions.map(session => (
+                             <SelectItem key={session.id} value={session.id}>
+                                {session.community} - {format(new Date(session.date), "PPP")}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
               </div>
 
-              <AnimatePresence>
-                {checkinStatus !== 'idle' && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
-                    transition={{
-                      type: 'spring',
-                      stiffness: 300,
-                      damping: 20,
-                    }}
-                    className="mt-6"
-                  >
-                    {checkinStatus === 'success' && checkedInData ? (
-                      <Alert
-                        variant="default"
-                        className="bg-green-50/50 dark:bg-green-900/30 border-green-500/30"
-                      >
-                        <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
-                        <AlertTitle className="text-green-800 dark:text-green-300 font-bold text-lg">
-                          Check-in Successful!
-                        </AlertTitle>
-                        <AlertDescription className="text-green-700 dark:text-green-400 space-y-1">
-                          <p>Event: <strong>{checkedInData.event.name}</strong></p>
-                          {checkedInData.userName && (
-                              <div className='flex items-center gap-2 pt-1'>
-                                  <User className='h-4 w-4'/>
-                                  <span>Participant: <strong>{checkedInData.userName}</strong></span>
-                              </div>
-                          )}
-                        </AlertDescription>
-                      </Alert>
-                    ) : (
-                      <Alert variant="destructive">
-                        <XCircle className="h-5 w-5" />
-                        <AlertTitle className="font-bold text-lg">
-                          Check-in Failed
-                        </AlertTitle>
+              {selectedSessionId && (
+                <div className='space-y-4'>
+                    <h3 className='font-semibold text-center'>Simulate QR Code Scan</h3>
+                     <div className='grid grid-cols-2 gap-4'>
+                        <Button onClick={() => handleScan('CH001')}>
+                            Simulate Scan (Aarav)
+                        </Button>
+                        <Button onClick={() => handleScan('CH002')}>
+                            Simulate Scan (Sneha)
+                        </Button>
+                    </div>
+                </div>
+              )}
+
+              {selectedSession && (
+                <motion.div initial={{opacity: 0}} animate={{opacity: 1}} className='mt-6'>
+                    <Alert>
+                        <CheckCircle className="h-5 w-5"/>
+                        <AlertTitle>Current Attendance</AlertTitle>
                         <AlertDescription>
-                          Invalid or unrecognized QR code. Please try again.
+                            <p>{selectedSession.participants.length} / {mockChildren.filter(c => c.community === selectedSession.community).length} children present.</p>
+                            <ul className='list-disc list-inside mt-2'>
+                                {selectedSession.participants.map(childId => {
+                                    const child = mockChildren.find(c => c.id === childId);
+                                    return <li key={childId}>{child?.name}</li>
+                                })}
+                            </ul>
                         </AlertDescription>
-                      </Alert>
-                    )}
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                    </Alert>
+                </motion.div>
+              )}
+
             </CardContent>
           </Card>
         </motion.div>
