@@ -51,9 +51,9 @@ export default function CheckinPage() {
     setCheckinStatus('idle');
     setCheckedInEvent(null);
 
-    if (!qrValue.trim()) {
+    if (!qrValue || !qrValue.trim()) {
       setCheckinStatus('error');
-      setIsScanning(true); // Allow scanning again
+      setTimeout(() => setIsScanning(true), 3000); // Allow scanning again after a delay
       return;
     }
 
@@ -63,7 +63,6 @@ export default function CheckinPage() {
     try {
       const parsedQr = JSON.parse(qrValue);
       const eventId = parsedQr.eventId;
-
       foundEvent = events.find((event) => event.id === eventId);
     } catch (error) {
       // If JSON parsing fails, try treating it as a simple ID
@@ -84,10 +83,6 @@ export default function CheckinPage() {
     setTimeout(() => setIsScanning(true), 3000);
   };
 
-  const previewStyle = {
-    height: 240,
-    width: 320,
-  };
 
   return (
     <DashboardLayout>
