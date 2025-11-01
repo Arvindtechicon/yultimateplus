@@ -42,6 +42,7 @@ import {
 import { Alert, AlertTitle } from '../ui/alert';
 import QRCodeComponent from 'qrcode.react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
+import { useAuth } from '@/context/AuthContext';
 
 interface ParticipantDashboardProps {
   user: User;
@@ -59,8 +60,8 @@ export default function ParticipantDashboard({
 }: ParticipantDashboardProps) {
   const { events, coachingCenters, alerts } = useAppData();
 
-  // Hardcode to the first child for demonstration purposes
-  const child = mockChildren[0];
+  // Find the child data that corresponds to the logged-in participant user
+  const child = useMemo(() => mockChildren.find(c => c.name.toLowerCase().includes(user.name.split(' ')[0].toLowerCase())) || mockChildren[0], [user.name]);
   
   const childAssessments = mockAssessments.filter(a => a.childId === child.id);
   const baseline = childAssessments.find(a => a.type === 'Baseline');

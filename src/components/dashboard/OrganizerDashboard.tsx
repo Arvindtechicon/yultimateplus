@@ -81,19 +81,21 @@ export default function OrganizerDashboard({ user }: { user: User }) {
     if(data) {
         setAttendanceModalOpen(false);
         try {
-            const scannedData = JSON.parse(data.text);
-            if (scannedData.childId && scannedData.sessionId) {
-                markSessionAttendance(scannedData.sessionId, scannedData.childId);
-                const child = mockChildren.find(c => c.id === scannedData.childId);
+            // In a real app, you'd parse the QR code string. Here we simulate it.
+            const childId = data.text; // Assuming QR code just contains the child ID.
+            const child = mockChildren.find(c => c.id === childId);
+            
+            if (child && selectedSessionId) {
+                markSessionAttendance(selectedSessionId, childId);
                 toast({
                     title: "Attendance Marked!",
-                    description: `${child?.name || 'Child'} marked present for session ${scannedData.sessionId}.`
+                    description: `${child.name} marked present for session ${selectedSessionId}.`
                 })
             } else {
                  toast({
                     variant: "destructive",
-                    title: "Invalid QR Code",
-                    description: "The scanned QR code is not valid for session attendance."
+                    title: "Invalid Scan",
+                    description: "Could not find child or session from QR code."
                 })
             }
         } catch (e) {
@@ -172,17 +174,33 @@ export default function OrganizerDashboard({ user }: { user: User }) {
                         <DialogContent>
                              <DialogHeader>
                                 <DialogTitle>Mark Attendance</DialogTitle>
-                                <DialogDescription>Scan a child's QR code to mark them as present.</DialogDescription>
+                                <DialogDescription>Select a session, then scan a child's QR code to mark them as present.</DialogDescription>
                             </DialogHeader>
-                            <div className='py-4 rounded-lg overflow-hidden relative w-full aspect-square bg-muted flex items-center justify-center'>
-                                <QrScanner
-                                    delay={300}
-                                    onError={(e) => console.error(e)}
-                                    onScan={handleScan}
-                                    className="w-full h-full object-cover"
-                                    constraints={{ video: { facingMode: 'environment' } }}
-                                />
-                                <div className="absolute inset-0 border-4 border-primary/50 rounded-lg pointer-events-none"></div>
+                            <div className="space-y-4 py-4">
+                                <Select onValueChange={setSelectedSessionId}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select a session" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {mockSessions.filter(s => s.status === 'upcoming').map(session => (
+                                            <SelectItem key={session.id} value={session.id}>
+                                                {session.community} - {format(new Date(session.date), "PPP")}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                {selectedSessionId && (
+                                    <div className='py-4 rounded-lg overflow-hidden relative w-full aspect-square bg-muted flex items-center justify-center'>
+                                        <QrScanner
+                                            delay={300}
+                                            onError={(e) => console.error(e)}
+                                            onScan={handleScan}
+                                            className="w-full h-full object-cover"
+                                            constraints={{ video: { facingMode: 'environment' } }}
+                                        />
+                                        <div className="absolute inset-0 border-4 border-primary/50 rounded-lg pointer-events-none"></div>
+                                    </div>
+                                )}
                             </div>
                         </DialogContent>
                     </Dialog>
