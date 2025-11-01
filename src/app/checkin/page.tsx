@@ -11,11 +11,11 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { CheckCircle, QrCode, User } from 'lucide-react';
+import { CheckCircle, QrCode } from 'lucide-react';
 import { motion } from 'framer-motion';
 import DashboardLayout from '@/components/DashboardLayout';
 import { useAppData } from '@/context/EventContext';
-import { mockChildren, type Session } from '@/lib/mockData';
+import { mockChildren } from '@/lib/mockData';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from '@/components/ui/label';
 import {
@@ -32,6 +32,7 @@ export default function CheckinPage() {
   const { toast } = useToast();
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
 
+  // This function simulates scanning a QR code and getting a result (e.g., a child's ID)
   const handleScan = (childId: string) => {
     if (!selectedSessionId) {
         toast({
@@ -48,14 +49,14 @@ export default function CheckinPage() {
     if (child && session) {
         markSessionAttendance(selectedSessionId, childId);
         toast({
-            title: "Check-in Successful!",
+            title: "✅ Check-in Successful!",
             description: `${child.name} marked present for session in ${session.community}.`,
         });
     } else {
         toast({
             variant: "destructive",
             title: "Check-in Failed",
-            description: "Could not find the child or session.",
+            description: "Could not find the child or session from the scanned QR code.",
         });
     }
   };
@@ -77,12 +78,12 @@ export default function CheckinPage() {
               </div>
               <CardTitle className="text-3xl font-bold">Session Check-in</CardTitle>
               <CardDescription>
-                Select a session and simulate scanning a child's QR code.
+                Select a session and simulate scanning a dummy QR code.
               </CardDescription>
             </CardHeader>
             <CardContent className='space-y-6'>
               <div className="space-y-2">
-                <Label htmlFor="session-select">Select a Session</Label>
+                <Label htmlFor="session-select">1. Select a Session</Label>
                 <Select onValueChange={setSelectedSessionId} value={selectedSessionId || ''}>
                     <SelectTrigger id="session-select">
                         <SelectValue placeholder="Choose a session..." />
@@ -99,16 +100,16 @@ export default function CheckinPage() {
 
               {selectedSessionId && (
                 <div className='space-y-4'>
-                    <h3 className='font-semibold text-center'>Simulate QR Code Scan</h3>
-                     <div className='grid grid-cols-2 gap-4'>
+                    <Label>2. Simulate QR Code Scan</Label>
+                     <div className='grid grid-cols-1 gap-4'>
                         <Button onClick={() => handleScan('CH001')} disabled={!selectedSessionId}>
-                            Simulate Scan (Aarav)
+                            Simulate Scan for Aarav (QR001)
                         </Button>
                         <Button onClick={() => handleScan('CH002')} disabled={!selectedSessionId}>
-                            Simulate Scan (Sneha)
+                             Simulate Scan for Sneha (QR002)
                         </Button>
                          <Button onClick={() => handleScan('CH003')} disabled={!selectedSessionId}>
-                            Simulate Scan (Rohan)
+                             Simulate Scan for Rohan (QR003)
                         </Button>
                     </div>
                 </div>
