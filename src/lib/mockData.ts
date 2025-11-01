@@ -1,3 +1,4 @@
+
 export interface User {
   id: number;
   name: string;
@@ -44,6 +45,101 @@ export interface CoachingCenter {
   location: string;
   participants: number[];
 }
+
+export interface Child {
+  id: string;
+  name: string;
+  gender: 'Male' | 'Female';
+  age: number;
+  community: string;
+  school: string;
+  programs: string[];
+  attendance: string[];
+  assessments: string[];
+  homeVisits: string[];
+}
+
+export interface Session {
+  id: string;
+  date: string;
+  community: string;
+  coach: string;
+  participants: string[];
+  status: 'completed' | 'upcoming';
+}
+
+export interface Assessment {
+  childId: string;
+  date: string;
+  type: 'Baseline' | 'Endline';
+  score: {
+    teamwork: number;
+    confidence: number;
+    communication: number;
+  };
+}
+
+export const mockChildren: Child[] = [
+  {
+    id: 'CH001',
+    name: 'Aarav Kumar',
+    gender: 'Male',
+    age: 12,
+    community: 'VV Puram',
+    school: 'Viveka School',
+    programs: ['Community A', 'School B'],
+    attendance: [],
+    assessments: [],
+    homeVisits: [],
+  },
+  {
+    id: 'CH002',
+    name: 'Sneha Rao',
+    gender: 'Female',
+    age: 13,
+    community: 'Lalithadripura',
+    school: 'Vivekananda High',
+    programs: ['School B'],
+    attendance: [],
+    assessments: [],
+    homeVisits: [],
+  },
+];
+
+export const mockSessions: Session[] = [
+  {
+    id: 'S001',
+    date: '2025-10-20',
+    community: 'VV Puram',
+    coach: 'Coach Ramesh',
+    participants: ['CH001', 'CH002'],
+    status: 'completed',
+  },
+  {
+    id: 'S002',
+    date: '2025-10-25',
+    community: 'Lalithadripura',
+    coach: 'Coach Ramesh',
+    participants: ['CH002'],
+    status: 'upcoming',
+  },
+];
+
+export const mockAssessments: Assessment[] = [
+  {
+    childId: 'CH001',
+    date: '2025-09-10',
+    type: 'Baseline',
+    score: { teamwork: 7, confidence: 8, communication: 6 },
+  },
+  {
+    childId: 'CH001',
+    date: '2025-10-10',
+    type: 'Endline',
+    score: { teamwork: 8, confidence: 9, communication: 7 },
+  },
+];
+
 
 export const users: User[] = [
   { id: 1, name: 'Admin User', email: 'admin@yultimate.com', role: 'Admin' },
