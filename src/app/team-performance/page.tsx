@@ -1,3 +1,4 @@
+
 'use client';
 
 import { motion } from 'framer-motion';
@@ -27,6 +28,7 @@ import {
   ResponsiveContainer,
   LineChart,
   Line,
+  Legend,
 } from 'recharts';
 import { Progress } from '@/components/ui/progress';
 
