@@ -28,6 +28,7 @@ import {
   LogIn,
   LogOut,
   Trophy,
+  Eye,
 } from 'lucide-react';
 import type { Event } from '@/lib/mockData';
 import { venues, organizations, users } from '@/lib/mockData';
@@ -40,6 +41,8 @@ import { useAppData } from '@/context/EventContext';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
 import EditEventForm from './dashboard/EditEventForm';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { ScrollArea } from './ui/scroll-area';
 
 interface EventCardProps {
   event: Event;
@@ -54,8 +57,10 @@ export default function EventCard({ event, showEditButton }: EventCardProps) {
 
   const venue = venues.find((v) => v.id === event.venueId);
   const organization = organizations.find((o) => o.id === event.organizationId);
+  const participants = users.filter(u => event.participants.includes(u.id));
 
   const isParticipant = user?.role === 'Participant';
+  const isOrganizerOrAdmin = user?.role === 'Organizer' || user?.role === 'Admin';
   const isRegistered = isParticipant && user && event.participants.includes(user.id);
   const myOrganizations = organizations.filter(org => user && org.organizers.includes(user.id));
   const isPastEvent = new Date(event.date) < new Date();
@@ -269,6 +274,42 @@ export default function EventCard({ event, showEditButton }: EventCardProps) {
                     </DialogContent>
                   </Dialog>
                 )}
+            </div>
+          )}
+          {isOrganizerOrAdmin && (
+             <div className='col-span-2 mt-2'>
+                <Dialog>
+                    <DialogTrigger asChild>
+                         <Button variant="outline" className="w-full" disabled={participants.length === 0}>
+                            <Eye className="mr-2 h-4 w-4" />
+                            View Participants ({participants.length})
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-md glass-card">
+                        <DialogHeader>
+                            <DialogTitle>Participants for {event.name}</DialogTitle>
+                            <DialogDescription>
+                                {participants.length} {participants.length === 1 ? 'person has' : 'people have'} registered for this event.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <ScrollArea className="h-72 my-4">
+                            <div className="space-y-4 pr-6">
+                                {participants.map(p => (
+                                    <div key={p.id} className="flex items-center gap-4">
+                                        <Avatar>
+                                            <AvatarImage src={`https://api.dicebear.com/7.x/micah/svg?seed=${p.name}`} />
+                                            <AvatarFallback>{p.name.charAt(0)}</AvatarFallback>
+                                        </Avatar>
+                                        <div>
+                                            <p className="font-semibold">{p.name}</p>
+                                            <p className="text-sm text-muted-foreground">{p.email}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </ScrollArea>
+                    </DialogContent>
+                </Dialog>
             </div>
           )}
         </CardFooter>
