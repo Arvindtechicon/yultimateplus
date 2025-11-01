@@ -53,10 +53,6 @@ export interface Child {
   age: number;
   community: string;
   school: string;
-  programs: string[];
-  attendance: string[];
-  assessments: string[];
-  homeVisits: string[];
 }
 
 export interface Session {
@@ -79,6 +75,13 @@ export interface Assessment {
   };
 }
 
+export interface HomeVisit {
+    id: string;
+    childId: string;
+    date: string;
+    notes: string;
+}
+
 export const mockChildren: Child[] = [
   {
     id: 'CH001',
@@ -87,10 +90,6 @@ export const mockChildren: Child[] = [
     age: 12,
     community: 'VV Puram',
     school: 'Viveka School',
-    programs: ['Community A', 'School B'],
-    attendance: [],
-    assessments: [],
-    homeVisits: [],
   },
   {
     id: 'CH002',
@@ -99,28 +98,48 @@ export const mockChildren: Child[] = [
     age: 13,
     community: 'Lalithadripura',
     school: 'Vivekananda High',
-    programs: ['School B'],
-    attendance: [],
-    assessments: [],
-    homeVisits: [],
+  },
+   {
+    id: 'CH003',
+    name: 'Rohan Patel',
+    gender: 'Male',
+    age: 11,
+    community: 'VV Puram',
+    school: 'Viveka School',
   },
 ];
 
 export const mockSessions: Session[] = [
   {
     id: 'S001',
-    date: '2025-10-20',
+    date: '2025-10-20T10:00:00Z',
     community: 'VV Puram',
     coach: 'Coach Ramesh',
-    participants: ['CH001', 'CH002'],
+    participants: ['CH001', 'CH003'],
     status: 'completed',
   },
   {
     id: 'S002',
-    date: '2025-10-25',
+    date: '2025-10-22T10:00:00Z',
     community: 'Lalithadripura',
-    coach: 'Coach Ramesh',
+    coach: 'Coach Priya',
     participants: ['CH002'],
+    status: 'completed',
+  },
+  {
+    id: 'S003',
+    date: '2025-10-27T10:00:00Z',
+    community: 'VV Puram',
+    coach: 'Coach Ramesh',
+    participants: [],
+    status: 'upcoming',
+  },
+    {
+    id: 'S004',
+    date: '2025-10-29T10:00:00Z',
+    community: 'Lalithadripura',
+    coach: 'Coach Priya',
+    participants: [],
     status: 'upcoming',
   },
 ];
@@ -128,17 +147,38 @@ export const mockSessions: Session[] = [
 export const mockAssessments: Assessment[] = [
   {
     childId: 'CH001',
-    date: '2025-09-10',
+    date: '2025-09-10T10:00:00Z',
     type: 'Baseline',
     score: { teamwork: 7, confidence: 8, communication: 6 },
   },
   {
     childId: 'CH001',
-    date: '2025-10-10',
+    date: '2025-10-18T10:00:00Z',
     type: 'Endline',
     score: { teamwork: 8, confidence: 9, communication: 7 },
   },
+  {
+    childId: 'CH002',
+    date: '2025-09-11T10:00:00Z',
+    type: 'Baseline',
+    score: { teamwork: 6, confidence: 7, communication: 8 },
+  },
 ];
+
+export const mockHomeVisits: HomeVisit[] = [
+    {
+        id: 'HV001',
+        childId: 'CH001',
+        date: '2025-10-15T10:00:00Z',
+        notes: 'Discussed progress with Aarav and his parents. They are very happy with his development in the program. He is showing more confidence at home as well.'
+    },
+    {
+        id: 'HV002',
+        childId: 'CH002',
+        date: '2025-10-16T10:00:00Z',
+        notes: 'Initial home visit. Sneha is excited to participate. Parents are supportive and keen to see her develop new skills.'
+    }
+]
 
 
 export const users: User[] = [

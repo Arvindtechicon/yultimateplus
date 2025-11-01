@@ -2,27 +2,43 @@
 "use client";
 
 import { createContext, useContext, useState, type ReactNode, useCallback } from 'react';
-import type { Event, CoachingCenter, Session } from '@/lib/mockData';
-import { events as initialEvents, coachingCenters as initialCoachingCenters, mockSessions as initialSessions } from '@/lib/mockData';
+import type { Event, CoachingCenter, Session, Child, Assessment, HomeVisit } from '@/lib/mockData';
+import { 
+    events as initialEvents, 
+    coachingCenters as initialCoachingCenters, 
+    mockSessions as initialSessions,
+    mockChildren as initialChildren,
+    mockAssessments as initialAssessments,
+    mockHomeVisits as initialHomeVisits,
+} from '@/lib/mockData';
 
 interface AppContextType {
   events: Event[];
   coachingCenters: CoachingCenter[];
   sessions: Session[];
+  children: Child[];
+  assessments: Assessment[];
+  homeVisits: HomeVisit[];
   addEvent: (newEventData: Omit<Event, 'id' | 'participants'>) => void;
   updateEvent: (eventId: number, updatedEventData: Omit<Event, 'id' | 'participants'>) => void;
   toggleEventRegistration: (eventId: number, userId: number) => void;
   addCoachingCenter: (newCenterData: Omit<CoachingCenter, 'id' | 'participants'>) => void;
   toggleCoachingCenterRegistration: (centerId: number, userId: number) => void;
   markSessionAttendance: (sessionId: string, childId: string) => void;
+  addAssessment: (newAssessmentData: Omit<Assessment, 'date'>) => void;
+  addHomeVisit: (newHomeVisitData: Omit<HomeVisit, 'id'>) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-export function AppProvider({ children }: { children: ReactNode }) {
+export function AppProvider({ children: componentChildren }: { children: ReactNode }) {
   const [events, setEvents] = useState<Event[]>(initialEvents);
   const [coachingCenters, setCoachingCenters] = useState<CoachingCenter[]>(initialCoachingCenters);
   const [sessions, setSessions] = useState<Session[]>(initialSessions);
+  const [children, setChildren] = useState<Child[]>(initialChildren);
+  const [assessments, setAssessments] = useState<Assessment[]>(initialAssessments);
+  const [homeVisits, setHomeVisits] = useState<HomeVisit[]>(initialHomeVisits);
+
 
   const addEvent = useCallback((newEventData: Omit<Event, 'id' | 'participants'>) => {
     setEvents(prevEvents => [
@@ -103,9 +119,46 @@ export function AppProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
+  const addAssessment = useCallback((newAssessmentData: Omit<Assessment, 'date'>) => {
+    setAssessments(prev => [
+      ...prev,
+      {
+        ...newAssessmentData,
+        date: new Date().toISOString(),
+      }
+    ]);
+  }, []);
+
+  const addHomeVisit = useCallback((newHomeVisitData: Omit<HomeVisit, 'id'>) => {
+    setHomeVisits(prev => [
+        ...prev,
+        {
+            ...newHomeVisitData,
+            id: `HV${prev.length + 1}`
+        }
+    ])
+  }, []);
+
+  const contextValue = {
+      events,
+      coachingCenters,
+      sessions,
+      children,
+      assessments,
+      homeVisits,
+      addEvent,
+      updateEvent,
+      toggleEventRegistration,
+      addCoachingCenter,
+      toggleCoachingCenterRegistration,
+      markSessionAttendance,
+      addAssessment,
+      addHomeVisit
+  }
+
   return (
-    <AppContext.Provider value={{ events, coachingCenters, sessions, addEvent, updateEvent, toggleEventRegistration, addCoachingCenter, toggleCoachingCenterRegistration, markSessionAttendance }}>
-      {children}
+    <AppContext.Provider value={contextValue}>
+      {componentChildren}
     </AppContext.Provider>
   );
 }
