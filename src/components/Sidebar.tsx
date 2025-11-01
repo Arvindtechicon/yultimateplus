@@ -13,6 +13,8 @@ import {
   Disc3,
   Trophy,
   Building,
+  LineChart,
+  ClipboardCheck,
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -37,6 +39,8 @@ export default function Sidebar({ user }: SidebarProps) {
         { href: '/events', label: 'Events', icon: Calendar },
         { href: '/map', label: 'Map', icon: Map },
         { href: '/checkin', label: 'Check-in', icon: QrCode },
+        { href: '/performance', label: 'Performance Report', icon: LineChart },
+        { href: '/assessments', label: 'LSAS Assessments', icon: ClipboardCheck },
     ]
 
     const roleLinks = {
