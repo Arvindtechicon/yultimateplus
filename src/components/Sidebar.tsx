@@ -62,11 +62,6 @@ export function Sidebar({ user, isOpen, setOpen }: SidebarProps) {
     const organizerLinks = [
       ...baseLinks.filter(link => link.href !== '/coaching'),
       { href: '/team-performance', label: 'Team Performance', icon: Group },
-      {
-        href: '/assessments',
-        label: 'LSAS Assessments',
-        icon: ClipboardCheck,
-      },
       { href: '/home-visits', label: 'Home Visits', icon: Home },
       { href: '/reports', label: 'Reports', icon: BarChart2 },
       {
