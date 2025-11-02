@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "User": {
@@ -126,56 +127,17 @@
     ]
   },
   "firestore": {
-    "structure": [
-      {
-        "path": "/users/{userId}",
-        "definition": {
-          "entityName": "User",
-          "schema": {
-            "$ref": "#/backend/entities/User"
-          },
-          "description": "Stores user data. Path-based ownership ensures only the user can access their own document. Includes user's role for authorization.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier of the user."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/events/{eventId}",
-        "definition": {
-          "entityName": "Event",
-          "schema": {
-            "$ref": "#/backend/entities/Event"
-          },
-          "description": "Stores event data.  The 'organizerId' field indicates the event organizer. This allows listing events and restricting update/delete operations to organizers or admins.",
-          "params": [
-            {
-              "name": "eventId",
-              "description": "The unique identifier of the event."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/venues/{venueId}",
-        "definition": {
-          "entityName": "Venue",
-          "schema": {
-            "$ref": "#/backend/entities/Venue"
-          },
-          "description": "Stores venue data. Allows listing all venues.  Admin role can be checked to restrict creation/updates.",
-          "params": [
-            {
-              "name": "venueId",
-              "description": "The unique identifier of the venue."
-            }
-          ]
-        }
-      }
-    ],
-    "reasoning": "The Firestore data structure is designed to support the Y-Ultimate Pulse application, focusing on simplicity, security, and scalability.  It leverages structural segregation and denormalization to achieve authorization independence and facilitate secure list operations (QAPs). User data is stored in `/users/{userId}`. Events, Venues and CoachingCenters are stored in top-level collections (`/events`, `/venues`).\n\nAuthorization Independence: The structure avoids hierarchical authorization dependencies by storing all necessary authorization information directly within each document.  For collaborative entities (if applicable in future), a 'members' map will be denormalized into the documents.\n\nQAPs (Rules Are Not Filters):  The segregation of data into collections with homogeneous security postures (`/users`, `/events`, `/venues`) ensures that list operations can be secured without filtering data based on document content. This approach is critical for performance and security.\n\nBy adhering to these principles, the Firestore structure promotes maintainable and secure access control, enabling atomic operations and simplifying security rule creation and debugging."
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "Stores user data. Path-based ownership ensures only the user can access their own document. Includes user's role for authorization."
+    },
+    "/events/{eventId}": {
+      "schema": { "$ref": "#/entities/Event" },
+      "description": "Stores event data.  The 'organizerId' field indicates the event organizer. This allows listing events and restricting update/delete operations to organizers or admins."
+    },
+    "/venues/{venueId}": {
+      "schema": { "$ref": "#/entities/Venue" },
+      "description": "Stores venue data. Allows listing all venues.  Admin role can be checked to restrict creation/updates."
+    }
   }
 }

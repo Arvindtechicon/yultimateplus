@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { MotionWrapper } from '@/components/MotionWrapper';
 import { AppDataProvider } from '@/context/EventContext';
+import { FirebaseClientProvider } from '@/firebase';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -34,6 +35,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <FirebaseClientProvider>
             <AuthProvider>
               <AppDataProvider>
                 <MotionWrapper>
@@ -42,6 +44,7 @@ export default function RootLayout({
                 <Toaster />
               </AppDataProvider>
             </AuthProvider>
+          </FirebaseClientProvider>
         </ThemeProvider>
       </body>
     </html>
