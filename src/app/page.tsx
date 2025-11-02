@@ -1,15 +1,15 @@
-
 'use client';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/context/AuthContext';
-import { Disc3, LogIn, User, Shield, Trophy, Briefcase, Heart } from 'lucide-react';
+import { Disc3, LogIn, UserPlus, Shield, Trophy, Briefcase, Heart } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type { User as UserType } from '@/lib/mockData';
 import { motion } from 'framer-motion';
 import Header from '@/components/Header';
 import { useEffect } from 'react';
+import Link from 'next/link';
 
 export default function Home() {
   const { login, user, loading } = useAuth();
@@ -76,7 +76,7 @@ export default function Home() {
             transition={{ duration: 0.5 }}
             className="text-center space-y-4 mb-12"
         >
-          <div className="inline-block p-4 bg-primary/10 rounded-full">
+          <div className="inline-block p-4 bg-gradient-to-br from-primary/10 to-transparent rounded-full shadow-inner border border-primary/20">
             <Disc3 className="w-16 h-16 text-primary" />
           </div>
           <h1 className="text-4xl md:text-6xl font-extrabold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
@@ -95,7 +95,7 @@ export default function Home() {
         >
           {loginOptions.map((option) => (
             <motion.div key={option.title} variants={itemVariants}>
-              <Card className="text-center glass-card hover:scale-105 hover:border-primary/50 transition-all duration-300 group">
+              <Card className="text-center glass-card hover:scale-105 hover:border-primary/50 transition-all duration-300 group flex flex-col h-full">
                 <CardHeader>
                     <div className="mx-auto bg-primary/10 dark:bg-primary/20 p-4 rounded-full w-fit mb-2 group-hover:scale-110 transition-transform duration-300">
                         <option.icon className="w-8 h-8 text-primary" />
@@ -103,10 +103,16 @@ export default function Home() {
                   <CardTitle>{option.title}</CardTitle>
                   <CardDescription>{option.description}</CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="flex flex-col gap-2 flex-grow justify-end">
                   <Button onClick={() => handleLogin(option.role)} className="w-full">
                     <LogIn className="mr-2 h-4 w-4" />
                     Login as {option.title}
+                  </Button>
+                   <Button variant="outline" className="w-full" asChild>
+                    <Link href={`/register/${option.title.toLowerCase()}`}>
+                      <UserPlus className="mr-2 h-4 w-4" />
+                      Sign Up as {option.title}
+                    </Link>
                   </Button>
                 </CardContent>
               </Card>

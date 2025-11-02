@@ -1,13 +1,14 @@
 "use client";
 
 import type { User } from '@/lib/mockData';
-import { users } from '@/lib/mockData';
+import { mockUsers } from '@/lib/mockData';
 import { useRouter } from 'next/navigation';
 import { createContext, useContext, useState, useEffect, type ReactNode, useCallback } from 'react';
 
 interface AuthContextType {
   user: User | null;
   login: (role: User['role']) => void;
+  loginFromRegistration: (user: User) => void;
   logout: () => void;
   loading: boolean;
 }
@@ -36,12 +37,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = useCallback((role: User['role']) => {
     // Find the first user with the specified role to log in as.
-    const userToLogin = users.find(u => u.role === role);
+    const userToLogin = mockUsers.find(u => u.role === role);
     if (userToLogin) {
       setUser(userToLogin);
       localStorage.setItem('y-ultimate-user', JSON.stringify(userToLogin));
       router.push('/dashboard');
     }
+  }, [router]);
+
+  const loginFromRegistration = useCallback((newUser: User) => {
+    setUser(newUser);
+    localStorage.setItem('y-ultimate-user', JSON.stringify(newUser));
+    setTimeout(() => {
+      router.push('/dashboard');
+    }, 600);
   }, [router]);
 
   const logout = useCallback(() => {
@@ -51,7 +60,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [router]);
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, loading, loginFromRegistration }}>
       {children}
     </AuthContext.Provider>
   );

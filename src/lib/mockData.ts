@@ -1,10 +1,32 @@
-
 export interface User {
-  id: number;
+  id: string;
   name: string;
   email: string;
   role: 'Admin' | 'Organizer' | 'Participant' | 'Coach';
 }
+
+export interface Participant extends User {
+  role: 'Participant';
+  phone: string;
+  location: string;
+  registeredEvents: number[];
+  qrCode: string;
+}
+
+export interface Organizer extends User {
+  role: 'Organizer';
+  phone: string;
+  orgName: string;
+  events: number[];
+}
+
+export interface Coach extends User {
+  role: 'Coach';
+  phone: string;
+  communities: string[];
+  sessions: string[];
+}
+
 
 export interface Event {
   id: number;
@@ -14,7 +36,7 @@ export interface Event {
   venueId: number;
   organizationId: number;
   type: 'Tournament' | 'Workshop' | 'Meetup';
-  participants: number[]; // array of user IDs
+  participants: string[]; // array of user IDs
   winners?: {
     first: string;
     second: string;
@@ -35,7 +57,7 @@ export interface Venue {
 export interface Organization {
   id: number;
   name: string;
-  organizers: number[]; // array of user IDs
+  organizers: string[]; // array of user IDs
 }
 
 export interface CoachingCenter {
@@ -43,7 +65,7 @@ export interface CoachingCenter {
   name: string;
   specialty: string;
   location: string;
-  participants: number[];
+  participants: string[];
   coordinates: {
     lat: number;
     lng: number;
@@ -215,19 +237,22 @@ export const mockHomeVisits: HomeVisit[] = [
 ]
 
 
-export const users: User[] = [
-  { id: 1, name: 'Admin User', email: 'admin@yultimate.com', role: 'Admin' },
-  { id: 2, name: 'Organizer User', email: 'organizer@yultimate.com', role: 'Organizer' },
-  { id: 3, name: 'Participant User', email: 'participant@yultimate.com', role: 'Participant' },
-  { id: 4, name: 'Jane Doe', email: 'jane@example.com', role: 'Participant' },
-  { id: 5, name: 'John Smith', email: 'john@example.com', role: 'Participant' },
-  { id: 6, name: 'Alice Johnson', email: 'alice@example.com', role: 'Organizer' },
-  { id: 7, name: 'Coach Ramesh', email: 'coach.ramesh@yultimate.com', role: 'Coach' },
+export const mockUsers: User[] = [
+  { id: '1', name: 'Admin User', email: 'admin@yultimate.com', role: 'Admin' },
+  { id: '2', name: 'Organizer User', email: 'organizer@yultimate.com', role: 'Organizer' },
+  { id: '3', name: 'Participant User', email: 'participant@yultimate.com', role: 'Participant' },
+  { id: '4', name: 'Jane Doe', email: 'jane@example.com', role: 'Participant' },
+  { id: '5', name: 'John Smith', email: 'john@example.com', role: 'Participant' },
+  { id: '6', name: 'Alice Johnson', email: 'alice@example.com', role: 'Organizer' },
+  { id: '7', name: 'Coach Ramesh', email: 'coach.ramesh@yultimate.com', role: 'Coach' },
 ];
+export const mockParticipants: Participant[] = [];
+export const mockOrganizers: Organizer[] = [];
+export const mockCoaches: Coach[] = [];
 
 export const organizations: Organization[] = [
-    { id: 1, name: 'Y-Ultimate Sports', organizers: [2, 6] },
-    { id: 2, name: 'Community Frisbee League', organizers: [6] },
+    { id: 1, name: 'Y-Ultimate Sports', organizers: ['2', '6'] },
+    { id: 2, name: 'Community Frisbee League', organizers: ['6'] },
 ];
 
 export const venues: Venue[] = [
@@ -245,7 +270,7 @@ export const events: Event[] = [
     venueId: 1,
     organizationId: 1,
     type: 'Tournament',
-    participants: [3, 4, 5],
+    participants: ['3', '4', '5'],
     winners: {
       first: 'Team Alpha',
       second: 'Team Beta',
@@ -260,7 +285,7 @@ export const events: Event[] = [
     venueId: 2,
     organizationId: 1,
     type: 'Workshop',
-    participants: [3, 5],
+    participants: ['3', '5'],
   },
   {
     id: 3,
@@ -270,7 +295,7 @@ export const events: Event[] = [
     venueId: 1,
     organizationId: 2,
     type: 'Meetup',
-    participants: [3, 4, 5],
+    participants: ['3', '4', '5'],
   },
   {
     id: 4,
@@ -280,14 +305,14 @@ export const events: Event[] = [
     venueId: 3,
     organizationId: 2,
     type: 'Tournament',
-    participants: [4, 5],
+    participants: ['4', '5'],
   },
 ];
 
 export const coachingCenters: CoachingCenter[] = [
-    { id: 1, name: 'Ultimate Performance Academy', specialty: 'Advanced Skills', location: 'Cityville', participants: [3], coordinates: { lat: 40.7328, lng: -74.0160 }, description: 'Elevate your game with our elite training program designed for competitive players.', fee: 5000, schedule: 'Mon, Wed, Fri: 6 PM - 8 PM' },
+    { id: 1, name: 'Ultimate Performance Academy', specialty: 'Advanced Skills', location: 'Cityville', participants: ['3'], coordinates: { lat: 40.7328, lng: -74.0160 }, description: 'Elevate your game with our elite training program designed for competitive players.', fee: 5000, schedule: 'Mon, Wed, Fri: 6 PM - 8 PM' },
     { id: 2, name: 'Frisbee Fundamentals', specialty: 'Beginner Training', location: 'Townsville', participants: [], coordinates: { lat: 34.0622, lng: -118.2537 }, description: 'Learn the basics of Ultimate Frisbee in a fun and supportive environment. Perfect for new players.', fee: 2500, schedule: 'Sat: 10 AM - 12 PM' },
-    { id: 3, name: 'Beach Ultimate Coaching', specialty: 'Beach Tactics', location: 'Beachtown', participants: [4,5], coordinates: { lat: 33.7901, lng: -118.2037 }, description: 'Master the art of playing on the sand, focusing on strategy, endurance, and handling the wind.', fee: 4000, schedule: 'Sun: 2 PM - 4 PM' },
+    { id: 3, name: 'Beach Ultimate Coaching', specialty: 'Beach Tactics', location: 'Beachtown', participants: ['4','5'], coordinates: { lat: 33.7901, lng: -118.2037 }, description: 'Master the art of playing on the sand, focusing on strategy, endurance, and handling the wind.', fee: 4000, schedule: 'Sun: 2 PM - 4 PM' },
 ];
 
 export const mockCommunities: Community[] = [
