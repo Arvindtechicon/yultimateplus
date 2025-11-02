@@ -217,7 +217,7 @@ function MapComponent() {
   const venueId = searchParams.get('venueId');
   const { events, venues, coachingCenters } = useAppData();
 
-  const { isLoaded } = useJsApiLoader({
+  const { isLoaded, loadError } = useJsApiLoader({
     id: 'google-map-script',
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
   });
@@ -289,17 +289,16 @@ function MapComponent() {
     setDirections(null);
   };
 
-  const handleOpenInGoogleMaps = (poi: PointOfInterest) => {
-    const url = `https://www.google.com/maps/search/?api=1&query=${poi.coordinates.lat},${poi.coordinates.lng}`;
-    window.open(url, '_blank');
-  };
-
   const getIconForPoi = (type: PointOfInterest['type']) => {
     switch (type) {
       case 'venue': return <Pin className="w-5 h-5 text-red-500" />;
       case 'coachingCenter': return <BookOpen className="w-5 h-5 text-teal-500" />;
       default: return <Pin className="w-5 h-5 text-primary" />;
     }
+  }
+
+  if (loadError) {
+      return <div>Error loading maps. Check your API key.</div>
   }
 
   if (!isLoaded)
@@ -353,7 +352,7 @@ function MapComponent() {
               className={cn(`cursor-pointer transition-all duration-300 glass-card hover:border-primary/60`,
                 selectedPoi?.id === poi.id ? 'border-primary shadow-lg' : ''
               )}
-              onClick={() => handleOpenInGoogleMaps(poi)}
+              onClick={() => handlePoiSelect(poi)}
             >
               <CardHeader>
                 <div className='flex justify-between items-start'>
@@ -407,7 +406,7 @@ function MapComponent() {
                 onClick={() => handlePoiSelect(poi)}
                 icon={{
                     url: getIconUrl(poi.type),
-                    scaledSize: new google.maps.Size(30, 45)
+                    scaledSize: new window.google.maps.Size(30, 45)
                 }}
               />
             ))}
@@ -439,3 +438,5 @@ function MapComponent() {
 }
 
 export default MapComponent;
+
+    
