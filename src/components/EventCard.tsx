@@ -19,6 +19,17 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+  } from "@/components/ui/alert-dialog";
+import {
   Calendar,
   MapPin,
   Building,
@@ -147,15 +158,36 @@ export default function EventCard({ event, showEditButton }: EventCardProps) {
           
           {isParticipant ? (
             <>
-              <Button 
-                onClick={handleRegistration} 
-                className="w-full"
-                variant={isRegistered ? 'secondary' : 'default'}
-                disabled={isPastEvent}
-                >
-                {isRegistered ? <LogOut className='mr-2' /> : <LogIn className='mr-2' />}
-                {isRegistered ? 'Unregister' : 'Register'}
-              </Button>
+                <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                         <Button 
+                            className="w-full"
+                            variant={isRegistered ? 'secondary' : 'default'}
+                            disabled={isPastEvent}
+                            >
+                            {isRegistered ? <LogOut className='mr-2' /> : <LogIn className='mr-2' />}
+                            {isRegistered ? 'Unregister' : 'Register'}
+                        </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>
+                                {isRegistered ? 'Confirm Unregistration' : 'Confirm Registration'}
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                                {isRegistered 
+                                    ? `Are you sure you want to unregister from "${event.name}"?`
+                                    : `You are about to register for "${event.name}". Do you want to proceed?`}
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleRegistration}>
+                                Confirm
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
 
               {isRegistered && (
                   <Dialog>
