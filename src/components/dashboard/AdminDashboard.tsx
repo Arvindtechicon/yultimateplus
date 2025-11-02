@@ -1,4 +1,4 @@
-import { users, organizations, venues, mockChildren, mockSessions } from '@/lib/mockData';
+import { mockUsers, organizations, venues, mockChildren, mockSessions } from '@/lib/mockData';
 import { StatCard } from './StatCard';
 import { Users, Calendar, Building, MapPin, Percent, UserCheck, BarChart3, Download, AlertTriangle, Info } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -19,7 +19,7 @@ const COLORS = ['hsl(var(--primary))', 'hsl(var(--secondary-foreground))'];
 
 
 export default function AdminDashboard() {
-    const { events, alerts } = useAppData();
+    const { events, alerts, users } = useAppData();
     const { toast } = useToast();
 
     const genderData = useMemo(() => {

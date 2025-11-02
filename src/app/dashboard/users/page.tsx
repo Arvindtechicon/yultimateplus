@@ -1,7 +1,6 @@
 
 'use client';
 
-import { users } from '@/lib/mockData';
 import { Users } from 'lucide-react';
 import {
   Card,
@@ -23,9 +22,11 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { motion } from 'framer-motion';
 import DashboardLayout from '@/components/DashboardLayout';
 import { useAuth } from '@/context/AuthContext';
+import { useAppData } from '@/context/EventContext';
 
 export default function UsersPage() {
   const { user } = useAuth();
+  const { users } = useAppData();
 
   if (!user || user.role !== 'Admin') {
     return (
