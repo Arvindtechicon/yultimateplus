@@ -16,7 +16,7 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { useFirebase } from '@/firebase';
 import type { User as AppUser } from '@/lib/mockData';
 import { useToast } from '@/hooks/use-toast';
