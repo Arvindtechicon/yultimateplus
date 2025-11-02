@@ -3,7 +3,7 @@ export interface User {
   id: number;
   name: string;
   email: string;
-  role: 'Admin' | 'Organizer' | 'Participant';
+  role: 'Admin' | 'Organizer' | 'Participant' | 'Coach';
 }
 
 export interface Event {
@@ -222,6 +222,7 @@ export const users: User[] = [
   { id: 4, name: 'Jane Doe', email: 'jane@example.com', role: 'Participant' },
   { id: 5, name: 'John Smith', email: 'john@example.com', role: 'Participant' },
   { id: 6, name: 'Alice Johnson', email: 'alice@example.com', role: 'Organizer' },
+  { id: 7, name: 'Coach Ramesh', email: 'coach.ramesh@yultimate.com', role: 'Coach' },
 ];
 
 export const organizations: Organization[] = [
@@ -245,6 +246,11 @@ export const events: Event[] = [
     organizationId: 1,
     type: 'Tournament',
     participants: [3, 4, 5],
+    winners: {
+      first: 'Team Alpha',
+      second: 'Team Beta',
+      third: 'Team Gamma',
+    }
   },
   {
     id: 2,

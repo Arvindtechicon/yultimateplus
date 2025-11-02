@@ -8,6 +8,7 @@ import OrganizerDashboard from '@/components/dashboard/OrganizerDashboard';
 import ParticipantDashboard from '@/components/dashboard/ParticipantDashboard';
 import { Skeleton } from '@/components/ui/skeleton';
 import DashboardLayout from '@/components/DashboardLayout';
+import CoachDashboard from '@/components/dashboard/CoachDashboard';
 
 export default function DashboardPage() {
   const { user, loading } = useAuth();
@@ -42,6 +43,8 @@ export default function DashboardPage() {
         return <OrganizerDashboard user={user} />;
       case 'Participant':
         return <ParticipantDashboard user={user} />;
+      case 'Coach':
+        return <CoachDashboard user={user} />;
       default:
         // This case should not be reached with a valid user object
         router.push('/');

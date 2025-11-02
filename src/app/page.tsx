@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/context/AuthContext';
-import { Disc3, LogIn, User, Shield, Trophy, Briefcase } from 'lucide-react';
+import { Disc3, LogIn, User, Shield, Trophy, Briefcase, Heart } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type { User as UserType } from '@/lib/mockData';
 import { motion } from 'framer-motion';
@@ -33,7 +33,7 @@ export default function Home() {
   };
 
   const loginOptions = [
-    { role: 'Organizer' as const, icon: User, title: 'Coach', description: 'Manage sessions and track child progress.' },
+    { role: 'Coach' as const, icon: Heart, title: 'Coach', description: 'Manage sessions and track child progress.' },
     { role: 'Organizer' as const, icon: Briefcase, title: 'Organizer', description: 'Create and manage your own events.' },
     { role: 'Participant' as const, icon: Trophy, title: 'Participant', description: 'Join events and track your activity.' },
   ];
