@@ -87,7 +87,7 @@ export function AppDataProvider({ children: componentChildren }: { children: Rea
   const [organizations, setOrganizations] = useState<Organization[]>(() => getInitialState('y-ultimate-organizations', initialOrganizations));
   const [tempEventImages, setTempEventImages] = useState<{ [eventId: number]: ImagePlaceholder[] }>(() => getInitialState('y-ultimate-temp-images', {}));
   
-  const [users, setUsers] = useState<User[]>(() => getInitialState('y-ultimate-users', initialUsers));
+  const [users, setUsers] = useState<User[]>(initialUsers);
   const [participants, setParticipants] = useState<Participant[]>(() => getInitialState('y-ultimate-participants', initialParticipants));
   const [organizers, setOrganizers] = useState<Organizer[]>(() => getInitialState('y-ultimate-organizers', initialOrganizers));
   const [coaches, setCoaches] = useState<Coach[]>(() => getInitialState('y-ultimate-coaches', initialCoaches));
@@ -101,24 +101,33 @@ export function AppDataProvider({ children: componentChildren }: { children: Rea
   useEffect(() => { localStorage.setItem('y-ultimate-venues', JSON.stringify(venues)); }, [venues]);
   useEffect(() => { localStorage.setItem('y-ultimate-temp-images', JSON.stringify(tempEventImages)); }, [tempEventImages]);
   useEffect(() => { localStorage.setItem('y-ultimate-organizations', JSON.stringify(organizations)); }, [organizations]);
-  useEffect(() => { localStorage.setItem('y-ultimate-users', JSON.stringify(users)); }, [users]);
+  
   useEffect(() => { localStorage.setItem('y-ultimate-participants', JSON.stringify(participants)); }, [participants]);
   useEffect(() => { localStorage.setItem('y-ultimate-organizers', JSON.stringify(organizers)); }, [organizers]);
   useEffect(() => { localStorage.setItem('y-ultimate-coaches', JSON.stringify(coaches)); }, [coaches]);
   useEffect(() => { localStorage.setItem('y-ultimate-teams', JSON.stringify(teams)); }, [teams]);
 
   const addUser = useCallback((user: User) => {
-    setUsers(prev => [...prev, user]);
+    setUsers(prev => {
+        // Prevent duplicates
+        if (prev.find(u => u.id === user.id)) {
+            return prev;
+        }
+        return [...prev, user];
+    });
   }, []);
   const addParticipant = useCallback((participant: Participant) => {
     setParticipants(prev => [...prev, participant]);
-  }, []);
+    addUser(participant);
+  }, [addUser]);
   const addOrganizer = useCallback((organizer: Organizer) => {
     setOrganizers(prev => [...prev, organizer]);
-  }, []);
+    addUser(organizer);
+  }, [addUser]);
   const addCoach = useCallback((coach: Coach) => {
     setCoaches(prev => [...prev, coach]);
-  }, []);
+    addUser(coach);
+  }, [addUser]);
 
 
   const addEvent = useCallback((newEventData: Omit<Event, 'id' | 'participants'>) => {
