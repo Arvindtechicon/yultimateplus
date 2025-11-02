@@ -19,12 +19,11 @@ import { MapPin, Users, BookOpen, LogIn, LogOut, ArrowLeft, Info, IndianRupee, C
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { useToast } from '@/hooks/use-toast';
-import { users } from '@/lib/mockData';
 import Link from 'next/link';
 
 export default function CoachingCenterDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const { coachingCenters, toggleCoachingCenterRegistration } = useAppData();
+  const { coachingCenters, toggleCoachingCenterRegistration, users } = useAppData();
   const { user } = useAuth();
   const { toast } = useToast();
 

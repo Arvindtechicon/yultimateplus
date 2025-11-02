@@ -43,7 +43,7 @@ import {
   Eye,
 } from 'lucide-react';
 import type { Event } from '@/lib/mockData';
-import { organizations, users } from '@/lib/mockData';
+import { organizations } from '@/lib/mockData';
 import { format } from 'date-fns';
 import { useRouter } from 'next/navigation';
 import QRCodeComponent from 'qrcode.react';
@@ -63,7 +63,7 @@ interface EventCardProps {
 
 export default function EventCard({ event, showEditButton }: EventCardProps) {
   const { user } = useAuth();
-  const { toggleEventRegistration, updateEvent, venues } = useAppData();
+  const { toggleEventRegistration, updateEvent, venues, users } = useAppData();
   const { toast } = useToast();
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
   const router = useRouter();
