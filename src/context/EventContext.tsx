@@ -37,7 +37,7 @@ interface AppContextType {
   coaches: Coach[];
   teams: Team[];
   tempEventImages: { [eventId: number]: ImagePlaceholder[] };
-  addEvent: (newEventData: Omit<Event, 'id' | 'participants'>) => void;
+  addEvent: (newEventData: Omit<Event, 'id' | 'participants'>) => Event;
   updateEvent: (eventId: number, updatedEventData: Omit<Event, 'id' | 'participants'>) => void;
   updateEventResults: (eventId: number, results: { first: TeamResult; second: TeamResult; third: TeamResult; highlights: string }) => void;
   toggleEventRegistration: (eventId: number, userId: string) => void;
@@ -121,15 +121,17 @@ export function AppDataProvider({ children: componentChildren }: { children: Rea
 
 
   const addEvent = useCallback((newEventData: Omit<Event, 'id' | 'participants'>) => {
+    const newEvent = {
+        ...newEventData,
+        id: events.length > 0 ? Math.max(...events.map(e => e.id)) + 1 : 1,
+        participants: [],
+      };
     setEvents(prevEvents => [
       ...prevEvents,
-      {
-        ...newEventData,
-        id: prevEvents.length > 0 ? Math.max(...prevEvents.map(e => e.id)) + 1 : 1,
-        participants: [],
-      }
+      newEvent
     ]);
-  }, []);
+    return newEvent;
+  }, [events]);
 
   const updateEvent = useCallback((eventId: number, updatedEventData: Omit<Event, 'id' | 'participants'>) => {
     setEvents(prevEvents => 

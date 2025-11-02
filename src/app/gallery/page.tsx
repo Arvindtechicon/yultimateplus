@@ -28,20 +28,25 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Textarea } from '@/components/ui/textarea';
 
 
 export default function GalleryPage() {
-    const { events, addImageToEvent, tempEventImages } = useAppData();
+    const { events, addImageToEvent, tempEventImages, addEvent } = useAppData();
     const { user } = useAuth();
     const { toast } = useToast();
     const [isUploadModalOpen, setUploadModalOpen] = useState(false);
     const [selectedEventForUpload, setSelectedEventForUpload] = useState<string | null>(null);
+    const [uploadMode, setUploadMode] = useState<'existing' | 'new'>('existing');
+    const [newAlbumName, setNewAlbumName] = useState('');
+    const [newAlbumDesc, setNewAlbumDesc] = useState('');
 
     const canUpload = user?.role === 'Admin' || user?.role === 'Organizer';
     
     const pastEvents = events.filter(e => new Date(e.date) < new Date());
     
-    // Assign images to past events for a mock album structure.
     const albums = pastEvents.map((event) => {
         const existingImages = PlaceHolderImages.filter(img => img.eventId === event.id);
         const newImages = tempEventImages[event.id] || [];
@@ -50,19 +55,48 @@ export default function GalleryPage() {
           ...event,
           images: [...existingImages, ...newImages],
         };
-    });
+    }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
 
   const handleUpload = () => {
-    if (!selectedEventForUpload) {
-        toast({
-            variant: "destructive",
-            title: "No Event Selected",
-            description: "Please select an event to upload the photo to.",
+    let eventId: number | null = null;
+    let eventName: string | undefined = '';
+
+    if (uploadMode === 'existing') {
+        if (!selectedEventForUpload) {
+            toast({
+                variant: "destructive",
+                title: "No Event Selected",
+                description: "Please select an event to upload the photo to.",
+            });
+            return;
+        }
+        eventId = parseInt(selectedEventForUpload, 10);
+        eventName = events.find(e => e.id === eventId)?.name;
+    } else { // new album
+        if (!newAlbumName.trim() || !newAlbumDesc.trim()) {
+            toast({
+                variant: "destructive",
+                title: "Album Details Missing",
+                description: "Please provide a name and description for the new album.",
+            });
+            return;
+        }
+        // Create a new mock event to act as an album
+        const newEvent = addEvent({
+            name: newAlbumName,
+            description: newAlbumDesc,
+            date: new Date().toISOString(),
+            venueId: 1, // Mock venue
+            organizationId: 1, // Mock org
+            type: 'Meetup',
         });
-        return;
+        eventId = newEvent.id;
+        eventName = newEvent.name;
     }
-    const eventId = parseInt(selectedEventForUpload, 10);
+
+    if (eventId === null) return;
+
     // In a real app, this would handle file uploads. Here we simulate it.
     const newImage: ImagePlaceholder = {
         id: `temp-${eventId}-${Date.now()}`,
@@ -71,13 +105,19 @@ export default function GalleryPage() {
         imageHint: "community event",
         eventId: eventId,
     };
+
     addImageToEvent(eventId, newImage);
     toast({
         title: "Photo Uploaded! (Simulated)",
-        description: "Your photo has been added to the album.",
+        description: `Your photo has been added to the "${eventName}" album.`,
     });
+
+    // Reset state
     setUploadModalOpen(false);
     setSelectedEventForUpload(null);
+    setNewAlbumName('');
+    setNewAlbumDesc('');
+    setUploadMode('existing');
   }
 
   const containerVariants = {
@@ -122,28 +162,60 @@ export default function GalleryPage() {
                                 Add Photos
                             </Button>
                         </DialogTrigger>
-                        <DialogContent className="sm:max-w-md glass-card">
+                        <DialogContent className="sm:max-w-lg glass-card">
                             <DialogHeader>
                                 <DialogTitle>Upload Photo to an Album</DialogTitle>
                             </DialogHeader>
                             <div className="py-4 space-y-4">
-                                <p className='text-sm text-muted-foreground'>This is a simulation. Select an event album and click upload to add a new random placeholder image.</p>
-                                <Select onValueChange={setSelectedEventForUpload}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select an event album" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {pastEvents.map((event) => (
-                                            <SelectItem key={event.id} value={String(event.id)}>
-                                                {event.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                <Input type="file" disabled />
-                                <Button onClick={handleUpload} className="w-full" disabled={!selectedEventForUpload}>
+                               <RadioGroup defaultValue="existing" onValueChange={(value: 'existing' | 'new') => setUploadMode(value)} className="grid grid-cols-2 gap-4">
+                                  <div>
+                                    <RadioGroupItem value="existing" id="r1" className="peer sr-only" />
+                                    <Label htmlFor="r1" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
+                                      Select Existing Album
+                                    </Label>
+                                  </div>
+                                  <div>
+                                    <RadioGroupItem value="new" id="r2" className="peer sr-only" />
+                                    <Label htmlFor="r2" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
+                                      Create New Album
+                                    </Label>
+                                  </div>
+                                </RadioGroup>
+
+                                {uploadMode === 'existing' ? (
+                                    <div className='space-y-4 pt-4'>
+                                        <p className='text-sm text-muted-foreground'>Select an existing event album and click upload to add a new random placeholder image.</p>
+                                        <Select onValueChange={setSelectedEventForUpload}>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select an event album" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {pastEvents.map((event) => (
+                                                    <SelectItem key={event.id} value={String(event.id)}>
+                                                        {event.name}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                ) : (
+                                    <div className='space-y-4 pt-4'>
+                                         <p className='text-sm text-muted-foreground'>Create a new album by providing a name and description. A new placeholder image will be added.</p>
+                                        <div className='space-y-2'>
+                                            <Label htmlFor='new-album-name'>New Album Name</Label>
+                                            <Input id='new-album-name' value={newAlbumName} onChange={(e) => setNewAlbumName(e.target.value)} placeholder="e.g. Community Day 2024" />
+                                        </div>
+                                         <div className='space-y-2'>
+                                            <Label htmlFor='new-album-desc'>Description</Label>
+                                            <Textarea id='new-album-desc' value={newAlbumDesc} onChange={(e) => setNewAlbumDesc(e.target.value)} placeholder="A short description for the new album." />
+                                        </div>
+                                    </div>
+                                )}
+                                
+                                <Input type="file" disabled className='mt-4' />
+                                <Button onClick={handleUpload} className="w-full" disabled={(uploadMode === 'existing' && !selectedEventForUpload) || (uploadMode === 'new' && (!newAlbumName.trim() || !newAlbumDesc.trim()))}>
                                     <Upload className="mr-2 h-4 w-4"/>
-                                    Upload to Album
+                                    {uploadMode === 'existing' ? 'Upload to Selected Album' : 'Create & Upload to New Album'}
                                 </Button>
                             </div>
                         </DialogContent>
