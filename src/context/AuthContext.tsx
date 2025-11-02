@@ -108,7 +108,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         await setDoc(userDocRef, appUserData);
         
-        setUser(appUserData); // Set user immediately
+        // Manually set user to avoid race condition with onAuthStateChanged
+        setUser(appUserData); 
+        setLoading(false);
         router.push('/dashboard');
         return userCredential;
       } catch (error: any) {
@@ -121,7 +123,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setLoading(false);
         throw error;
       }
-      // setLoading(false) will be handled by the onAuthStateChanged listener
     },
     [auth, firestore, router, toast]
   );
