@@ -35,6 +35,7 @@ const formSchema = z.object({
   description: z.string().min(10, { message: "Description must be at least 10 characters." }),
   date: z.date({ required_error: "A date is required." }),
   venueName: z.string().min(3, { message: "Venue name must be at least 3 characters." }),
+  venueLocation: z.string().min(3, { message: "Venue location must be at least 3 characters." }),
   organizationId: z.string().min(1, { message: "Please select an organization." }),
   type: z.enum(["Tournament", "Workshop", "Meetup"]),
 });
@@ -59,6 +60,7 @@ export default function EditEventForm({ event, organizations, onSubmit, onCancel
       description: event.description,
       date: new Date(event.date),
       venueName: currentVenue?.name || "",
+      venueLocation: currentVenue?.location || "",
       organizationId: String(event.organizationId),
       type: event.type,
     },
@@ -67,7 +69,7 @@ export default function EditEventForm({ event, organizations, onSubmit, onCancel
   const handleSubmit = (data: EditEventFormValues) => {
     let venue = venues.find(v => v.name.toLowerCase() === data.venueName.toLowerCase());
     if (!venue) {
-        venue = addVenue(data.venueName);
+        venue = addVenue(data.venueName, data.venueLocation);
     }
     
     onSubmit({
@@ -109,55 +111,68 @@ export default function EditEventForm({ event, organizations, onSubmit, onCancel
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="date"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>Date</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-full pl-3 text-left font-normal",
-                        !field.value && "text-muted-foreground"
-                      )}
-                    >
-                      {field.value ? (
-                        format(field.value, "PPP")
-                      ) : (
-                        <span>Pick a date</span>
-                      )}
-                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={field.value}
-                    onSelect={field.onChange}
-                    disabled={(date) => date < new Date()}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <div className="grid grid-cols-2 gap-4">
-            <FormField
+         <FormField
             control={form.control}
             name="venueName"
             render={({ field }) => (
                 <FormItem>
-                <FormLabel>Venue</FormLabel>
+                <FormLabel>Venue Name</FormLabel>
                  <FormControl>
-                    <Input placeholder="Enter a venue name" {...field} />
+                    <Input placeholder="e.g. City Park Fields" {...field} />
                 </FormControl>
+                <FormMessage />
+                </FormItem>
+            )}
+            />
+        <FormField
+            control={form.control}
+            name="venueLocation"
+            render={({ field }) => (
+                <FormItem>
+                <FormLabel>Venue Location</FormLabel>
+                 <FormControl>
+                    <Input placeholder="e.g. 123 Park Ave, Cityville" {...field} />
+                </FormControl>
+                <FormMessage />
+                </FormItem>
+            )}
+            />
+        <div className="grid grid-cols-2 gap-4">
+            <FormField
+            control={form.control}
+            name="date"
+            render={({ field }) => (
+                <FormItem className="flex flex-col">
+                <FormLabel>Date</FormLabel>
+                <Popover>
+                    <PopoverTrigger asChild>
+                    <FormControl>
+                        <Button
+                        variant={"outline"}
+                        className={cn(
+                            "w-full pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                        )}
+                        >
+                        {field.value ? (
+                            format(field.value, "PPP")
+                        ) : (
+                            <span>Pick a date</span>
+                        )}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                    </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        disabled={(date) => date < new Date()}
+                        initialFocus
+                    />
+                    </PopoverContent>
+                </Popover>
                 <FormMessage />
                 </FormItem>
             )}

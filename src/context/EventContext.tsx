@@ -34,7 +34,7 @@ interface AppContextType {
   markSessionAttendance: (sessionId: string, childId: string) => void;
   addAssessment: (newAssessmentData: Omit<Assessment, 'date'>) => void;
   addHomeVisit: (newHomeVisitData: Omit<HomeVisit, 'id'>) => void;
-  addVenue: (venueName: string) => Venue;
+  addVenue: (venueName: string, venueLocation: string) => Venue;
   addImageToEvent: (eventId: number, image: ImagePlaceholder) => void;
 }
 
@@ -207,11 +207,11 @@ export function AppDataProvider({ children: componentChildren }: { children: Rea
     ])
   }, []);
 
-  const addVenue = useCallback((venueName: string): Venue => {
+  const addVenue = useCallback((venueName: string, venueLocation: string): Venue => {
     const newVenue: Venue = {
         id: venues.length > 0 ? Math.max(...venues.map(v => v.id)) + 1 : 1,
         name: venueName,
-        location: `${venueName} Location`,
+        location: venueLocation,
         coordinates: {
             lat: 12.2958 + (Math.random() - 0.5) * 0.1,
             lng: 76.6394 + (Math.random() - 0.5) * 0.1,
