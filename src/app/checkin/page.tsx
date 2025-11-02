@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { CheckCircle, QrCode } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import DashboardLayout from '@/components/DashboardLayout';
 import { useAppData } from '@/context/EventContext';
 import { mockChildren } from '@/lib/mockData';
@@ -32,7 +32,6 @@ export default function CheckinPage() {
   const { toast } = useToast();
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
 
-  // This function simulates scanning a QR code and getting a result (e.g., a child's ID)
   const handleScan = (childId: string) => {
     if (!selectedSessionId) {
         toast({
@@ -47,11 +46,20 @@ export default function CheckinPage() {
     const session = sessions.find(s => s.id === selectedSessionId);
 
     if (child && session) {
+        const isAlreadyMarked = session.participants.includes(childId);
         markSessionAttendance(selectedSessionId, childId);
-        toast({
-            title: "✅ Check-in Successful!",
-            description: `${child.name} marked present for session in ${session.community}.`,
-        });
+        
+        if (!isAlreadyMarked) {
+          toast({
+              title: "✅ Check-in Successful!",
+              description: `${child.name} marked present for session in ${session.community}.`,
+          });
+        } else {
+            toast({
+                title: "Already Checked In",
+                description: `${child.name} was already marked as present.`,
+            });
+        }
     } else {
         toast({
             variant: "destructive",
@@ -115,23 +123,41 @@ export default function CheckinPage() {
                 </div>
               )}
 
+              <AnimatePresence>
               {selectedSession && (
-                <motion.div initial={{opacity: 0}} animate={{opacity: 1}} className='mt-6'>
+                <motion.div 
+                    initial={{opacity: 0, height: 0}} 
+                    animate={{opacity: 1, height: 'auto'}} 
+                    exit={{opacity: 0, height: 0}}
+                    className='mt-6 overflow-hidden'
+                >
                     <Alert>
                         <CheckCircle className="h-5 w-5"/>
                         <AlertTitle>Current Attendance for "{selectedSession.community}"</AlertTitle>
                         <AlertDescription>
                             <p>{selectedSession.participants.length} / {mockChildren.filter(c => c.community === selectedSession.community).length} children present.</p>
                             <ul className='list-disc list-inside mt-2 text-xs'>
+                                <AnimatePresence>
                                 {selectedSession.participants.map(childId => {
                                     const child = mockChildren.find(c => c.id === childId);
-                                    return <li key={childId}>{child?.name}</li>
+                                    return (
+                                        <motion.li 
+                                            key={childId}
+                                            initial={{ opacity: 0, x: -10 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            exit={{ opacity: 0, x: 10 }}
+                                        >
+                                            {child?.name}
+                                        </motion.li>
+                                    );
                                 })}
+                                </AnimatePresence>
                             </ul>
                         </AlertDescription>
                     </Alert>
                 </motion.div>
               )}
+              </AnimatePresence>
 
             </CardContent>
           </Card>
