@@ -39,10 +39,12 @@ import {
   Tooltip,
   Legend,
 } from 'recharts';
-import { Alert, AlertTitle } from '../ui/alert';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import QRCodeComponent from 'qrcode.react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
 import { useAuth } from '@/context/AuthContext';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '../ui/carousel';
+import EventQrCard from './EventQrCard';
 
 interface ParticipantDashboardProps {
   user: User;
@@ -129,9 +131,12 @@ export default function ParticipantDashboard({
         className="space-y-4"
       >
           {alerts.map(a => (
-            <Alert key={a.id} variant={a.type}>
-              {a.type === 'destructive' ? <AlertTriangle className="h-4 w-4" /> : <Info className="h-4 w-4" />}
-              <AlertTitle>{a.message}</AlertTitle>
+            <Alert key={a.id} variant={a.type === 'destructive' ? 'destructive' : 'default'} className="items-start">
+              {a.type === 'destructive' ? <AlertTriangle className="h-5 w-5" /> : <Info className="h-5 w-5" />}
+              <div className='ml-2'>
+                <AlertTitle>{a.message}</AlertTitle>
+                <AlertDescription>This is a mock alert for demonstration.</AlertDescription>
+              </div>
             </Alert>
           ))}
       </motion.div>
@@ -170,47 +175,38 @@ export default function ParticipantDashboard({
             <Card className="glass-card">
                 <CardHeader>
                     <CardTitle>My Upcoming Events</CardTitle>
-                    <CardDescription>Your QR codes for check-in.</CardDescription>
+                    <CardDescription>Your QR codes for quick check-in.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     {registeredEvents.length > 0 ? (
-                        <div className="space-y-4">
-                            {registeredEvents.map(event => {
-                                const qrValue = JSON.stringify({ eventId: event.id, eventName: event.name, userId: user.id, userName: user.name });
-                                return (
-                                    <div key={event.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
-                                        <div>
-                                            <p className="font-semibold">{event.name}</p>
-                                            <p className="text-sm text-muted-foreground">{format(new Date(event.date), 'PPPP p')}</p>
+                        <Carousel
+                            opts={{
+                                align: "start",
+                            }}
+                            className="w-full"
+                        >
+                            <CarouselContent>
+                                {registeredEvents.map(event => {
+                                    const qrValue = JSON.stringify({ eventId: event.id, eventName: event.name, userId: user.id, userName: user.name });
+                                    return (
+                                    <CarouselItem key={event.id} className="md:basis-1/2 lg:basis-1/3">
+                                        <div className="p-1">
+                                            <EventQrCard event={event} qrValue={qrValue} />
                                         </div>
-                                        <Dialog>
-                                            <DialogTrigger asChild>
-                                                <Button variant="outline">
-                                                    <QrCode className="mr-2 h-4 w-4" />
-                                                    Show QR Code
-                                                </Button>
-                                            </DialogTrigger>
-                                            <DialogContent className="sm:max-w-[425px] glass-card">
-                                                <DialogHeader>
-                                                    <DialogTitle className='text-center'>{event.name}</DialogTitle>
-                                                </DialogHeader>
-                                                <div className="flex flex-col items-center justify-center p-4 gap-4">
-                                                    <div className="bg-white p-4 rounded-lg">
-                                                        <QRCodeComponent value={qrValue} size={256} />
-                                                    </div>
-                                                    <p className="text-xs text-muted-foreground text-center">Show this QR code to the event organizer to check in.</p>
-                                                </div>
-                                            </DialogContent>
-                                        </Dialog>
-                                    </div>
-                                );
-                            })}
-                        </div>
+                                    </CarouselItem>
+                                    )
+                                })}
+                            </CarouselContent>
+                            <CarouselPrevious className='-left-4' />
+                            <CarouselNext className='-right-4' />
+                        </Carousel>
                     ) : (
-                        <div className="text-center py-8">
+                        <div className="text-center py-8 flex flex-col items-center justify-center">
+                            <QrCode className="w-16 h-16 text-muted-foreground/50 mb-4" />
+                            <p className="font-semibold">No Upcoming Events</p>
                             <p className="text-sm text-muted-foreground">You are not registered for any upcoming events.</p>
-                            <Button asChild variant="link" className='mt-2'>
-                                <Link href="/events">Browse Events</Link>
+                            <Button asChild variant="default" className='mt-4'>
+                                <Link href="/events">Browse & Register for Events</Link>
                             </Button>
                         </div>
                     )}
