@@ -22,7 +22,7 @@ import {
 import { mockTeams, mockPlayerStats } from '@/lib/mockData';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
 import QRCodeComponent from 'qrcode.react';
 
 const topPlayers = mockPlayerStats.sort((a, b) => b.score - a.score).slice(0, 3);
@@ -118,7 +118,13 @@ export default function LeaderboardPage() {
                                 <DialogTrigger asChild>
                                     <Button variant="link" className="mt-2">View Certificate</Button>
                                 </DialogTrigger>
-                                <DialogContent>
+                                <DialogContent className="max-w-3xl">
+                                    <DialogHeader>
+                                        <DialogTitle>Certificate for {player.name}</DialogTitle>
+                                        <DialogDescription>
+                                            This certificate recognizes the outstanding achievement of {player.name}.
+                                        </DialogDescription>
+                                    </DialogHeader>
                                     <Certificate name={player.name} achievement={`Top Player #${index+1}`} />
                                 </DialogContent>
                             </Dialog>
