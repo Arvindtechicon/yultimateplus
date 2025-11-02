@@ -67,6 +67,7 @@ export function Sidebar({ user, isOpen, setOpen }: SidebarProps) {
         { href: '/leaderboard', label: 'Leaderboard', icon: Award },
         { href: '/team-performance', label: 'Team Performance', icon: Group },
         { href: '/reports', label: 'Event Reports', icon: BarChart2 },
+        { href: '/gallery', label: 'Gallery', icon: Image },
     ];
 
     const coachLinks = [
