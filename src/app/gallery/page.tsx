@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Image as ImageIcon, Maximize, Upload } from 'lucide-react';
+import { Image as ImageIcon, Maximize, Upload, PlusCircle } from 'lucide-react';
 import DashboardLayout from '@/components/DashboardLayout';
 import { PlaceHolderImages, type ImagePlaceholder } from '@/lib/placeholder-images';
 import Image from 'next/image';
@@ -15,6 +15,13 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+  } from '@/components/ui/select';
 import { useAppData } from '@/context/EventContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -27,7 +34,8 @@ export default function GalleryPage() {
     const { events, addImageToEvent, tempEventImages } = useAppData();
     const { user } = useAuth();
     const { toast } = useToast();
-    const [isUploadModalOpen, setUploadModalOpen] = useState<string | null>(null);
+    const [isUploadModalOpen, setUploadModalOpen] = useState(false);
+    const [selectedEventForUpload, setSelectedEventForUpload] = useState<string | null>(null);
 
     const canUpload = user?.role === 'Admin' || user?.role === 'Organizer';
     
@@ -45,7 +53,16 @@ export default function GalleryPage() {
     });
 
 
-  const handleUpload = (eventId: number) => {
+  const handleUpload = () => {
+    if (!selectedEventForUpload) {
+        toast({
+            variant: "destructive",
+            title: "No Event Selected",
+            description: "Please select an event to upload the photo to.",
+        });
+        return;
+    }
+    const eventId = parseInt(selectedEventForUpload, 10);
     // In a real app, this would handle file uploads. Here we simulate it.
     const newImage: ImagePlaceholder = {
         id: `temp-${eventId}-${Date.now()}`,
@@ -59,7 +76,8 @@ export default function GalleryPage() {
         title: "Photo Uploaded! (Simulated)",
         description: "Your photo has been added to the album.",
     });
-    setUploadModalOpen(null);
+    setUploadModalOpen(false);
+    setSelectedEventForUpload(null);
   }
 
   const containerVariants = {
@@ -86,15 +104,52 @@ export default function GalleryPage() {
           transition={{ duration: 0.5 }}
           className="text-center mb-12"
         >
-          <div className="inline-block p-4 bg-gradient-to-br from-primary/10 to-transparent rounded-full shadow-inner border border-primary/20">
-            <ImageIcon className="w-12 h-12 text-primary" />
-          </div>
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tighter">
-            Photo Gallery
-          </h1>
-          <p className="max-w-[600px] mx-auto text-muted-foreground md:text-xl mt-4">
-            A collection of moments from our past events.
-          </p>
+            <div className='flex flex-col items-center justify-center'>
+                <div className="inline-block p-4 bg-gradient-to-br from-primary/10 to-transparent rounded-full shadow-inner border border-primary/20">
+                    <ImageIcon className="w-12 h-12 text-primary" />
+                </div>
+                <h1 className="text-4xl md:text-5xl font-bold tracking-tighter mt-4">
+                    Photo Gallery
+                </h1>
+                <p className="max-w-[600px] mx-auto text-muted-foreground md:text-xl mt-4">
+                    A collection of moments from our past events.
+                </p>
+                {canUpload && (
+                     <Dialog open={isUploadModalOpen} onOpenChange={setUploadModalOpen}>
+                        <DialogTrigger asChild>
+                            <Button className="mt-6">
+                                <PlusCircle className="mr-2 h-4 w-4"/>
+                                Add Photos
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-md glass-card">
+                            <DialogHeader>
+                                <DialogTitle>Upload Photo to an Album</DialogTitle>
+                            </DialogHeader>
+                            <div className="py-4 space-y-4">
+                                <p className='text-sm text-muted-foreground'>This is a simulation. Select an event album and click upload to add a new random placeholder image.</p>
+                                <Select onValueChange={setSelectedEventForUpload}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select an event album" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {pastEvents.map((event) => (
+                                            <SelectItem key={event.id} value={String(event.id)}>
+                                                {event.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <Input type="file" disabled />
+                                <Button onClick={handleUpload} className="w-full" disabled={!selectedEventForUpload}>
+                                    <Upload className="mr-2 h-4 w-4"/>
+                                    Upload to Album
+                                </Button>
+                            </div>
+                        </DialogContent>
+                    </Dialog>
+                )}
+            </div>
         </motion.div>
 
         <motion.div 
@@ -129,29 +184,6 @@ export default function GalleryPage() {
                                 <DialogTitle>{album.name}</DialogTitle>
                                 <DialogDescription>
                                     Browse photos from this event.
-                                    {canUpload && (
-                                        <Dialog open={isUploadModalOpen === `upload-${album.id}`} onOpenChange={(isOpen) => !isOpen && setUploadModalOpen(null)}>
-                                            <DialogTrigger asChild>
-                                                <Button size="sm" className="mt-2" onClick={() => setUploadModalOpen(`upload-${album.id}`)}>
-                                                    <Upload className="mr-2 h-4 w-4"/>
-                                                    Upload Photo
-                                                </Button>
-                                            </DialogTrigger>
-                                            <DialogContent className="sm:max-w-md glass-card">
-                                                <DialogHeader>
-                                                    <DialogTitle>Upload Photo to {album.name}</DialogTitle>
-                                                </DialogHeader>
-                                                <div className="py-4 space-y-4">
-                                                    <p className='text-sm text-muted-foreground'>This is a simulation. Click upload to add a new random placeholder image to the album.</p>
-                                                    <Input type="file" disabled />
-                                                    <Button onClick={() => handleUpload(album.id)} className="w-full">
-                                                        <Upload className="mr-2 h-4 w-4"/>
-                                                        Upload
-                                                    </Button>
-                                                </div>
-                                            </DialogContent>
-                                        </Dialog>
-                                    )}
                                 </DialogDescription>
                             </DialogHeader>
                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 py-4 max-h-[70vh] overflow-y-auto">
@@ -178,7 +210,15 @@ export default function GalleryPage() {
                 ) : null
             ))}
         </motion.div>
-
+        {albums.filter(a => a.images.length > 0).length === 0 && (
+             <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-center py-16 col-span-full">
+                <p className='text-lg font-medium'>No Photos Yet</p>
+                <p className="text-muted-foreground mt-2">Photos from past events will appear here.</p>
+            </motion.div>
+        )}
       </div>
     </DashboardLayout>
   );
