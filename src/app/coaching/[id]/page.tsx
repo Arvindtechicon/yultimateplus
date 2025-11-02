@@ -22,7 +22,8 @@ import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
 
 export default function CoachingCenterDetailPage() {
-  const { id } = useParams<{ id: string }>();
+  const params = useParams<{ id: string }>();
+  const id = params.id;
   const { coachingCenters, toggleCoachingCenterRegistration, users } = useAppData();
   const { user } = useAuth();
   const { toast } = useToast();
