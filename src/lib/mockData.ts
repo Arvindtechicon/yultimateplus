@@ -41,7 +41,8 @@ export interface Event {
     first: string;
     second: string;
     third: string;
-  }
+  };
+  highlights?: string;
 }
 
 export interface Venue {
@@ -115,6 +116,10 @@ export interface MockAlert {
     id: number;
     message: string;
     type: 'destructive' | 'default';
+    cta?: {
+        label: string;
+        href: string;
+    }
 }
 
 export interface Community {
@@ -132,10 +137,35 @@ export interface ImagePlaceholder {
     eventId?: number;
   }
 
+export interface Feedback {
+    id: string;
+    userId: string;
+    targetId: string; // event, session, or tournament id
+    type: 'event' | 'session' | 'general';
+    rating: number; // e.g., 1-5
+    comment: string;
+}
+
+export interface Team {
+    id: string;
+    name: string;
+    spiritScore: number;
+    wins: number;
+    losses: number;
+}
+
+export interface PlayerStat {
+    id: string; // matches user id
+    name: string;
+    score: number;
+    team: string;
+}
+
 
 export const mockAlerts: MockAlert[] = [
-    { id: 1, message: "Attendance missing for Session S002", type: 'destructive' },
-    { id: 2, message: "Endline assessment due for Sneha Rao", type: 'default' },
+    { id: 1, message: "Attendance missing for Session S002", type: 'destructive', cta: {label: 'View Session', href: '/checkin'} },
+    { id: 2, message: "Endline assessment due for Sneha Rao", type: 'default', cta: {label: 'Go to Assessments', href: '/assessments'} },
+    { id: 3, message: "New event 'Beach Ultimate' has been posted!", type: 'default', cta: {label: 'View Event', href: '/events'} },
 ];
 
 export const mockChildren: Child[] = [
@@ -275,7 +305,8 @@ export const events: Event[] = [
       first: 'Team Alpha',
       second: 'Team Beta',
       third: 'Team Gamma',
-    }
+    },
+    highlights: 'Team Alpha dominated the finals with their fast-paced offense and tight defense, securing a 15-10 victory over Team Beta. The MVP of the tournament was Sarah from Team Alpha for her incredible layouts and 20 assists.'
   },
   {
     id: 2,
@@ -306,6 +337,12 @@ export const events: Event[] = [
     organizationId: 2,
     type: 'Tournament',
     participants: ['4', '5'],
+     winners: {
+      first: 'Sandstormers',
+      second: 'Wave Riders',
+      third: 'Tidal Force',
+    },
+     highlights: 'In a windy final, the Sandstormers edged out the Wave Riders 12-11 in a universe point thriller. Their zone defense proved to be the deciding factor.'
   },
 ];
 
@@ -318,4 +355,21 @@ export const coachingCenters: CoachingCenter[] = [
 export const mockCommunities: Community[] = [
     { name: 'VV Puram', lat: 12.2958, lng: 76.6394, children: 30 },
     { name: 'Lalithadripura', lat: 12.2710, lng: 76.6930, children: 22 },
+];
+
+export const mockFeedback: Feedback[] = [];
+
+export const mockTeams: Team[] = [
+    { id: 'T1', name: 'Team Alpha', spiritScore: 12, wins: 5, losses: 0 },
+    { id: 'T2', name: 'Team Beta', spiritScore: 11, wins: 4, losses: 1 },
+    { id: 'T3', name: 'Team Gamma', spiritScore: 10, wins: 3, losses: 2 },
+    { id: 'T4', name: 'Sandstormers', spiritScore: 12, wins: 5, losses: 0 },
+    { id: 'T5', name: 'Wave Riders', spiritScore: 11, wins: 4, losses: 1 },
+    { id: 'T6', name: 'Tidal Force', spiritScore: 10, wins: 3, losses: 2 },
+];
+
+export const mockPlayerStats: PlayerStat[] = [
+    { id: '3', name: 'Participant User', score: 120, team: 'Team Alpha' },
+    { id: '4', name: 'Jane Doe', score: 110, team: 'Team Beta' },
+    { id: '5', name: 'John Smith', score: 100, team: 'Team Gamma' },
 ];

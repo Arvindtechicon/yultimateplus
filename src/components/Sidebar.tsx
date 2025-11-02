@@ -20,6 +20,7 @@ import {
   Image,
   X,
   Heart,
+  Award
 } from 'lucide-react';
 import {
   Sheet,
@@ -44,6 +45,7 @@ export function Sidebar({ user, isOpen, setOpen }: SidebarProps) {
       { href: '/dashboard', label: 'Overview', icon: Home },
       { href: '/events', label: 'Events', icon: Calendar },
       { href: '/coaching', label: 'Coaching', icon: BookOpen },
+      { href: '/leaderboard', label: 'Leaderboard', icon: Award },
       { href: '/map', label: 'Map', icon: Map },
       { href: '/checkin', label: 'Check-in', icon: QrCode },
       { href: '/gallery', label: 'Gallery', icon: Image },
@@ -62,6 +64,7 @@ export function Sidebar({ user, isOpen, setOpen }: SidebarProps) {
     const organizerLinks = [
         { href: '/dashboard', label: 'Overview', icon: Home },
         { href: '/dashboard/my-events', label: 'My Events', icon: Trophy },
+        { href: '/leaderboard', label: 'Leaderboard', icon: Award },
         { href: '/team-performance', label: 'Team Performance', icon: Group },
         { href: '/reports', label: 'Event Reports', icon: BarChart2 },
     ];
@@ -71,6 +74,7 @@ export function Sidebar({ user, isOpen, setOpen }: SidebarProps) {
         { href: '/events', label: 'Events', icon: Calendar },
         { href: '/coaching', label: 'Coaching', icon: BookOpen },
         { href: '/checkin', label: 'Session Check-in', icon: QrCode },
+        { href: '/leaderboard', label: 'Leaderboard', icon: Award },
         { href: '/assessments', label: 'LSAS Assessments', icon: ClipboardCheck },
         { href: '/home-visits', label: 'Home Visits', icon: Heart },
         { href: '/reports', label: 'Programme Reports', icon: BarChart2 },
