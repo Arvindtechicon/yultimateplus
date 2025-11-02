@@ -1,10 +1,18 @@
+
 'use client';
 
 import { motion } from 'framer-motion';
-import { UserPlus } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { UserPlus, ArrowLeft } from 'lucide-react';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import ParticipantRegistrationForm from '@/components/auth/ParticipantRegistrationForm';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 export default function ParticipantRegistrationPage() {
   return (
@@ -25,18 +33,23 @@ export default function ParticipantRegistrationPage() {
             <div className="mx-auto bg-primary/10 dark:bg-primary/20 p-4 rounded-full w-fit mb-4">
               <UserPlus className="w-10 h-10 text-primary" />
             </div>
-            <CardTitle className="text-3xl font-bold">Participant Registration</CardTitle>
+            <CardTitle className="text-3xl font-bold">
+              Participant Registration
+            </CardTitle>
             <CardDescription>
-              Join the community to participate in events and track your progress.
+              Join the community to participate in events and track your
+              progress.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <ParticipantRegistrationForm />
-             <div className="mt-6 text-center text-sm">
-                Already have an account?{' '}
-                <Link href="/" className="underline text-primary">
-                    Login
+            <div className="mt-6 text-center text-sm">
+              <Button asChild variant="link">
+                <Link href="/">
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Back to Home
                 </Link>
+              </Button>
             </div>
           </CardContent>
         </Card>

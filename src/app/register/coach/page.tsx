@@ -1,10 +1,18 @@
+
 'use client';
 
 import { motion } from 'framer-motion';
-import { UserPlus } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { UserPlus, ArrowLeft } from 'lucide-react';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import CoachRegistrationForm from '@/components/auth/CoachRegistrationForm';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 export default function CoachRegistrationPage() {
   return (
@@ -25,18 +33,22 @@ export default function CoachRegistrationPage() {
             <div className="mx-auto bg-primary/10 dark:bg-primary/20 p-4 rounded-full w-fit mb-4">
               <UserPlus className="w-10 h-10 text-primary" />
             </div>
-            <CardTitle className="text-3xl font-bold">Coach Registration</CardTitle>
+            <CardTitle className="text-3xl font-bold">
+              Coach Registration
+            </CardTitle>
             <CardDescription>
               Become a coach to manage sessions and help players grow.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <CoachRegistrationForm />
-             <div className="mt-6 text-center text-sm">
-                Already have an account?{' '}
-                <Link href="/" className="underline text-primary">
-                    Login
+            <div className="mt-6 text-center text-sm">
+              <Button asChild variant="link">
+                <Link href="/">
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Back to Home
                 </Link>
+              </Button>
             </div>
           </CardContent>
         </Card>

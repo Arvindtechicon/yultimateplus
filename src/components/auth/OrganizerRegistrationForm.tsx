@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useForm } from 'react-hook-form';
@@ -13,25 +14,41 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useAppData } from '@/context/EventContext';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import type { Organizer } from '@/lib/mockData';
+import { useFirebase } from '@/firebase';
+import { collection, addDoc } from 'firebase/firestore';
 
-const formSchema = z.object({
-  personalName: z.string().min(2, { message: 'Your name must be at least 2 characters.' }),
-  orgName: z.string().min(2, { message: 'Organization name must be at least 2 characters.' }),
-  email: z.string().email({ message: 'Please enter a valid email address.' }),
-  phone: z.string().regex(/^\d{10}$/, { message: 'Phone number must be 10 digits.' }),
-});
+const formSchema = z
+  .object({
+    personalName: z
+      .string()
+      .min(2, { message: 'Your name must be at least 2 characters.' }),
+    orgName: z
+      .string()
+      .min(2, { message: 'Organization name must be at least 2 characters.' }),
+    email: z.string().email({ message: 'Please enter a valid email address.' }),
+    phone: z
+      .string()
+      .regex(/^\d{10}$/, { message: 'Phone number must be 10 digits.' }),
+    password: z
+      .string()
+      .min(6, { message: 'Password must be at least 6 characters.' }),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ['confirmPassword'],
+  });
 
 type FormValues = z.infer<typeof formSchema>;
 
 export default function OrganizerRegistrationForm() {
-  const { users, addUser, addOrganizer } = useAppData();
-  const { loginFromRegistration } = useAuth();
+  const { register } = useAuth();
+  const { firestore } = useFirebase();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -42,106 +59,141 @@ export default function OrganizerRegistrationForm() {
       orgName: '',
       email: '',
       phone: '',
+      password: '',
+      confirmPassword: '',
     },
   });
 
-  const handleSubmit = (data: FormValues) => {
+  const handleSubmit = async (data: FormValues) => {
     setIsLoading(true);
-    const emailExists = users.some(u => u.email.toLowerCase() === data.email.toLowerCase());
-
-    if (emailExists) {
-      form.setError('email', {
-        type: 'manual',
-        message: 'An account with this email already exists. Please login.',
-      });
-      setIsLoading(false);
-      return;
-    }
-    
-    const id = `O${Date.now().toString(36).slice(-6)}`;
-    const newUser: Organizer = {
-        id,
+    try {
+      // 1. Register the user via AuthContext
+      const userCredential = await register(data.email, data.password, {
         name: data.personalName,
-        email: data.email,
         role: 'Organizer',
         phone: data.phone,
         orgName: data.orgName,
-        events: []
-    };
+        events: [],
+      });
 
-    addUser(newUser);
-    addOrganizer(newUser);
-    
-    toast({
-      title: '✅ Registration Successful!',
-      description: `Welcome, ${data.personalName}! Your organizer account is ready.`,
-    });
+      // 2. Create the organization in Firestore
+      const newOrg = {
+        name: data.orgName,
+        organizers: [userCredential.user.uid],
+      };
+      await addDoc(collection(firestore, 'organizations'), newOrg);
 
-    loginFromRegistration(newUser);
+      toast({
+        title: '✅ Registration Successful!',
+        description: `Welcome, ${data.personalName}! Your organizer account is ready.`,
+      });
+      // The router.push is handled by the AuthContext's onAuthStateChanged effect
+    } catch (error: any) {
+      console.error('Organizer registration failed:', error);
+      // Toast is handled within AuthContext's register function
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <FormField
+          <FormField
             control={form.control}
             name="personalName"
             render={({ field }) => (
-                <FormItem>
+              <FormItem>
                 <FormLabel>Your Full Name</FormLabel>
                 <FormControl>
-                    <Input placeholder="John Doe" {...field} />
+                  <Input placeholder="John Doe" {...field} />
                 </FormControl>
                 <FormMessage />
-                </FormItem>
+              </FormItem>
             )}
-            />
-            <FormField
+          />
+          <FormField
             control={form.control}
             name="orgName"
             render={({ field }) => (
-                <FormItem>
+              <FormItem>
                 <FormLabel>Organization Name</FormLabel>
                 <FormControl>
-                    <Input placeholder="e.g., Ultimate Impact" {...field} />
+                  <Input placeholder="e.g., Ultimate Impact" {...field} />
                 </FormControl>
                 <FormMessage />
-                </FormItem>
+              </FormItem>
             )}
-            />
+          />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <FormField
+          <FormField
             control={form.control}
             name="email"
             render={({ field }) => (
-                <FormItem>
+              <FormItem>
                 <FormLabel>Email Address</FormLabel>
                 <FormControl>
-                    <Input type="email" placeholder="john.doe@example.com" {...field} />
+                  <Input
+                    type="email"
+                    placeholder="john.doe@example.com"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
-                </FormItem>
+              </FormItem>
             )}
-            />
-            <FormField
+          />
+          <FormField
             control={form.control}
             name="phone"
             render={({ field }) => (
-                <FormItem>
+              <FormItem>
                 <FormLabel>Phone Number</FormLabel>
                 <FormControl>
-                    <Input placeholder="9876543210" {...field} />
+                  <Input placeholder="9876543210" {...field} />
                 </FormControl>
                 <FormMessage />
-                </FormItem>
+              </FormItem>
             )}
-            />
+          />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <Input type="password" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="confirmPassword"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Confirm Password</FormLabel>
+                <FormControl>
+                  <Input type="password" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
 
         <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Create Organizer Account'}
+          {isLoading ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            'Create Organizer Account'
+          )}
         </Button>
       </form>
     </Form>
