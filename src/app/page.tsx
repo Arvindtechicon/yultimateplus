@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -17,9 +16,10 @@ import {
   Briefcase,
   Heart,
   Shield,
+  ArrowRight,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Header from '@/components/Header';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -32,6 +32,7 @@ export default function Home() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showAuthForm, setShowAuthForm] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -83,81 +84,107 @@ export default function Home() {
           </p>
         </motion.div>
 
-        <Card className="w-full max-w-sm glass-card">
-          <CardHeader>
-            <CardTitle>Welcome</CardTitle>
-            <CardDescription>
-              Login or register to continue.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Tabs defaultValue="login" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="login">Login</TabsTrigger>
-                <TabsTrigger value="register">Register</TabsTrigger>
-              </TabsList>
-              <TabsContent value="login">
-                <form onSubmit={handleLogin} className="space-y-4 pt-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="m@example.com"
-                      required
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
-                    <Input
-                      id="password"
-                      type="password"
-                      required
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                    />
-                  </div>
-                  <Button type="submit" className="w-full">
-                    Login
-                  </Button>
-                </form>
-                <div className="mt-4 text-center">
-                   <Button variant="link" size="sm" onClick={handleAdminLogin}>
-                      <Shield className="mr-2 h-4 w-4" />
-                      Login as Admin
-                    </Button>
-                </div>
-              </TabsContent>
-              <TabsContent value="register">
-                <div className="space-y-4 pt-4 text-center">
-                  <p className="text-sm text-muted-foreground">
-                    Choose your role to get started:
-                  </p>
-                  <Button variant="outline" className="w-full" asChild>
-                    <Link href={`/register/participant`}>
-                      <UserPlus className="mr-2 h-4 w-4" />
-                      Sign Up as Participant
-                    </Link>
-                  </Button>
-                  <Button variant="outline" className="w-full" asChild>
-                    <Link href={`/register/organizer`}>
-                      <Briefcase className="mr-2 h-4 w-4" />
-                      Sign Up as Organizer
-                    </Link>
-                  </Button>
-                  <Button variant="outline" className="w-full" asChild>
-                    <Link href={`/register/coach`}>
-                      <Heart className="mr-2 h-4 w-4" />
-                      Sign Up as Coach
-                    </Link>
-                  </Button>
-                </div>
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
+        <AnimatePresence>
+          {!showAuthForm ? (
+            <motion.div
+                key="get-started"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.3 }}
+            >
+              <Button size="lg" onClick={() => setShowAuthForm(true)} className="group">
+                Get Started
+                <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+              </Button>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="auth-card"
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.95 }}
+              transition={{ duration: 0.4, ease: 'easeInOut' }}
+              className="w-full max-w-sm"
+            >
+              <Card className="w-full glass-card">
+                <CardHeader>
+                  <CardTitle>Welcome</CardTitle>
+                  <CardDescription>
+                    Login or register to continue.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Tabs defaultValue="login" className="w-full">
+                    <TabsList className="grid w-full grid-cols-2">
+                      <TabsTrigger value="login">Login</TabsTrigger>
+                      <TabsTrigger value="register">Register</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="login">
+                      <form onSubmit={handleLogin} className="space-y-4 pt-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="email">Email</Label>
+                          <Input
+                            id="email"
+                            type="email"
+                            placeholder="m@example.com"
+                            required
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="password">Password</Label>
+                          <Input
+                            id="password"
+                            type="password"
+                            required
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                          />
+                        </div>
+                        <Button type="submit" className="w-full">
+                          Login
+                        </Button>
+                      </form>
+                      <div className="mt-4 text-center">
+                        <Button variant="link" size="sm" onClick={handleAdminLogin}>
+                            <Shield className="mr-2 h-4 w-4" />
+                            Login as Admin
+                        </Button>
+                      </div>
+                    </TabsContent>
+                    <TabsContent value="register">
+                      <div className="space-y-4 pt-4 text-center">
+                        <p className="text-sm text-muted-foreground">
+                          Choose your role to get started:
+                        </p>
+                        <Button variant="outline" className="w-full" asChild>
+                          <Link href={`/register/participant`}>
+                            <UserPlus className="mr-2 h-4 w-4" />
+                            Sign Up as Participant
+                          </Link>
+                        </Button>
+                        <Button variant="outline" className="w-full" asChild>
+                          <Link href={`/register/organizer`}>
+                            <Briefcase className="mr-2 h-4 w-4" />
+                            Sign Up as Organizer
+                          </Link>
+                        </Button>
+                        <Button variant="outline" className="w-full" asChild>
+                          <Link href={`/register/coach`}>
+                            <Heart className="mr-2 h-4 w-4" />
+                            Sign Up as Coach
+                          </Link>
+                        </Button>
+                      </div>
+                    </TabsContent>
+                  </Tabs>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </main>
     </div>
   );
