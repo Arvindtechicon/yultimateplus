@@ -245,11 +245,6 @@ export const events: Event[] = [
     organizationId: 1,
     type: 'Tournament',
     participants: [3, 4, 5],
-    winners: {
-        first: 'John Smith',
-        second: 'Jane Doe',
-        third: 'Participant User',
-    }
   },
   {
     id: 2,

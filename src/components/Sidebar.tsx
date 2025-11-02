@@ -63,10 +63,12 @@ export function Sidebar({ user, isOpen, setOpen }: SidebarProps) {
     const organizerLinks = [
       { href: '/dashboard', label: 'Overview', icon: Home },
       { href: '/dashboard/my-events', label: 'My Events', icon: Trophy },
+      { href: '/events', label: 'Events', icon: Calendar },
       { href: '/checkin', label: 'Check-in', icon: QrCode },
       { href: '/team-performance', label: 'Team Performance', icon: Group },
       { href: '/home-visits', label: 'Home Visits', icon: Home },
       { href: '/reports', label: 'Reports', icon: BarChart2 },
+      { href: '/gallery', label: 'Gallery', icon: Image },
     ];
 
     const adminLinks = [
