@@ -45,7 +45,7 @@ import {
 import type { Event } from '@/lib/mockData';
 import { organizations, users } from '@/lib/mockData';
 import { format } from 'date-fns';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import QRCodeComponent from 'qrcode.react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
@@ -66,6 +66,7 @@ export default function EventCard({ event, showEditButton }: EventCardProps) {
   const { toggleEventRegistration, updateEvent, venues } = useAppData();
   const { toast } = useToast();
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
+  const router = useRouter();
 
   const venue = venues.find((v) => v.id === event.venueId);
   const organization = organizations.find((o) => o.id === event.organizationId);
@@ -104,8 +105,7 @@ export default function EventCard({ event, showEditButton }: EventCardProps) {
 
   const handleDirectionsClick = () => {
     if (venue) {
-      const url = `https://www.google.com/maps/search/?api=1&query=${venue.coordinates.lat},${venue.coordinates.lng}`;
-      window.open(url, '_blank');
+      router.push(`/map?venueId=${venue.id}`);
     }
   };
 
