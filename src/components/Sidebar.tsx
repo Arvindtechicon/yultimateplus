@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -60,16 +61,12 @@ export function Sidebar({ user, isOpen, setOpen }: SidebarProps) {
     ];
 
     const organizerLinks = [
-      ...baseLinks.filter(link => link.href !== '/coaching'),
+      { href: '/dashboard', label: 'Overview', icon: Home },
+      { href: '/dashboard/my-events', label: 'My Events', icon: Trophy },
+      { href: '/checkin', label: 'Check-in', icon: QrCode },
       { href: '/team-performance', label: 'Team Performance', icon: Group },
       { href: '/home-visits', label: 'Home Visits', icon: Home },
       { href: '/reports', label: 'Reports', icon: BarChart2 },
-      {
-        href: '/dashboard/my-events',
-        label: 'My Events',
-        icon: Trophy,
-        disabled: false,
-      },
     ];
 
     const adminLinks = [

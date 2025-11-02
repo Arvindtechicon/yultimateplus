@@ -201,7 +201,7 @@ export default function EventCard({ event, showEditButton }: EventCardProps) {
             </Dialog>
           )}
 
-          <Button onClick={handleDirectionsClick} className="w-full col-start-2">
+          <Button onClick={handleDirectionsClick} className="w-full">
             <Navigation className="mr-2 h-4 w-4" />
             Get Directions
           </Button>
