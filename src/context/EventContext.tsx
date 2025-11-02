@@ -47,7 +47,7 @@ const getInitialState = <T,>(key: string, fallback: T): T => {
     }
     try {
         const stored = localStorage.getItem(key);
-        if (stored) {
+        if (stored && stored !== 'undefined' && stored !== 'null') {
             return JSON.parse(stored);
         }
     } catch (error) {
