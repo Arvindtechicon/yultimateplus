@@ -48,6 +48,7 @@ interface AppContextType {
   addHomeVisit: (newHomeVisitData: Omit<HomeVisit, 'id'>) => void;
   addVenue: (venueName: string, venueLocation: string) => Venue;
   addImageToEvent: (eventId: number, image: ImagePlaceholder) => void;
+  deleteImageFromEvent: (eventId: number, imageId: string) => void;
   addOrganization: (newOrgData: Omit<Organization, 'id' | 'organizers'>) => void;
   addParticipant: (participant: Participant) => void;
   addOrganizer: (organizer: Organizer) => void;
@@ -293,6 +294,16 @@ export function AppDataProvider({ children: componentChildren }: { children: Rea
     }));
   }, []);
 
+  const deleteImageFromEvent = useCallback((eventId: number, imageId: string) => {
+    setTempEventImages(prev => {
+        const newImages = {...prev};
+        if (newImages[eventId]) {
+            newImages[eventId] = newImages[eventId].filter(img => img.id !== imageId);
+        }
+        return newImages;
+    })
+  }, []);
+
   const addOrganization = useCallback((newOrgData: Omit<Organization, 'id' | 'organizers'>) => {
     setOrganizations(prevOrgs => [
       ...prevOrgs,
@@ -310,7 +321,8 @@ export function AppDataProvider({ children: componentChildren }: { children: Rea
       organizers, coaches, teams, tempEventImages, addEvent, updateEvent, toggleEventRegistration,
       addCoachingCenter, toggleCoachingCenterRegistration, markSessionAttendance, addAssessment,
       addHomeVisit, addVenue, addImageToEvent, addOrganization,
-      addUser, addParticipant, addOrganizer, addCoach, updateEventResults
+      addUser, addParticipant, addOrganizer, addCoach, updateEventResults,
+      deleteImageFromEvent,
   }
 
   return (

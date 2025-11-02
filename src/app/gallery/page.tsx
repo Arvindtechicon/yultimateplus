@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Image as ImageIcon, Maximize, Upload, PlusCircle } from 'lucide-react';
+import { Image as ImageIcon, Maximize, Upload, PlusCircle, Trash2 } from 'lucide-react';
 import DashboardLayout from '@/components/DashboardLayout';
 import { PlaceHolderImages, type ImagePlaceholder } from '@/lib/placeholder-images';
 import Image from 'next/image';
@@ -15,6 +15,17 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+  } from "@/components/ui/alert-dialog";
 import {
     Select,
     SelectContent,
@@ -34,7 +45,7 @@ import { Textarea } from '@/components/ui/textarea';
 
 
 export default function GalleryPage() {
-    const { events, addImageToEvent, tempEventImages, addEvent } = useAppData();
+    const { events, addImageToEvent, tempEventImages, addEvent, deleteImageFromEvent } = useAppData();
     const { user } = useAuth();
     const { toast } = useToast();
     const [isUploadModalOpen, setUploadModalOpen] = useState(false);
@@ -43,7 +54,7 @@ export default function GalleryPage() {
     const [newAlbumName, setNewAlbumName] = useState('');
     const [newAlbumDesc, setNewAlbumDesc] = useState('');
 
-    const canUpload = user?.role === 'Admin' || user?.role === 'Organizer';
+    const canManagePhotos = user?.role === 'Admin' || user?.role === 'Organizer';
     
     const pastEvents = events.filter(e => new Date(e.date) < new Date());
     
@@ -120,6 +131,15 @@ export default function GalleryPage() {
     setUploadMode('existing');
   }
 
+  const handleDeleteImage = (eventId: number, imageId: string) => {
+    deleteImageFromEvent(eventId, imageId);
+    toast({
+        variant: "destructive",
+        title: "Photo Deleted",
+        description: "The photo has been removed from the album.",
+    });
+  }
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -154,7 +174,7 @@ export default function GalleryPage() {
                 <p className="max-w-[600px] mx-auto text-muted-foreground md:text-xl mt-4">
                     A collection of moments from our past events.
                 </p>
-                {canUpload && (
+                {canManagePhotos && (
                      <Dialog open={isUploadModalOpen} onOpenChange={setUploadModalOpen}>
                         <DialogTrigger asChild>
                             <Button className="mt-6">
@@ -272,6 +292,33 @@ export default function GalleryPage() {
                                             <div className="absolute inset-0 bg-black/20 group-hover:bg-black/50 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
                                                 <Maximize className="w-8 h-8 text-white" />
                                             </div>
+                                            {canManagePhotos && image.id.startsWith('temp-') && (
+                                                 <AlertDialog>
+                                                    <AlertDialogTrigger asChild>
+                                                        <Button
+                                                            variant="destructive"
+                                                            size="icon"
+                                                            className="absolute top-2 right-2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
+                                                    </AlertDialogTrigger>
+                                                    <AlertDialogContent>
+                                                        <AlertDialogHeader>
+                                                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                                            <AlertDialogDescription>
+                                                                This action cannot be undone. This will permanently delete the photo from this album.
+                                                            </AlertDialogDescription>
+                                                        </AlertDialogHeader>
+                                                        <AlertDialogFooter>
+                                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                            <AlertDialogAction onClick={() => handleDeleteImage(album.id, image.id)}>
+                                                                Delete
+                                                            </AlertDialogAction>
+                                                        </AlertDialogFooter>
+                                                    </AlertDialogContent>
+                                                </AlertDialog>
+                                            )}
                                         </div>
                                     </motion.div>
                                 ))}
