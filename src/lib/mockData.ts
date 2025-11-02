@@ -310,16 +310,6 @@ export const events: Event[] = [
     highlights: 'Team Alpha dominated the finals with their fast-paced offense and tight defense, securing a 15-10 victory over Team Beta. The MVP of the tournament was Sarah from Team Alpha for her incredible layouts and 20 assists.'
   },
   {
-    id: 3,
-    name: 'Weekly Pickup Game',
-    date: '2024-07-25T18:00:00Z',
-    description: 'Casual pickup games for the community.',
-    venueId: 1,
-    organizationId: 2,
-    type: 'Meetup',
-    participants: ['3', '4', '5'],
-  },
-  {
     id: 4,
     name: 'Beach Ultimate Championship',
     date: '2024-09-10T10:00:00Z',
