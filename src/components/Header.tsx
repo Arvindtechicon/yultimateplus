@@ -140,9 +140,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
             </DropdownMenu>
             </>
           ) : (
-             <Button asChild>
-                <Link href='/leaderboard'>Leaderboard</Link>
-            </Button>
+             null
           )}
         </div>
       </div>
