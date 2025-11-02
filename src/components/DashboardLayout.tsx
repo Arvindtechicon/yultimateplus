@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -46,7 +47,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
       <Sidebar user={user} isOpen={isSidebarOpen} setOpen={setSidebarOpen} />
-      <div className="flex flex-col md:pl-64">
+      <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-72">
         <Header onMenuClick={() => setSidebarOpen(true)} />
         <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
       </div>

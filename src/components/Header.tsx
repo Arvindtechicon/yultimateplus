@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from 'next/link';
@@ -29,12 +30,14 @@ export default function Header({ onMenuClick }: HeaderProps) {
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-lg">
       <div className="container flex h-16 items-center">
-        <div className="md:hidden">
-            <Button size="icon" variant="ghost" onClick={onMenuClick}>
-                <Menu className="h-6 w-6" />
-                <span className="sr-only">Toggle Menu</span>
-            </Button>
-        </div>
+        {user && (
+            <div className="md:hidden">
+                <Button size="icon" variant="ghost" onClick={onMenuClick}>
+                    <Menu className="h-6 w-6" />
+                    <span className="sr-only">Toggle Menu</span>
+                </Button>
+            </div>
+        )}
         <Link href="/" className="mr-6 hidden md:flex items-center space-x-2">
           <Disc3 className="h-6 w-6 text-primary" />
           <span className="font-bold sm:inline-block">

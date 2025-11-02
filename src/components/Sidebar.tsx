@@ -133,7 +133,7 @@ export function Sidebar({ user, isOpen, setOpen }: SidebarProps) {
     <>
       {/* Mobile Sidebar */}
       <Sheet open={isOpen} onOpenChange={setOpen}>
-        <SheetContent side="left" className="p-0 md:hidden">
+        <SheetContent side="left" className="p-0 sm:hidden">
           <SheetHeader className="p-4 border-b">
             <SheetTitle className="flex items-center gap-2">
               <Link
@@ -153,7 +153,7 @@ export function Sidebar({ user, isOpen, setOpen }: SidebarProps) {
       </Sheet>
 
       {/* Desktop Sidebar */}
-      <aside className="hidden md:fixed md:inset-y-0 md:left-0 md:z-10 md:block md:w-64 md:border-r md:bg-background">
+      <aside className="hidden sm:fixed sm:inset-y-0 sm:left-0 sm:z-10 sm:block sm:w-72 sm:border-r sm:bg-background">
         <div className="flex h-full max-h-screen flex-col gap-2">
           <div className="flex h-16 items-center border-b px-6">
             <Link href="/" className="flex items-center gap-2 font-semibold">
