@@ -35,6 +35,43 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Function to create a default admin user if one doesn't exist
+const seedAdminUser = async (auth: any, firestore: any) => {
+    const adminEmail = 'admin123@yultimate.com';
+    const adminPass = 'admin@2025';
+    const adminUID = 'admin_user_predefined_uid'; // A predictable UID
+
+    try {
+        // Try to sign in to check if user exists in Auth
+        await signInWithEmailAndPassword(auth, adminEmail, adminPass);
+        signOut(auth); // Sign out immediately after check
+    } catch (error: any) {
+        if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+            console.log("Admin user not found, creating one...");
+            try {
+                 // The UID cannot be set deterministically on the client-side.
+                 // We will create the user and then use the generated UID.
+                const userCredential = await createUserWithEmailAndPassword(auth, adminEmail, adminPass);
+                const adminUser = userCredential.user;
+
+                const adminData: AppUser = {
+                    id: adminUser.uid,
+                    email: adminEmail,
+                    name: 'Admin',
+                    role: 'Admin',
+                };
+                
+                await setDoc(doc(firestore, 'users', adminUser.uid), adminData);
+                console.log('Admin user created successfully.');
+                await signOut(auth); // Sign out after creating
+            } catch (creationError) {
+                console.error("Failed to create admin user:", creationError);
+            }
+        }
+    }
+};
+
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AppUser | null>(null);
   const [loading, setLoading] = useState(true);
@@ -43,6 +80,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
 
   useEffect(() => {
+    if (auth && firestore) {
+        seedAdminUser(auth, firestore);
+    }
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         try {
@@ -51,7 +91,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (userDoc.exists()) {
             setUser({ id: userDoc.id, ...userDoc.data() } as AppUser);
           } else {
-            // This case might happen if the user doc creation fails after registration
             console.error('User document not found for UID:', firebaseUser.uid);
             setUser(null);
           }

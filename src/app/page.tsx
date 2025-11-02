@@ -14,13 +14,11 @@ import {
   Disc3,
   LogIn,
   UserPlus,
-  Shield,
-  Trophy,
   Briefcase,
   Heart,
+  Shield,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import type { User as UserType } from '@/lib/mockData';
 import { motion } from 'framer-motion';
 import Header from '@/components/Header';
 import { useEffect, useState } from 'react';
@@ -54,26 +52,9 @@ export default function Home() {
     login(email, password);
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        type: 'spring',
-        stiffness: 100,
-      },
-    },
+  const handleAdminLogin = () => {
+    setEmail('admin123@yultimate.com');
+    setPassword('admin@2025');
   };
 
   return (
@@ -142,6 +123,12 @@ export default function Home() {
                     Login
                   </Button>
                 </form>
+                <div className="mt-4 text-center">
+                   <Button variant="link" size="sm" onClick={handleAdminLogin}>
+                      <Shield className="mr-2 h-4 w-4" />
+                      Login as Admin
+                    </Button>
+                </div>
               </TabsContent>
               <TabsContent value="register">
                 <div className="space-y-4 pt-4 text-center">
