@@ -62,15 +62,16 @@ export function Sidebar({ user, isOpen, setOpen }: SidebarProps) {
     ];
 
     const organizerLinks = [
-        { href: '/dashboard', label: 'Overview', icon: Home },
-        { href: '/dashboard/my-events', label: 'My Events', icon: Trophy },
-        { href: '/events', label: 'All Events', icon: Calendar },
-        { href: '/team-performance', label: 'Team Performance', icon: Group },
-        { href: '/reports', label: 'Event Reports', icon: BarChart2 },
-      ];
+      { href: '/dashboard', label: 'Overview', icon: Home },
+      { href: '/dashboard/my-events', label: 'My Events', icon: Trophy },
+      { href: '/events', label: 'All Events', icon: Calendar },
+      { href: '/team-performance', label: 'Team Performance', icon: Group },
+      { href: '/reports', label: 'Event Reports', icon: BarChart2 },
+    ];
 
     const coachLinks = [
         { href: '/dashboard', label: 'Overview', icon: Home },
+        { href: '/events', label: 'Events', icon: Calendar },
         { href: '/coaching', label: 'Coaching', icon: BookOpen },
         { href: '/checkin', label: 'Session Check-in', icon: QrCode },
         { href: '/assessments', label: 'LSAS Assessments', icon: ClipboardCheck },
