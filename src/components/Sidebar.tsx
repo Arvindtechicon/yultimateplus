@@ -71,6 +71,7 @@ export function Sidebar({ user, isOpen, setOpen }: SidebarProps) {
 
     const coachLinks = [
         { href: '/dashboard', label: 'Overview', icon: Home },
+        { href: '/coaching', label: 'Coaching', icon: BookOpen },
         { href: '/checkin', label: 'Session Check-in', icon: QrCode },
         { href: '/assessments', label: 'LSAS Assessments', icon: ClipboardCheck },
         { href: '/home-visits', label: 'Home Visits', icon: Heart },
