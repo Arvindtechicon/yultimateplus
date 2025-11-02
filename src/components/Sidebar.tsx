@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -30,7 +29,6 @@ import {
 } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
 import type { User } from '@/lib/mockData';
-import { Button } from './ui/button';
 
 interface SidebarProps {
   user: User;
@@ -178,5 +176,3 @@ export function Sidebar({ user, isOpen, setOpen }: SidebarProps) {
     </>
   );
 }
-
-export default Sidebar;
