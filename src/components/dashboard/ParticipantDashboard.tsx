@@ -2,7 +2,7 @@
 
 import type { User } from '@/lib/mockData';
 import { venues, mockChildren, mockAssessments, mockSessions } from '@/lib/mockData';
-import { CalendarCheck, Search, Trophy, X, BookOpen, Home, BarChart2, AlertTriangle, QrCode } from 'lucide-react';
+import { CalendarCheck, Search, Trophy, X, BookOpen, Home, BarChart2, AlertTriangle, QrCode, Info } from 'lucide-react';
 import { StatCard } from './StatCard';
 import {
   Card,
@@ -130,7 +130,7 @@ export default function ParticipantDashboard({
       >
           {alerts.map(a => (
             <Alert key={a.id} variant={a.type}>
-              <AlertTriangle className="h-4 w-4" />
+              {a.type === 'destructive' ? <AlertTriangle className="h-4 w-4" /> : <Info className="h-4 w-4" />}
               <AlertTitle>{a.message}</AlertTitle>
             </Alert>
           ))}

@@ -2,7 +2,7 @@
 import type { User, Event, Child, HomeVisit } from '@/lib/mockData';
 import { organizations, mockSessions, mockChildren } from '@/lib/mockData';
 import { StatCard } from './StatCard';
-import { Calendar, Users, Building, PlusCircle, Home, QrCode, Percent, BookUser, AlertTriangle, Heart } from 'lucide-react';
+import { Calendar, Users, Building, PlusCircle, Home, QrCode, Percent, BookUser, AlertTriangle, Heart, Info } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '../ui/button';
 import { motion } from 'framer-motion';
@@ -115,7 +115,7 @@ export default function CoachDashboard({ user }: { user: User }) {
       >
           {alerts.map(a => (
             <Alert key={a.id} variant={a.type}>
-              <AlertTriangle className="h-4 w-4" />
+              {a.type === 'destructive' ? <AlertTriangle className="h-4 w-4" /> : <Info className="h-4 w-4" />}
               <AlertTitle>{a.message}</AlertTitle>
             </Alert>
           ))}

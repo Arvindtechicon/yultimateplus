@@ -1,6 +1,6 @@
 import { users, organizations, venues, mockChildren, mockSessions } from '@/lib/mockData';
 import { StatCard } from './StatCard';
-import { Users, Calendar, Building, MapPin, Percent, UserCheck, BarChart3, Download, AlertTriangle } from 'lucide-react';
+import { Users, Calendar, Building, MapPin, Percent, UserCheck, BarChart3, Download, AlertTriangle, Info } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -97,8 +97,8 @@ export default function AdminDashboard() {
         className="space-y-4"
       >
           {alerts.map(a => (
-            <Alert key={a.id} variant={a.type}>
-              <AlertTriangle className="h-4 w-4" />
+             <Alert key={a.id} variant={a.type}>
+              {a.type === 'destructive' ? <AlertTriangle className="h-4 w-4" /> : <Info className="h-4 w-4" />}
               <AlertTitle>{a.message}</AlertTitle>
             </Alert>
           ))}
