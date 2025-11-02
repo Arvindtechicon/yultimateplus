@@ -36,6 +36,7 @@ interface AppContextType {
   addHomeVisit: (newHomeVisitData: Omit<HomeVisit, 'id'>) => void;
   addVenue: (venueName: string, venueLocation: string) => Venue;
   addImageToEvent: (eventId: number, image: ImagePlaceholder) => void;
+  addOrganization: (newOrgData: Omit<Organization, 'id' | 'organizers'>) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -228,6 +229,17 @@ export function AppDataProvider({ children: componentChildren }: { children: Rea
     }));
   }, []);
 
+  const addOrganization = useCallback((newOrgData: Omit<Organization, 'id' | 'organizers'>) => {
+    setOrganizations(prevOrgs => [
+      ...prevOrgs,
+      {
+        ...newOrgData,
+        id: prevOrgs.length > 0 ? Math.max(...prevOrgs.map(o => o.id)) + 1 : 1,
+        organizers: [], // New orgs start with no organizers, can be assigned later
+      }
+    ]);
+  }, []);
+
   const contextValue = {
       events,
       coachingCenters,
@@ -249,6 +261,7 @@ export function AppDataProvider({ children: componentChildren }: { children: Rea
       addHomeVisit,
       addVenue,
       addImageToEvent,
+      addOrganization,
   }
 
   return (
