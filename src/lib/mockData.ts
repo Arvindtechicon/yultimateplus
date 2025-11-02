@@ -1,3 +1,4 @@
+
 export interface User {
   id: string;
   name: string;
@@ -307,16 +308,6 @@ export const events: Event[] = [
       third: 'Team Gamma',
     },
     highlights: 'Team Alpha dominated the finals with their fast-paced offense and tight defense, securing a 15-10 victory over Team Beta. The MVP of the tournament was Sarah from Team Alpha for her incredible layouts and 20 assists.'
-  },
-  {
-    id: 2,
-    name: 'Advanced Throws Workshop',
-    date: '2024-08-05T14:00:00Z',
-    description: 'Learn advanced throwing techniques from pro players.',
-    venueId: 2,
-    organizationId: 1,
-    type: 'Workshop',
-    participants: ['3', '5'],
   },
   {
     id: 3,
