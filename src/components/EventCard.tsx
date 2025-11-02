@@ -41,6 +41,7 @@ import {
   LogOut,
   Trophy,
   Eye,
+  Award,
 } from 'lucide-react';
 import type { Event } from '@/lib/mockData';
 import { organizations } from '@/lib/mockData';
@@ -55,6 +56,8 @@ import { useState } from 'react';
 import EditEventForm from './dashboard/EditEventForm';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { ScrollArea } from './ui/scroll-area';
+import SubmitResultsForm from './dashboard/SubmitResultsForm';
+import type { TeamResult } from './dashboard/SubmitResultsForm';
 
 interface EventCardProps {
   event: Event;
@@ -63,9 +66,10 @@ interface EventCardProps {
 
 export default function EventCard({ event, showEditButton }: EventCardProps) {
   const { user } = useAuth();
-  const { toggleEventRegistration, updateEvent, venues, users } = useAppData();
+  const { toggleEventRegistration, updateEvent, venues, users, teams, updateEventResults } = useAppData();
   const { toast } = useToast();
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
+  const [isResultsDialogOpen, setResultsDialogOpen] = useState(false);
   const router = useRouter();
 
   const venue = venues.find((v) => v.id === event.venueId);
@@ -102,6 +106,15 @@ export default function EventCard({ event, showEditButton }: EventCardProps) {
     });
     setEditDialogOpen(false);
   }
+
+  const handleSubmitResults = (results: { first: TeamResult; second: TeamResult; third: TeamResult; highlights: string }) => {
+    updateEventResults(event.id, results);
+    toast({
+      title: "Results Submitted!",
+      description: `Winners and scores for ${event.name} have been updated.`
+    });
+    setResultsDialogOpen(false);
+  };
 
   const handleDirectionsClick = () => {
     if (venue) {
@@ -153,6 +166,12 @@ export default function EventCard({ event, showEditButton }: EventCardProps) {
             <Users className="w-4 h-4 text-muted-foreground" />
             <span>{event.participants.length} participants</span>
           </div>
+          {event.winners && (
+             <div className="flex items-start gap-2 pt-2 text-amber-600 dark:text-amber-400">
+                <Trophy className="w-4 h-4 mt-0.5" />
+                <span className='font-semibold'>1st: {event.winners.first}</span>
+            </div>
+          )}
         </CardContent>
         <CardFooter className="grid grid-cols-2 gap-2 pt-4">
           
@@ -262,6 +281,30 @@ export default function EventCard({ event, showEditButton }: EventCardProps) {
                     </DialogContent>
                 </Dialog>
                 
+                 {isPastEvent && (
+                    <Dialog open={isResultsDialogOpen} onOpenChange={setResultsDialogOpen}>
+                        <DialogTrigger asChild>
+                             <Button variant="outline" className="w-full">
+                                <Award className="mr-2 h-4 w-4" />
+                                Manage Results
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-lg glass-card">
+                            <DialogHeader>
+                                <DialogTitle>Submit Match Results for {event.name}</DialogTitle>
+                                <DialogDescription>
+                                    Select the winning teams and update their spirit scores.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <SubmitResultsForm 
+                                event={event} 
+                                teams={teams}
+                                onSubmit={handleSubmitResults}
+                                onCancel={() => setResultsDialogOpen(false)}
+                            />
+                        </DialogContent>
+                    </Dialog>
+                )}
             </div>
           )}
           {isOrganizerOrAdmin && (

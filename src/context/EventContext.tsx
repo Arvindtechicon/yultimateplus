@@ -2,7 +2,7 @@
 "use client";
 
 import { createContext, useContext, useState, type ReactNode, useCallback, useEffect } from 'react';
-import type { Event, CoachingCenter, Session, Child, Assessment, HomeVisit, MockAlert, Venue, ImagePlaceholder, Organization, User, Participant, Coach, Organizer } from '@/lib/mockData';
+import type { Event, CoachingCenter, Session, Child, Assessment, HomeVisit, MockAlert, Venue, ImagePlaceholder, Organization, User, Participant, Coach, Organizer, Team } from '@/lib/mockData';
 import { 
     events as initialEvents, 
     coachingCenters as initialCoachingCenters, 
@@ -16,8 +16,10 @@ import {
     mockUsers as initialUsers,
     mockParticipants as initialParticipants,
     mockOrganizers as initialOrganizers,
-    mockCoaches as initialCoaches
+    mockCoaches as initialCoaches,
+    mockTeams as initialTeams
 } from '@/lib/mockData';
+import type { TeamResult } from '@/components/dashboard/SubmitResultsForm';
 
 interface AppContextType {
   events: Event[];
@@ -33,9 +35,11 @@ interface AppContextType {
   participants: Participant[];
   organizers: Organizer[];
   coaches: Coach[];
+  teams: Team[];
   tempEventImages: { [eventId: number]: ImagePlaceholder[] };
   addEvent: (newEventData: Omit<Event, 'id' | 'participants'>) => void;
   updateEvent: (eventId: number, updatedEventData: Omit<Event, 'id' | 'participants'>) => void;
+  updateEventResults: (eventId: number, results: { first: TeamResult; second: TeamResult; third: TeamResult; highlights: string }) => void;
   toggleEventRegistration: (eventId: number, userId: string) => void;
   addCoachingCenter: (newCenterData: Omit<CoachingCenter, 'id' | 'participants' | 'coordinates'>) => void;
   toggleCoachingCenterRegistration: (centerId: number, userId: string) => void;
@@ -86,6 +90,7 @@ export function AppDataProvider({ children: componentChildren }: { children: Rea
   const [participants, setParticipants] = useState<Participant[]>(() => getInitialState('y-ultimate-participants', initialParticipants));
   const [organizers, setOrganizers] = useState<Organizer[]>(() => getInitialState('y-ultimate-organizers', initialOrganizers));
   const [coaches, setCoaches] = useState<Coach[]>(() => getInitialState('y-ultimate-coaches', initialCoaches));
+  const [teams, setTeams] = useState<Team[]>(() => getInitialState('y-ultimate-teams', initialTeams));
 
   useEffect(() => { localStorage.setItem('y-ultimate-events', JSON.stringify(events)); }, [events]);
   useEffect(() => { localStorage.setItem('y-ultimate-coaching-centers', JSON.stringify(coachingCenters)); }, [coachingCenters]);
@@ -99,6 +104,7 @@ export function AppDataProvider({ children: componentChildren }: { children: Rea
   useEffect(() => { localStorage.setItem('y-ultimate-participants', JSON.stringify(participants)); }, [participants]);
   useEffect(() => { localStorage.setItem('y-ultimate-organizers', JSON.stringify(organizers)); }, [organizers]);
   useEffect(() => { localStorage.setItem('y-ultimate-coaches', JSON.stringify(coaches)); }, [coaches]);
+  useEffect(() => { localStorage.setItem('y-ultimate-teams', JSON.stringify(teams)); }, [teams]);
 
   const addUser = useCallback((user: User) => {
     setUsers(prev => [...prev, user]);
@@ -138,6 +144,52 @@ export function AppDataProvider({ children: componentChildren }: { children: Rea
         })
     );
   }, []);
+
+  const updateEventResults = useCallback((eventId: number, results: { first: TeamResult; second: TeamResult; third: TeamResult; highlights: string }) => {
+    const { first, second, third, highlights } = results;
+    
+    // Update team stats
+    setTeams(prevTeams => {
+        const teamMap = new Map(prevTeams.map(t => [t.id, {...t}]));
+
+        const updateTeam = (teamId: string, isWinner: boolean) => {
+            const team = teamMap.get(teamId);
+            if(team) {
+                if (isWinner) team.wins += 1;
+                else team.losses += 1;
+                
+                if (teamId === first.teamId) team.spiritScore = (team.spiritScore + first.spiritScore) / 2;
+                if (teamId === second.teamId) team.spiritScore = (team.spiritScore + second.spiritScore) / 2;
+                if (teamId === third.teamId) team.spiritScore = (team.spiritScore + third.spiritScore) / 2;
+            }
+        };
+
+        updateTeam(first.teamId, true);
+        updateTeam(second.teamId, false); // Simplified: assuming 2nd/3rd are losses for ranking
+        updateTeam(third.teamId, false);
+
+        return Array.from(teamMap.values());
+    });
+
+    // Update event details
+    setEvents(prevEvents => 
+        prevEvents.map(event => {
+            if (event.id === eventId) {
+                return {
+                    ...event,
+                    winners: {
+                        first: teams.find(t => t.id === first.teamId)?.name || 'Unknown',
+                        second: teams.find(t => t.id === second.teamId)?.name || 'Unknown',
+                        third: teams.find(t => t.id === third.teamId)?.name || 'Unknown',
+                    },
+                    highlights,
+                };
+            }
+            return event;
+        })
+    );
+}, [teams]);
+
 
   const toggleEventRegistration = useCallback((eventId: number, userId: string) => {
     setEvents(prevEvents =>
@@ -253,10 +305,10 @@ export function AppDataProvider({ children: componentChildren }: { children: Rea
   const contextValue = {
       events, coachingCenters, sessions, children: appChildren, assessments,
       homeVisits, alerts, venues, organizations, users, participants,
-      organizers, coaches, tempEventImages, addEvent, updateEvent, toggleEventRegistration,
+      organizers, coaches, teams, tempEventImages, addEvent, updateEvent, toggleEventRegistration,
       addCoachingCenter, toggleCoachingCenterRegistration, markSessionAttendance, addAssessment,
       addHomeVisit, addVenue, addImageToEvent, addOrganization,
-      addUser, addParticipant, addOrganizer, addCoach,
+      addUser, addParticipant, addOrganizer, addCoach, updateEventResults
   }
 
   return (
