@@ -13,7 +13,7 @@ import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useMemo } from 'react';
-import { Alert, AlertTitle } from '../ui/alert';
+import { Alert, AlertTitle, AlertDescription } from '../ui/alert';
 
 const COLORS = ['hsl(var(--primary))', 'hsl(var(--secondary-foreground))'];
 
@@ -97,9 +97,12 @@ export default function AdminDashboard() {
         className="space-y-4"
       >
           {alerts.map(a => (
-             <Alert key={a.id} variant={a.type}>
-              {a.type === 'destructive' ? <AlertTriangle className="h-4 w-4" /> : <Info className="h-4 w-4" />}
-              <AlertTitle>{a.message}</AlertTitle>
+             <Alert key={a.id} variant={a.type === 'destructive' ? 'destructive' : 'default'} className="items-start">
+              {a.type === 'destructive' ? <AlertTriangle className="h-5 w-5" /> : <Info className="h-5 w-5" />}
+              <div className='ml-2'>
+                <AlertTitle>{a.message}</AlertTitle>
+                <AlertDescription>This is a mock alert for demonstration.</AlertDescription>
+              </div>
             </Alert>
           ))}
       </motion.div>
