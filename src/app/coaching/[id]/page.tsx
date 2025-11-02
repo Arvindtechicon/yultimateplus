@@ -23,7 +23,7 @@ import { users } from '@/lib/mockData';
 import Link from 'next/link';
 
 export default function CoachingCenterDetailPage() {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const { coachingCenters, toggleCoachingCenterRegistration } = useAppData();
   const { user } = useAuth();
   const { toast } = useToast();
