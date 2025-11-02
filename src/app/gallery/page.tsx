@@ -86,7 +86,7 @@ export default function GalleryPage() {
           transition={{ duration: 0.5 }}
           className="text-center mb-12"
         >
-          <div className="inline-block p-4 bg-primary/10 rounded-full mb-4">
+          <div className="inline-block p-4 bg-gradient-to-br from-primary/10 to-transparent rounded-full shadow-inner border border-primary/20">
             <ImageIcon className="w-12 h-12 text-primary" />
           </div>
           <h1 className="text-4xl md:text-5xl font-bold tracking-tighter">
@@ -183,4 +183,3 @@ export default function GalleryPage() {
     </DashboardLayout>
   );
 }
-

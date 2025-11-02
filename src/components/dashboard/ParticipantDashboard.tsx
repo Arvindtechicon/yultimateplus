@@ -2,7 +2,7 @@
 
 import type { User } from '@/lib/mockData';
 import { venues, mockChildren, mockAssessments, mockSessions } from '@/lib/mockData';
-import { CalendarCheck, Search, Trophy, X, BookOpen, Home, BarChart2, AlertTriangle, QrCode, Info } from 'lucide-react';
+import { CalendarCheck, Search, Trophy, X, BookOpen, Home, BarChart2, AlertTriangle, QrCode, Info, BarChart } from 'lucide-react';
 import { StatCard } from './StatCard';
 import {
   Card,
@@ -32,10 +32,10 @@ import {
   Radar,
   RadarChart,
   ResponsiveContainer,
-  BarChart,
+  BarChart as BarChartRecharts,
   XAxis,
   YAxis,
-  Bar,
+  Bar as BarRecharts,
   Tooltip,
   Legend,
 } from 'recharts';
@@ -222,18 +222,18 @@ export default function ParticipantDashboard({
          >
             <Card className="glass-card">
                 <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><BarChart2 /> My Attendance Summary</CardTitle>
+                    <CardTitle className="flex items-center gap-2"><BarChart /> My Attendance Summary</CardTitle>
                     <CardDescription>Your attendance record for completed sessions.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <ChartContainer config={chartConfig} className="h-[250px] w-full">
                         <ResponsiveContainer>
-                            <BarChart data={attendanceData}>
+                            <BarChartRecharts data={attendanceData}>
                                 <XAxis dataKey="date" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
                                 <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => value > 0 ? 'Attended' : ''} domain={[0, 1]} />
                                 <Tooltip cursor={false} content={<ChartTooltipContent formatter={(value) => value > 0 ? 'Attended' : 'Absent'} hideLabel />} />
-                                <Bar dataKey="attended" fill="var(--color-attended)" radius={[4, 4, 0, 0]} />
-                            </BarChart>
+                                <BarRecharts dataKey="attended" fill="var(--color-attended)" radius={[4, 4, 0, 0]} />
+                            </BarChartRecharts>
                         </ResponsiveContainer>
                     </ChartContainer>
                 </CardContent>

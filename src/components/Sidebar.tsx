@@ -86,7 +86,7 @@ export function Sidebar({ user, isOpen, setOpen }: SidebarProps) {
         icon: ClipboardCheck,
       },
       { href: '/home-visits', label: 'Home Visits', icon: Heart },
-      { href: '/reports', label: 'Reports', icon: BarChart2 },
+      { href: '/reports', label: 'Programme Reports', icon: BarChart2 },
       { href: '/dashboard/users', label: 'Users', icon: Users },
       {
         href: '/dashboard/organizations',

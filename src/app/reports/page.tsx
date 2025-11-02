@@ -110,7 +110,7 @@ export default function ReportsPage() {
           className="flex justify-between items-center mb-12"
         >
             <div className="text-left">
-                <div className="inline-block p-4 bg-primary/10 rounded-full mb-4">
+                <div className="inline-block p-4 bg-gradient-to-br from-primary/10 to-transparent rounded-full shadow-inner border border-primary/20">
                     <BarChart2 className="w-12 h-12 text-primary" />
                 </div>
                 <h1 className="text-4xl md:text-5xl font-bold tracking-tighter">

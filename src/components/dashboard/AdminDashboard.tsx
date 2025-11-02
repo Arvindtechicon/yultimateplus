@@ -1,6 +1,6 @@
 import { mockUsers, organizations, venues, mockChildren, mockSessions } from '@/lib/mockData';
 import { StatCard } from './StatCard';
-import { Users, Calendar, Building, MapPin, Percent, UserCheck, BarChart3, Download, AlertTriangle, Info } from 'lucide-react';
+import { Users, Calendar, Building, MapPin, Percent, UserCheck, BarChart3, Download, AlertTriangle, Info, BarChart2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
