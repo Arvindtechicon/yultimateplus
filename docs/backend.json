@@ -1,0 +1,181 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user of the Y-Ultimate Pulse application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the User entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The user's full name."
+        },
+        "email": {
+          "type": "string",
+          "description": "The user's email address.",
+          "format": "email"
+        },
+        "role": {
+          "type": "string",
+          "description": "The user's role within the application (e.g., Admin, Organizer, Participant)."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "email",
+        "role"
+      ]
+    },
+    "Event": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Event",
+      "type": "object",
+      "description": "Represents an event within the Y-Ultimate Pulse application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Event entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the event."
+        },
+        "description": {
+          "type": "string",
+          "description": "A description of the event."
+        },
+        "startTime": {
+          "type": "string",
+          "description": "The start time of the event.",
+          "format": "date-time"
+        },
+        "endTime": {
+          "type": "string",
+          "description": "The end time of the event.",
+          "format": "date-time"
+        },
+        "venueId": {
+          "type": "string",
+          "description": "Reference to the Venue where the event is held. (Relationship: Venue 1:N Event)"
+        },
+        "organizerId": {
+          "type": "string",
+          "description": "Reference to the User organizing the event. (Relationship: User 1:N Event)"
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "URL of the event image stored in Firebase Storage.",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description",
+        "startTime",
+        "endTime",
+        "venueId",
+        "organizerId"
+      ]
+    },
+    "Venue": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Venue",
+      "type": "object",
+      "description": "Represents a venue where events are held.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Venue entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the venue."
+        },
+        "address": {
+          "type": "string",
+          "description": "The address of the venue."
+        },
+        "latitude": {
+          "type": "number",
+          "description": "The latitude coordinate of the venue."
+        },
+        "longitude": {
+          "type": "number",
+          "description": "The longitude coordinate of the venue."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "address",
+        "latitude",
+        "longitude"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user data. Path-based ownership ensures only the user can access their own document. Includes user's role for authorization.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/events/{eventId}",
+        "definition": {
+          "entityName": "Event",
+          "schema": {
+            "$ref": "#/backend/entities/Event"
+          },
+          "description": "Stores event data.  The 'organizerId' field indicates the event organizer. This allows listing events and restricting update/delete operations to organizers or admins.",
+          "params": [
+            {
+              "name": "eventId",
+              "description": "The unique identifier of the event."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/venues/{venueId}",
+        "definition": {
+          "entityName": "Venue",
+          "schema": {
+            "$ref": "#/backend/entities/Venue"
+          },
+          "description": "Stores venue data. Allows listing all venues.  Admin role can be checked to restrict creation/updates.",
+          "params": [
+            {
+              "name": "venueId",
+              "description": "The unique identifier of the venue."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore data structure is designed to support the Y-Ultimate Pulse application, focusing on simplicity, security, and scalability.  It leverages structural segregation and denormalization to achieve authorization independence and facilitate secure list operations (QAPs). User data is stored in `/users/{userId}`. Events, Venues and CoachingCenters are stored in top-level collections (`/events`, `/venues`).\n\nAuthorization Independence: The structure avoids hierarchical authorization dependencies by storing all necessary authorization information directly within each document.  For collaborative entities (if applicable in future), a 'members' map will be denormalized into the documents.\n\nQAPs (Rules Are Not Filters):  The segregation of data into collections with homogeneous security postures (`/users`, `/events`, `/venues`) ensures that list operations can be secured without filtering data based on document content. This approach is critical for performance and security.\n\nBy adhering to these principles, the Firestore structure promotes maintainable and secure access control, enabling atomic operations and simplifying security rule creation and debugging."
+  }
+}

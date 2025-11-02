@@ -1,0 +1,96 @@
+/**
+ * @fileoverview Firestore Security Rules for Y-Ultimate Pulse.
+ *
+ * Core Philosophy:
+ * This ruleset prioritizes a secure, owner-based access control model for user data,
+ * combined with public read access and restricted write access for events and venues.
+ * Authorization decisions are made independently at each level of the hierarchy.
+ *
+ * Data Structure:
+ * - /users/{userId}: Stores individual user profiles, accessible only to the user themselves.
+ * - /events/{eventId}: Stores event information, publicly readable but writable only by the organizer or an admin (not yet implemented).
+ * - /venues/{venueId}: Stores venue information, publicly readable, with write access potentially restricted to admins (not yet implemented).
+ *
+ * Key Security Decisions:
+ * - User listing is disallowed to protect privacy.
+ * - Events and Venues are publicly readable to facilitate discovery.
+ * - Default security posture for ambiguous relationships is strict owner-only access.
+ *
+ * Denormalization for Authorization:
+ * - Events: The `organizerId` field within each event document is used to quickly verify ownership for updates and deletes, avoiding costly `get()` operations.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * @description Controls access to user profile data.
+     * @path /users/{userId}
+     * @allow (create) Signed-in user can create their own profile if the userId matches their auth.uid.
+     * @allow (get, list, update, delete) Signed-in user can only access their own profile.
+     * @deny (create) User cannot create a profile with an ID that does not match their own auth.uid.
+     * @deny (get, list, update, delete) User cannot access other user profiles.
+     * @principle Enforces strict user-ownership for all operations on user profiles.
+     */
+    match /users/{userId} {
+      function isSignedIn() {
+        return request.auth != null;
+      }
+
+      function isOwner(userId) {
+        return request.auth.uid == userId;
+      }
+
+      function isExistingOwner(userId) {
+          return isOwner(userId) && resource != null;
+      }
+
+      allow create: if isSignedIn() && isOwner(userId) && request.resource.data.id == request.auth.uid;
+      allow get: if isOwner(userId);
+      allow list: if false;
+      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Controls access to event data.
+     * @path /events/{eventId}
+     * @allow (get, list) Anyone can read event details.
+     * @allow (create) Signed-in user can create a new event, and organizerId must match their uid.
+     * @deny (update, delete) Only the event organizer can update or delete the event.
+     * @principle Allows public read access while restricting write access to the organizer.
+     */
+    match /events/{eventId} {
+      function isSignedIn() {
+        return request.auth != null;
+      }
+
+      function isOwner(organizerId) {
+        return request.auth.uid == organizerId;
+      }
+
+      function isExistingOwner(organizerId) {
+          return isOwner(organizerId) && resource != null;
+      }
+
+      allow get: if true;
+      allow list: if true;
+      allow create: if isSignedIn() && request.resource.data.organizerId == request.auth.uid;
+      allow update: if isExistingOwner(resource.data.organizerId);
+      allow delete: if isExistingOwner(resource.data.organizerId);
+    }
+
+    /**
+     * @description Controls access to venue data.
+     * @path /venues/{venueId}
+     * @allow (get, list) Anyone can read venue details.
+     * @deny (create, update, delete) Only admins can create, update, or delete venues (not yet implemented).
+     * @principle Allows public read access but restricts write access (currently disabled).
+     */
+    match /venues/{venueId} {
+      allow get: if true;
+      allow list: if true;
+      allow create, update, delete: if false; // TODO: Implement admin-only write access.
+    }
+  }
+}
