@@ -245,31 +245,37 @@ export default function GalleryPage() {
         </motion.div>
 
         <motion.div 
-            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+            className="grid grid-cols-2 md:grid-cols-4 auto-rows-[250px] gap-4"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
         >
-            {albums.map(album => (
+            {albums.map((album, index) => (
                 album.images.length > 0 ? (
-                    <motion.div key={album.id} variants={itemVariants}>
+                    <motion.div 
+                        key={album.id} 
+                        variants={itemVariants} 
+                        className={`relative rounded-lg overflow-hidden group
+                            ${index === 0 ? 'col-span-2 row-span-2' : ''}
+                            ${index === 3 ? 'md:col-span-2' : ''}
+                        `}
+                    >
                     <Dialog>
                         <DialogTrigger asChild>
-                            <Card className="group relative overflow-hidden rounded-lg cursor-pointer glass-card h-full flex flex-col">
-                                <CardContent className="p-0">
-                                    <Image
-                                        src={album.images[0].imageUrl}
-                                        alt={album.images[0].description}
-                                        width={400}
-                                        height={300}
-                                        className="object-cover w-full aspect-video transition-transform duration-300 group-hover:scale-105"
-                                    />
-                                </CardContent>
-                                <div className="p-4 flex-grow flex flex-col justify-between">
-                                    <h3 className="font-semibold text-base leading-tight truncate">{album.name}</h3>
-                                    <p className="text-sm text-muted-foreground">{album.images.length} photos</p>
+                            <div className="w-full h-full cursor-pointer">
+                                <Image
+                                    src={album.images[0].imageUrl}
+                                    alt={album.images[0].description}
+                                    layout='fill'
+                                    objectFit='cover'
+                                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                                <div className="absolute bottom-0 left-0 p-4 text-white">
+                                    <h3 className="font-semibold text-lg leading-tight truncate">{album.name}</h3>
+                                    <p className="text-sm opacity-80">{album.images.length} photos</p>
                                 </div>
-                            </Card>
+                            </div>
                         </DialogTrigger>
                         <DialogContent className="max-w-6xl p-4 md:p-6 glass-card">
                              <DialogHeader>
