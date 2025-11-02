@@ -317,10 +317,10 @@ function MapComponent() {
       >
         <div className='p-2 space-y-4'>
             <h2 className="text-2xl font-bold">Points of Interest</h2>
-             <Card className="p-4 glass-card">
+             <div className="space-y-2">
                 <div className="flex gap-2">
                 <Input
-                    placeholder="Enter your starting location"
+                    placeholder="Your starting point..."
                     value={userLocation}
                     onChange={(e) => setUserLocation(e.target.value)}
                     disabled={!selectedPoi}
@@ -330,15 +330,15 @@ function MapComponent() {
                     disabled={!selectedPoi || !userLocation}
                 >
                     <Navigation className="mr-2 h-4 w-4" />
-                    Get Directions
+                    Go
                 </Button>
                 </div>
                 {!selectedPoi && (
-                <p className="text-sm text-muted-foreground mt-2">
-                    Select a point of interest from the list to get directions.
+                <p className="text-sm text-muted-foreground">
+                    Select a point of interest to get directions.
                 </p>
                 )}
-            </Card>
+            </div>
         </div>
         <div className='overflow-y-auto space-y-4 p-2 flex-grow'>
         {pointsOfInterest.map((poi, i) => (
