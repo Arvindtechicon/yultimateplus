@@ -10,6 +10,7 @@
  * - /users/{userId}: Stores individual user profiles, accessible only to the user themselves.
  * - /events/{eventId}: Stores event information, publicly readable but writable only by the organizer or an admin (not yet implemented).
  * - /venues/{venueId}: Stores venue information, publicly readable, with write access potentially restricted to admins (not yet implemented).
+ * - /organizations/{organizationId}: Stores organization data. Can be created by any signed-in user, but only managed by its members.
  *
  * Key Security Decisions:
  * - User listing is disallowed to protect privacy.
@@ -18,6 +19,7 @@
  *
  * Denormalization for Authorization:
  * - Events: The `organizerId` field within each event document is used to quickly verify ownership for updates and deletes, avoiding costly `get()` operations.
+ * - Organizations: The `organizers` array within each document is used to verify management permissions.
  */
 rules_version = '2';
 service cloud.firestore {
@@ -91,6 +93,30 @@ service cloud.firestore {
       allow get: if true;
       allow list: if true;
       allow create, update, delete: if false; // TODO: Implement admin-only write access.
+    }
+
+    /**
+     * @description Controls access to organization data.
+     * @path /organizations/{organizationId}
+     * @allow (create) Any signed-in user can create a new organization.
+     * @allow (get, list) Anyone can read organization details.
+     * @deny (update, delete) Only a member of the 'organizers' array can update/delete.
+     * @principle Allows public read access while restricting write access to members.
+     */
+    match /organizations/{organizationId} {
+        function isSignedIn() {
+            return request.auth != null;
+        }
+
+        function isOrganizer() {
+            // Ensure the user's UID is in the list of organizers for the existing document.
+            return isSignedIn() && request.auth.uid in resource.data.organizers;
+        }
+
+        allow get: if true;
+        allow list: if true;
+        allow create: if isSignedIn() && request.auth.uid in request.resource.data.organizers;
+        allow update, delete: if isOrganizer();
     }
   }
 }
