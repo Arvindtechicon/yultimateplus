@@ -112,7 +112,6 @@ export default function OrganizerRegistrationForm() {
     } catch (error: any) {
       // This catch block will now primarily handle errors from the `register` function (Auth),
       // as the Firestore error is handled in the `.catch` block above.
-      console.error('Organizer registration failed:', error);
       // The toast for auth errors is handled within AuthContext's register function.
     } finally {
       setIsLoading(false);
