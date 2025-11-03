@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -10,29 +11,119 @@ import {
 } from '@/components/ui/card';
 import { useAuth } from '@/context/AuthContext';
 import {
-  Disc3,
+  Heart,
   LogIn,
   UserPlus,
   Briefcase,
-  Heart,
-  Shield,
   ArrowRight,
+  Shield,
+  Trophy,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import Header from '@/components/Header';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+
+const RoleCard = ({ icon, title, description, loginAction, registerHref }: { icon: React.ReactNode, title: string, description: string, loginAction: () => void, registerHref: string }) => {
+    return (
+        <motion.div
+            whileHover={{ y: -5, boxShadow: '0px 10px 30px rgba(99, 60, 255, 0.2)' }}
+            className="flex-1"
+        >
+            <Card className="glass-card flex flex-col items-center text-center h-full p-6">
+                <CardHeader className="p-0 items-center">
+                    <div className="p-4 bg-primary/10 rounded-full mb-4">
+                        {icon}
+                    </div>
+                    <CardTitle className="text-2xl">{title}</CardTitle>
+                    <CardDescription className="mt-2">{description}</CardDescription>
+                </CardHeader>
+                <CardContent className="p-0 flex-grow w-full flex flex-col justify-end mt-6 gap-3">
+                    <Button onClick={loginAction} className="w-full">
+                        <LogIn className="mr-2 h-4 w-4" />
+                        Login as {title}
+                    </Button>
+                     <Button variant="outline" className="w-full" asChild>
+                        <Link href={registerHref}>
+                            <UserPlus className="mr-2 h-4 w-4" />
+                            Sign Up as {title}
+                        </Link>
+                    </Button>
+                </CardContent>
+            </Card>
+        </motion.div>
+    );
+};
+
+const LoginModal = ({ isOpen, onOpenChange }: { isOpen: boolean, onOpenChange: (open: boolean) => void }) => {
+    const { login } = useAuth();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+
+    const handleLogin = (e: React.FormEvent) => {
+        e.preventDefault();
+        login(email, password);
+    };
+
+    const handleAdminLogin = () => {
+        setEmail('admin123@yultimate.com');
+        setPassword('admin@2025');
+    };
+
+    return (
+        <Dialog open={isOpen} onOpenChange={onOpenChange}>
+            <DialogContent className="sm:max-w-md glass-card">
+                <DialogHeader>
+                    <DialogTitle>Welcome Back</DialogTitle>
+                    <DialogDescription>
+                        Enter your credentials to access your account.
+                    </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleLogin} className="space-y-4 pt-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="email">Email</Label>
+                        <Input
+                        id="email"
+                        type="email"
+                        placeholder="m@example.com"
+                        required
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="password">Password</Label>
+                        <Input
+                        id="password"
+                        type="password"
+                        required
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        />
+                    </div>
+                    <Button type="submit" className="w-full">
+                        <LogIn className="mr-2 h-4 w-4" /> Login
+                    </Button>
+                </form>
+                <div className="mt-4 text-center">
+                    <Button variant="link" size="sm" onClick={handleAdminLogin}>
+                        <Shield className="mr-2 h-4 w-4" />
+                        Login as Admin
+                    </Button>
+                </div>
+            </DialogContent>
+        </Dialog>
+    )
+}
 
 export default function Home() {
-  const { login, user, loading } = useAuth();
+  const { user, loading } = useAuth();
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showAuthForm, setShowAuthForm] = useState(false);
+  const [isLoginModalOpen, setLoginModalOpen] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -48,15 +139,7 @@ export default function Home() {
     );
   }
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    login(email, password);
-  };
-
-  const handleAdminLogin = () => {
-    setEmail('admin123@yultimate.com');
-    setPassword('admin@2025');
-  };
+  const openLogin = () => setLoginModalOpen(true);
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-background">
@@ -73,9 +156,6 @@ export default function Home() {
           transition={{ duration: 0.5 }}
           className="text-center space-y-4 mb-12"
         >
-          <div className="inline-block p-4 bg-gradient-to-br from-primary/10 to-transparent rounded-full shadow-inner border border-primary/20">
-            <Disc3 className="w-16 h-16 text-primary" />
-          </div>
           <h1 className="text-4xl md:text-6xl font-extrabold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
             Y-Ultimate Pulse
           </h1>
@@ -84,107 +164,37 @@ export default function Home() {
           </p>
         </motion.div>
 
-        <AnimatePresence>
-          {!showAuthForm ? (
-            <motion.div
-                key="get-started"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.3 }}
-            >
-              <Button size="lg" onClick={() => setShowAuthForm(true)} className="group">
-                Get Started
-                <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-              </Button>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="auth-card"
-              initial={{ opacity: 0, y: 20, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 20, scale: 0.95 }}
-              transition={{ duration: 0.4, ease: 'easeInOut' }}
-              className="w-full max-w-sm"
-            >
-              <Card className="w-full glass-card">
-                <CardHeader>
-                  <CardTitle>Welcome</CardTitle>
-                  <CardDescription>
-                    Login or register to continue.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Tabs defaultValue="login" className="w-full">
-                    <TabsList className="grid w-full grid-cols-2">
-                      <TabsTrigger value="login">Login</TabsTrigger>
-                      <TabsTrigger value="register">Register</TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="login">
-                      <form onSubmit={handleLogin} className="space-y-4 pt-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="email">Email</Label>
-                          <Input
-                            id="email"
-                            type="email"
-                            placeholder="m@example.com"
-                            required
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="password">Password</Label>
-                          <Input
-                            id="password"
-                            type="password"
-                            required
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                          />
-                        </div>
-                        <Button type="submit" className="w-full">
-                          Login
-                        </Button>
-                      </form>
-                      <div className="mt-4 text-center">
-                        <Button variant="link" size="sm" onClick={handleAdminLogin}>
-                            <Shield className="mr-2 h-4 w-4" />
-                            Login as Admin
-                        </Button>
-                      </div>
-                    </TabsContent>
-                    <TabsContent value="register">
-                      <div className="space-y-4 pt-4 text-center">
-                        <p className="text-sm text-muted-foreground">
-                          Choose your role to get started:
-                        </p>
-                        <Button variant="outline" className="w-full" asChild>
-                          <Link href={`/register/participant`}>
-                            <UserPlus className="mr-2 h-4 w-4" />
-                            Sign Up as Participant
-                          </Link>
-                        </Button>
-                        <Button variant="outline" className="w-full" asChild>
-                          <Link href={`/register/organizer`}>
-                            <Briefcase className="mr-2 h-4 w-4" />
-                            Sign Up as Organizer
-                          </Link>
-                        </Button>
-                        <Button variant="outline" className="w-full" asChild>
-                          <Link href={`/register/coach`}>
-                            <Heart className="mr-2 h-4 w-4" />
-                            Sign Up as Coach
-                          </Link>
-                        </Button>
-                      </div>
-                    </TabsContent>
-                  </Tabs>
-                </CardContent>
-              </Card>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="w-full max-w-5xl flex flex-col md:flex-row gap-8"
+        >
+            <RoleCard 
+                icon={<Heart className="w-8 h-8 text-primary" />}
+                title="Coach"
+                description="Manage sessions and track child progress."
+                loginAction={openLogin}
+                registerHref="/register/coach"
+            />
+             <RoleCard 
+                icon={<Briefcase className="w-8 h-8 text-primary" />}
+                title="Organizer"
+                description="Create and manage your own events."
+                loginAction={openLogin}
+                registerHref="/register/organizer"
+            />
+             <RoleCard 
+                icon={<Trophy className="w-8 h-8 text-primary" />}
+                title="Participant"
+                description="Join events and track your activity."
+                loginAction={openLogin}
+                registerHref="/register/participant"
+            />
+        </motion.div>
+        
+        <LoginModal isOpen={isLoginModalOpen} onOpenChange={setLoginModalOpen} />
+
       </main>
     </div>
   );
