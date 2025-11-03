@@ -21,6 +21,8 @@ import { useState } from 'react';
 import type { Organizer } from '@/lib/mockData';
 import { useFirebase } from '@/firebase';
 import { collection, addDoc } from 'firebase/firestore';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 const formSchema = z
   .object({
@@ -81,16 +83,37 @@ export default function OrganizerRegistrationForm() {
         name: data.orgName,
         organizers: [userCredential.user.uid],
       };
-      await addDoc(collection(firestore, 'organizations'), newOrg);
+      
+      const orgsCollectionRef = collection(firestore, 'organizations');
+
+      // Use non-blocking write with contextual error handling
+      addDoc(orgsCollectionRef, newOrg).catch(serverError => {
+          const permissionError = new FirestorePermissionError({
+              path: orgsCollectionRef.path,
+              operation: 'create',
+              requestResourceData: newOrg
+          });
+          errorEmitter.emit('permission-error', permissionError);
+
+          // We can still show a generic error to the user while the detailed
+          // error is shown in the dev overlay.
+          toast({
+              variant: 'destructive',
+              title: 'Organization Creation Failed',
+              description: 'You may not have the required permissions.'
+          });
+      });
 
       toast({
         title: '✅ Registration Successful!',
         description: `Welcome, ${data.personalName}! Your organizer account is ready.`,
       });
-      // The router.push is handled by the AuthContext's onAuthStateChanged effect
+      
     } catch (error: any) {
+      // This catch block will now primarily handle errors from the `register` function (Auth),
+      // as the Firestore error is handled in the `.catch` block above.
       console.error('Organizer registration failed:', error);
-      // Toast is handled within AuthContext's register function
+      // The toast for auth errors is handled within AuthContext's register function.
     } finally {
       setIsLoading(false);
     }
