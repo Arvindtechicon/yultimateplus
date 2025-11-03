@@ -109,19 +109,13 @@ const LoginModal = ({ isOpen, onOpenChange }: { isOpen: boolean, onOpenChange: (
                         <LogIn className="mr-2 h-4 w-4" /> Login
                     </Button>
                 </form>
-                <div className="mt-4 text-center">
-                    <Button variant="link" size="sm" onClick={handleAdminLogin}>
-                        <Shield className="mr-2 h-4 w-4" />
-                        Login as Admin
-                    </Button>
-                </div>
             </DialogContent>
         </Dialog>
     )
 }
 
 export default function Home() {
-  const { user, loading } = useAuth();
+  const { user, loading, login } = useAuth();
   const router = useRouter();
   const [isLoginModalOpen, setLoginModalOpen] = useState(false);
 
@@ -140,6 +134,10 @@ export default function Home() {
   }
 
   const openLogin = () => setLoginModalOpen(true);
+  
+  const handleAdminLoginClick = () => {
+    login('admin123@yultimate.com', 'admin@2025');
+  };
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-background">
@@ -193,6 +191,18 @@ export default function Home() {
             />
         </motion.div>
         
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="mt-12"
+        >
+            <Button variant="link" onClick={handleAdminLoginClick}>
+                <Shield className="mr-2 h-4 w-4" />
+                Login as Admin
+            </Button>
+        </motion.div>
+
         <LoginModal isOpen={isLoginModalOpen} onOpenChange={setLoginModalOpen} />
 
       </main>
