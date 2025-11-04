@@ -206,6 +206,9 @@ export default function Home() {
         <LoginModal isOpen={isLoginModalOpen} onOpenChange={setLoginModalOpen} />
 
       </main>
+      <footer className="relative z-10 py-4 text-center text-sm text-muted-foreground">
+        built with ❤️ by Tech Terrific
+      </footer>
     </div>
   );
 }
