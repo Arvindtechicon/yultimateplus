@@ -5,7 +5,7 @@
 
 Y-Ultimate Pulse is a comprehensive platform designed to manage sports events, coaching programs, and participant progress, with a primary focus on Ultimate Frisbee communities. It provides distinct experiences for different user roles, including Admins, Organizers, Coaches, and Participants, each with a dashboard and tools tailored to their needs.
 
-![Y-Ultimate Pulse Dashboard](https://yultimateplus.vercel.app/)
+![https://yultimateplus.vercel.app/]
 
 ---
 
